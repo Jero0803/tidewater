@@ -647,8 +647,8 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   tiempo jugado, última vez; Jugar y Borrar (el segundo clic confirma, "¿Borrar del todo?"). Nueva partida con nombre
   (en blanco: "Partida N"); con 5, avisa que hay que borrar una.
 - Borrar la partida que se está jugando deja de guardarla y carga la siguiente.
-- **Pendiente menor:** la guía de primeras veces (`tidewater.guide`) es común a todas las partidas; una partida
-  nueva no vuelve a mostrar la bienvenida (se puede repetir con F1).
+- La guía de primeras veces (`tidewater.guide`) es común a todas las partidas: la bienvenida sale solo la primera
+  vez que se abre el juego, no en cada partida nueva (decidido; se puede repetir con F1).
 - 10 tests nuevos. Probado en el navegador: crear "Prueba" (empieza en nivel 1, $0, básica regalada), volver a la
   Partida 1 con su progreso, borrar con confirmación desde la pantalla de inicio (corregido: el clic de borrar
   arrancaba el juego), panel, escribir el nombre sin activar atajos.
@@ -739,3 +739,5 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   **La Fase 1 queda programada.** 10 tests nuevos (todos pasan).
 - **2026-11-18** · Decidido D49 y programados los **perfiles de partida**: hasta 5 partidas con nombre, en la
   pantalla de inicio y en el panel (jugar, crear, borrar). 10 tests nuevos (todos pasan).
+- **2026-11-18** · Decidido: la bienvenida sale solo la primera vez que se abre el juego, no en cada partida nueva
+  (así funciona ya; sin cambios de código).
