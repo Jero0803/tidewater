@@ -6,6 +6,7 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
 import { CatchMinigame } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
+import { activeMap } from '../maps/registry.js';
 import { FishingRod } from './FishingRod.js';
 import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
@@ -36,8 +37,11 @@ export class Game {
 		this.profiles = new Profiles();
 		const prof = this.profile = this.profiles.active;
 		this.state = new GameState( undefined, { key: this.profiles.saveKey( prof.id ), legacy: this.profiles.legacy( prof.id ) } );
-		this.state.onSaved = ( s ) => this.profiles.touch( prof.id, { level: s.level, money: s.money, played: Math.round( s.playedSeconds ) } );
+		this.state.onSaved = ( s ) => this.profiles.touch( prof.id, { level: s.level, money: s.money, played: Math.round( s.playedSeconds ), map: s.mapId } );
 		this.state.load();
+		// the map this page loaded (maps/registry.js): its log and licences become the current ones
+		this.map = activeMap();
+		this.state.mapId = this.map.id;
 		// the game clock carries on from the saved hour (D16)
 		if ( this.state.hour !== null && ! ( app.qs && app.qs.has( 'bench' ) ) ) app.settings.timeOfDay = this.state.hour;
 		this.rod = new FishingRod( { scene: app.scene, camera: app.camera, query: app.query, terrain: app.terrainData, audio: app.audio } );

@@ -1,5 +1,6 @@
 import { loc } from '../i18n.js';
 import { MAX_PROFILES } from './Profiles.js';
+import { mapById } from '../maps/registry.js';
 
 // Save profiles in the interface (Profiles holds the data, Game switches / creates / deletes):
 //   start screen   under "Click to explore": the current game in one line and "Change", which opens the list
@@ -102,9 +103,10 @@ export class ProfilesUI {
 	summary( p ) {
 
 		const s = this.game.state;
-		const sum = p.id === this.game.profile.id ? { level: s.level, money: s.money, played: s.playedSeconds } : p.summary;
+		const sum = p.id === this.game.profile.id ? { level: s.level, money: s.money, played: s.playedSeconds, map: s.mapId } : p.summary;
 		if ( ! sum ) return loc( 'New game', 'Partida nueva' );
-		return `${ loc( 'Lv', 'Nv' ) } ${ sum.level } · $${ Math.round( sum.money ).toLocaleString() } · ${ played( sum.played ) }`;
+		const map = mapById( sum.map );
+		return `${ map ? map.name + ' · ' : '' }${ loc( 'Lv', 'Nv' ) } ${ sum.level } · $${ Math.round( sum.money ).toLocaleString() } · ${ played( sum.played ) }`;
 
 	}
 

@@ -1,7 +1,7 @@
 import { WORLD } from '../world/WorldLayout.js';
 import { STAND } from './FishStand.js';
 import { CHANDLERY } from './Chandlery.js';
-import { ISLAND_SPOTS } from './Spots.js';
+import { SPOTS } from './Spots.js';
 
 // Minimap, lower right: the island baked once from the terrain data into a 2D canvas (depth-tinted
 // sea, reef and seagrass, sand, grass and forest by height, rock, paths, village pads, the pier,
@@ -147,7 +147,7 @@ export class Minimap {
 
 			} },
 		];
-		this.spots = ISLAND_SPOTS.map( ( s ) => {
+		this.spots = SPOTS.map( ( s ) => {
 
 			const el = h( 'div', 'gm-spot', `<span>${ s.name }</span>` );
 			this.marks.prepend( el );

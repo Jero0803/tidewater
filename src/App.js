@@ -19,7 +19,7 @@ import { Clouds } from './sky/Clouds.js';
 import { SkyProClouds } from './sky/SkyProClouds.js';
 import { Environment } from './sky/Environment.js';
 
-import { TerrainData } from './world/TerrainData.js';
+import { activeMap } from './maps/registry.js';
 import { TerrainGPU } from './world/TerrainGPU.js';
 import { Terrain } from './world/Terrain.js';
 import { computeShoreField } from './world/ShoreField.js';
@@ -137,7 +137,10 @@ export class App {
 
 		// ---------------------------------------------------------------- island
 		await progress( 0.06, loc( 'Shaping the island…', 'Dando forma a la isla…' ) );
-		this.terrainData = new TerrainData();
+		// the active map's terrain generator (maps/registry.js; changing map reloads the page)
+		this.map = activeMap();
+		const TerrainGen = await this.map.terrain();
+		this.terrainData = new TerrainGen();
 		this.colliders = new Colliders();
 		// the village flattens building pads into the heightmap: build it before any terrain
 		// data is derived (shore field, GPU textures, meshes)

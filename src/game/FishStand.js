@@ -1,4 +1,5 @@
 import { loc } from '../i18n.js';
+import { activeMap } from '../maps/registry.js';
 import { Group, Mesh, Vector3, BoxGeometry, Matrix4, Quaternion } from '../engine/index.js';
 import { mergeGeometries } from '../engine/geometry/BufferGeometryUtils.js';
 import { prepare, mergePrepared, box, cylinder, sphere, rod, mat4 } from '../world/boat/GeoKit.js';
@@ -13,7 +14,7 @@ import { FISH } from './FishTable.js';
 // chalkboard of prices and a hand-painted sign, and the buyer behind it. Built from photoscanned
 // surfaces and props (StallKit, Poly Haven CC0); the old procedural stall is the fallback if they
 // fail to load.
-export const STAND = { x: 49.9, z: - 74.6, yaw: 1.45 }; // beside the boardwalk up from the pier foot, facing it
+export const STAND = activeMap().vendors.stand; // where the active map puts Joe's stand (maps/*.js)
 
 const STALL_FLOOR = 0.06; // top of the stall's plank floor (local y)
 const ICE_TOP = 1.27; // top of the ice in the chest on the counter (local y)

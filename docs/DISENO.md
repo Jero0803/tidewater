@@ -671,12 +671,27 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
-| L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | Pendiente |
+| L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | **Hecha** (2026-11-18) |
 | L2 | Viaje | Desde el amarre del bote (E): destinos y costo; vender o soltar la nevera antes de viajar (D20) | Pendiente |
 | L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | Pendiente |
 | L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | Pendiente |
 | L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | Pendiente |
 | Pulido | Por capas | Vegetación fría (pinos, eucaliptos, frailejones, juncos), pieles de peces de agua dulce, sonido de montaña, niebla y cielo de altura | Después |
+
+**Entrega L1, cómo quedó el registro:**
+
+- `src/maps/island.js` reúne todo lo propio de la isla: nombre, índice de XP, generador de terreno (se carga al
+  arrancar), distribución (`layout`: muelle, amarre, pueblo, arrecife, inicio, oleaje), vendedores, sus 18
+  especies, sus 5 spots, sus licencias y qué sistemas tiene (`features`: arrecife, rompiente, aves marinas,
+  ballena, palmeras; se usarán desde L3).
+- `src/maps/registry.js`: `activeMap()` decide el mapa de esta carga: `?map=<id>` en la dirección (para probar),
+  el mapa guardado en la partida activa o el mapa por defecto. Seguro en Node (isla).
+- Leen el mapa activo: `WorldLayout.js` (los 21 archivos que lo usan no cambiaron), los puestos de Joe y Marta, los
+  spots, las licencias, las especies que pican (`Bites`), la lista de la tienda, el guardado (mapa de la partida y
+  multiplicador de XP) y el terreno (`App`).
+- Las partidas muestran su mapa en el menú ("Partida 1 · La isla · Nv 5 · …").
+- 6 tests nuevos. Probado en el navegador: la isla se ve y rinde igual (168 fps), la partida carga igual; el
+  simulador (incluido el terreno en Node) da lo mismo.
 
 **A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
@@ -772,3 +787,5 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · Empieza el Mapa 1. Revisado el motor (agua, peces y vegetación sirven; el terreno y la
   distribución de la isla hay que generalizarlos). Decididos D50 (prototipo jugable primero), D51 (inspirado en la
   Laguna de Tota) y D52 (lago como inicio, isla libre). Plan de 5 entregas (L1–L5) más pulido.
+- **2026-11-18** · **L1 hecha:** registro de mapas; la isla es el primer mapa (`src/maps/island.js`) y todo lo
+  propio de ella se lee del mapa activo. Se ve y juega idéntico. 6 tests nuevos (todos pasan).

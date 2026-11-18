@@ -1,4 +1,5 @@
 import { FISH } from './FishTable.js';
+import { activeMap } from '../maps/registry.js';
 
 // Phase 1 progression rules (docs/DISENO.md, D8–D44): size classes, XP and levels, licences. Pure functions on
 // plain data, no DOM and no state of their own, so they run in Node (tests, tools/balance) as well as in the game.
@@ -94,14 +95,9 @@ export function dayPhase( hour ) {
 
 }
 
-// prices and minimum levels while the island is the starting map (D37 island prices for a 24-minute day, scaled ×5
-// with the 120-minute day, D47; D43 levels 4 and 7)
-export const LICENSES = [
-	null,
-	{ tier: 1, id: 'basic', price: 175, minLevel: 1 },
-	{ tier: 2, id: 'intermediate', price: 500, minLevel: 4 },
-	{ tier: 3, id: 'advanced', price: 1000, minLevel: 7 },
-];
+// prices and minimum levels of the active map's licences ([ null, basic, intermediate, advanced ], maps/*.js; the
+// island: D37 prices ×5 for the 120-minute day, D47; levels 4 and 7, D43)
+export const LICENSES = activeMap().licenses;
 // the HUD and a toast warn when the active licence has this much left
 export const LICENSE_WARN_SECONDS = 5 * 60;
 

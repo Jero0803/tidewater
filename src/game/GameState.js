@@ -2,6 +2,7 @@ import { FISH, fishLengthCm } from './FishTable.js';
 import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE, convertLegacyUpgrades } from './Gear.js';
 import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES,
 	sizeClass, classValue, releaseReason, licenseTierOf } from './Progression.js';
+import { activeMap } from '../maps/registry.js';
 
 // Save version 3 (docs/DISENO.md D20, D44): v2 plus the Phase 1 shop (float rig by grade). Older saves are read from
 // their own keys and converted (v1 -> v2 -> v3); the old keys are left untouched, so going back to an older build
@@ -9,7 +10,7 @@ import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicens
 const SAVE_KEY = 'tidewater.save.v3';
 const SAVE_KEY_V2 = 'tidewater.save.v2';
 const SAVE_KEY_V1 = 'tidewater.save.v1';
-export const START_MAP = 'island';
+export const START_MAP = 'island'; // the map of the saves from before maps existed (v1 / v2 conversions)
 const PLAYED_SAVE_EVERY = 10; // seconds of play between saves of the played-time counter
 
 // Everything the player owns, split as D20 says: what travels with the player (wallet, XP, played time, gear, the
@@ -32,8 +33,8 @@ export class GameState {
 		this._playedSavedAt = 0;
 		this.hour = null; // game clock (0..24) when last saved; null = the world's default
 		this.inventory = []; // { id, species, kg, cm, value, caughtAt (game hours), record }
-		this.mapId = START_MAP;
-		this.maps = { [ START_MAP ]: newMapData() }; // map id -> { log, licences }
+		this.mapId = activeMap().id; // the map being played (saved: the next load opens it, maps/registry.js)
+		this.maps = { [ this.mapId ]: newMapData() }; // map id -> { log, licences }
 		// the last addFish (the catch card): { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept,
 		// cls (size class id), xp (gained), level, levelUp (levels gained), reason (why released: 'juvenile' | 'protected'
 		// | 'license' | 'full' | null), tier (licence tier the species needs) }
@@ -173,7 +174,7 @@ export class GameState {
 		const reason = releaseReason( species, kg, this.licenseTier ) || ( this.fits( kg ) ? null : 'full' );
 		const kept = ! reason;
 		const levelBefore = this.level;
-		const xp = catchXp( species, kg, { newSpecies } );
+		const xp = catchXp( species, kg, { newSpecies, mapIndex: activeMap().xpIndex } );
 		this.xp += xp;
 		const level = this.level;
 		this.lastCatch = { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept, cls, xp, level, levelUp: level - levelBefore, reason, tier: licenseTierOf( species ) };
@@ -375,8 +376,8 @@ export class GameState {
 		this.playedSeconds = 0;
 		this.hour = null;
 		this.inventory = [];
-		this.mapId = START_MAP;
-		this.maps = { [ START_MAP ]: newMapData() };
+		this.mapId = activeMap().id;
+		this.maps = { [ this.mapId ]: newMapData() };
 		this.upgrades = defaultUpgrades();
 		this.fuel = null;
 		this.save();

@@ -3,6 +3,7 @@ import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { UPGRADES, nextLevel, FUEL_PRICE } from './Gear.js';
 import { FishPortrait } from './FishPortrait.js';
 import { levelFromXp, LICENSES, LICENSE_WARN_SECONDS, DAY_SECONDS, licenseTierOf, dayPhase } from './Progression.js';
+import { activeMap } from '../maps/registry.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -577,7 +578,7 @@ GameHUD.prototype.renderShop = function () {
 	const active = s.licenseTier;
 	const licRows = LICENSES.filter( Boolean ).map( ( L ) => {
 
-		const names = FISH_IDS.filter( ( id ) => licenseTierOf( id ) === L.tier && ! FISH[ id ].protected ).map( ( id ) => FISH[ id ].name ).join( ', ' );
+		const names = activeMap().species.filter( ( id ) => licenseTierOf( id ) === L.tier && ! FISH[ id ].protected ).map( ( id ) => FISH[ id ].name ).join( ', ' );
 		const own = s.licences[ L.tier ] > s.playedSeconds;
 		const block = s.licenseBlock( L.tier );
 		const status = own ? `${ loc( 'Active', 'Activa' ) } · ${ minutes( s.licences[ L.tier ] - s.playedSeconds ) }${ L.tier < active ? ' · ' + loc( 'covered by a higher one', 'cubierta por una superior' ) : '' }`

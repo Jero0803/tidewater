@@ -1,4 +1,5 @@
 import { loc } from '../i18n.js';
+import { activeMap } from '../maps/registry.js';
 import { Group, Mesh, Vector3, Matrix4 } from '../engine/index.js';
 import { prepare, mergePrepared, box, cylinder, sphere, rod, torus, mat4 } from '../world/boat/GeoKit.js';
 import { createPropMaterial, PAT } from './GameMaterials.js';
@@ -9,7 +10,7 @@ import { loadStallAssets, KitBuilder, LAYER, ATLAS, place, Shapes } from './Stal
 // reels, display shelves of rope and floats behind her, a rack of rods, jerrycans of diesel, fenders,
 // a coil of mooring line and a hand-painted sign on posts (StallKit, Poly Haven CC0; the old
 // procedural table is the fallback). Sells the gear levels in Gear.js and fuel.
-export const CHANDLERY = { x: 85.5, z: - 60.5, yaw: - 1.9 }; // faces the beach and the pier
+export const CHANDLERY = activeMap().vendors.chandlery; // where the active map puts Marta's chandlery (maps/*.js)
 
 export class Chandlery {
 

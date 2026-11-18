@@ -1,4 +1,8 @@
-import { FISH, FISH_IDS } from './FishTable.js';
+import { FISH } from './FishTable.js';
+import { activeMap } from '../maps/registry.js';
+
+// the species that bite on the active map (maps/*.js)
+const MAP_FISH = activeMap().species;
 
 // Where the bobber is and what lives there.
 //   depth     water depth under the bobber (m)
@@ -41,7 +45,7 @@ export function pickSpecies( habitat, hour, rng = Math.random ) {
 
 	let total = 0;
 	const w = [];
-	for ( const id of FISH_IDS ) {
+	for ( const id of MAP_FISH ) {
 
 		const f = FISH[ id ];
 		let hw = 0;
@@ -57,11 +61,11 @@ export function pickSpecies( habitat, hour, rng = Math.random ) {
 	for ( let i = 0; i < w.length; i ++ ) {
 
 		r -= w[ i ];
-		if ( r <= 0 ) return FISH_IDS[ i ];
+		if ( r <= 0 ) return MAP_FISH[ i ];
 
 	}
 
-	return FISH_IDS[ FISH_IDS.length - 1 ];
+	return MAP_FISH[ MAP_FISH.length - 1 ];
 
 }
 

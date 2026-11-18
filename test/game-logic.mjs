@@ -5,6 +5,8 @@ import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
 import { Profiles, MAX_PROFILES, INDEX_KEY } from '../src/game/Profiles.js';
+import { MAPS, DEFAULT_MAP, activeMap, mapById, currentMapId } from '../src/maps/registry.js';
+import { WORLD } from '../src/world/WorldLayout.js';
 import { gearStats, defaultUpgrades, UPGRADES, convertLegacyUpgrades } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
 	LICENSES, LICENSE_SECONDS, CLOCK_HOURS_PER_SECOND, dayPhase, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
@@ -433,6 +435,20 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	ok( P.list.length === 1 && P.active.id === 'p6' && ! m.has( 'tidewater.save.v3' ), 'profiles: deleting them all leaves one new game (ids never reused)' );
 	m.set( INDEX_KEY, '{broken' );
 	ok( new Profiles( sto ).list.length === 1, 'profiles: a broken index starts over with one game' );
+
+}
+// ---- map registry (L1, docs/DISENO.md 7d)
+{
+
+	const m = activeMap();
+	ok( DEFAULT_MAP === 'island' && currentMapId() === 'island' && m === MAPS.island && mapById( 'nope' ) === null, 'maps: the island is the default and active map (in Node)' );
+	ok( WORLD === m.layout && WORLD.pier.x === 55 && WORLD.reef.radius === 58, 'maps: the world layout is the one of the active map' );
+	ok( m.species.length === 18 && m.species.every( ( id ) => FISH[ id ] ) && m.species.length === FISH_IDS.length, 'maps: the island lists its 18 species' );
+	ok( LICENSES === m.licenses && LICENSES[ 2 ].price === 500 && ISLAND_SPOTS === m.spots, 'maps: licences and spots come from the map' );
+	let onlyMap = true;
+	for ( let i = 0; i < 400; i ++ ) if ( ! m.species.includes( pickSpecies( habitatAt( { depth: 8, reefDist: 20, pierDist: 30 } ), 12, rng ) ) ) onlyMap = false;
+	ok( onlyMap, 'maps: only the species of the map bite' );
+	ok( new GameState( { getItem: () => null, setItem: () => {} } ).mapId === 'island', 'maps: a new game is on the active map' );
 
 }
 console.log( `value check ${ value }` );
