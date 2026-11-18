@@ -92,6 +92,8 @@ hacia arriba (mapas de nivel más alto).
 | D36 | **Por ahora, cada técnica es un aparejo completo (caña + carrete + sedal) que sube de nivel** ("Aparejo de spinning nivel 3"). La bodega y el bote siguen siendo globales. Más adelante se evaluará separar piezas (caña, carrete, sedal, gramos del señuelo) | Pocas compras y fácil de entender para empezar; se puede refinar después | 2026-11-18 |
 | D37 | **Tienda por técnicas aprobada:** aparejos de flotador, spinning, fondo, casting y curricán por grado (grado = número del mapa), bodega y bote globales; precio = precio estándar del mapa × factor de la técnica; licencias por mapa (5 / 15 / 25 % de lo ganado en un día) | El equipo de cada mapa cuesta el 30–58 % de lo ganado en él y siempre sobra dinero | 2026-11-18 |
 | D38 | **La pelea profunda se une a las técnicas en una sola fase** (Fase 2): freno ajustable y equipo equilibrado llegan junto con spinning, casting, fondo y curricán | Con la pelea actual el grado del aparejo casi no importa; la pelea nueva es la que le da sentido | 2026-11-18 |
+| D39 | **La Fase 1 solo implementa lo que ya existe en el código:** clases de tamaño, XP, niveles, licencias, spots y, de la tienda, el **aparejo de flotador** por grados más la bodega y el bote. Las demás técnicas llegan en la Fase 2 | La Fase 1 se puede programar y probar pronto sin depender de mecánicas nuevas | 2026-11-18 |
+| D40 | **La isla empieza con 5 spots con nombre**, equivalentes a los cinco tipos de agua que ya calcula el juego: playa de la bahía (bajos), muelle, arrecife de la bahía, centro de la bahía (bahía) y mar abierto (profundo). Entre spots se usa el más cercano. **Futuros:** bajo de arena del este, farallones y la plataforma | Conserva casi igual el equilibrio actual; el sistema de spots cuesta lo mismo con 5 que con 8 y los otros se agregan barato después | 2026-11-18 |
 
 ---
 
@@ -410,9 +412,21 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
   midiendo con el simulador como referencia.
 - [x] ~~XP para abrir el mapa 2 y cómo crece~~ Resuelto con D32: cada mapa abre 10 niveles después (~5 h por mapa).
 
-**Spots (D9)**
-- [ ] Lista de spots de la isla actual y qué especies tiene cada uno
-- [ ] ¿Qué pasa entre spots? (propuesta: el spot más cercano, o una lista genérica de "aguas abiertas")
+**Spots (D9, D40)**
+- [x] ~~Lista de spots de la isla~~ Cinco spots (D40, tabla abajo).
+- [x] ~~¿Qué pasa entre spots?~~ Se usa el spot más cercano (D40).
+- [ ] Probabilidades exactas de cada especie por spot (se calibran con el simulador al implementar, para conservar el reparto de dinero medido)
+
+| Spot | Equivale a (tipo de agua actual) | Profundidad medida | Cómo se llega | Especies (frecuente → rara) |
+|---|---|---|---|---|
+| Playa de la bahía | Bajos | 0.5–2 m | A pie | Lisa, agujón, pejerrey cabezón → jurel (alba y ocaso) |
+| Muelle | Muelle | ~4 m en la punta | A pie | Sargento mayor, ronco → rabirrubia, agujón → sábalo (noche) |
+| Arrecife de la bahía | Arrecife | 2–9 m | A pie desde la playa oeste o en bote | Ronco, sargento, cirujano, cromis → rabirrubia, ángel, loro, pez perro |
+| Centro de la bahía | Bahía | 10–17 m | Bote | Barracuda, jurel, rabirrubia → ronco → sábalo (noche) |
+| Mar abierto | Profundo | 22 m a 800 m al sur; 90 m a 1,100 m | Bote (gasta diésel) | Pargo colorado, atún, dorado → mero, barracuda |
+
+Spots futuros (medidos): **bajo de arena del este** (~1.5 m, dentro de la bahía al este), **farallones** (0.5–2 m entre
+las rocas de las puntas de los cabos) y **la plataforma** (13–22 m, 300–800 m al sur, afuera de la bahía).
 
 **Licencias por pez (D10–D13)**
 - [x] ~~¿Por especie o por grupo?~~ Tres licencias (D11).
@@ -574,3 +588,6 @@ mejora se desbloquea en cada nivel.
   Pendientes: la licencia avanzada del lago y la lentitud de la primera hora.
 - **2026-11-18** · Decididos D37 (tienda por técnicas aprobada) y D38 (pelea profunda unida a las técnicas en la
   Fase 2). Hoja de ruta actualizada.
+- **2026-11-18** · Decididos D39 (la Fase 1 solo implementa lo que ya existe: flotador, bodega y bote) y D40
+  (cinco spots en la isla, equivalentes a los tipos de agua actuales; tres spots futuros anotados). Medidas las
+  profundidades reales de la isla para ubicar los spots.
