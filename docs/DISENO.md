@@ -103,6 +103,9 @@ hacia arriba (mapas de nivel más alto).
 | D47 | **Un día del juego dura 120 minutos reales** (1 hora del juego = 5 minutos reales; reemplaza D22). La licencia sigue durando un día del juego (D21), o sea 120 min de juego, y **su precio sube ×5** para mantener el equilibrio medido: en la isla básica $175, intermedia $500, avanzada $1,000. El aviso de licencia por vencer salta a los 5 min. Los precios de licencias de los demás mapas (sección 6) están calculados para un día de 24 min: se multiplican ×5 | Con 24 min el día pasaba demasiado rápido | 2026-11-18 |
 | D48 | **Tienda de la Fase 1:** precios de la tabla aprobada ($8,550 en total). Mientras el flotador sea la única técnica usa las estadísticas completas de su grado (×1.0; el ×0.8 de D37 entra en la Fase 2): el grado 0 es el equipo inicial de siempre y el 6 iguala o supera al mejor de antes. **Conversión de mejoras viejas (D44):** lo gastado en sedal, carrete y caña da el grado de flotador más alto que alcance y el resto se devuelve en dinero; bodega, tanque y motor pasan al primer grado de igual o mayor capacidad; sonda y luces se conservan | Nadie pierde nada y la isla sigue alcanzable con una sola técnica | 2026-11-18 |
 | D49 | **Perfiles de partida:** hasta 5 partidas con nombre en el navegador, cada una con su guardado. Se eligen en la pantalla de inicio (partida actual y "Cambiar") y en el panel (H → Juego → Partidas): jugar, crear y borrar (pide confirmar). Cambiar de partida recarga la página, como el idioma. La partida que ya existía pasa a ser "Partida 1" con su guardado de siempre | Ver el avance de cada partida y empezar de cero sin perder la otra | 2026-11-18 |
+| D50 | **El lago se hace como prototipo jugable primero:** preparar mapas (M1), luego un lago jugable aunque se vea básico (terreno, agua en calma, 7 especies, 5 spots, viaje) y después se pule por capas (vegetación fría, pieles de los peces, sonidos, niebla) | Saber pronto si el proyecto funciona con más de un mapa | 2026-11-18 |
+| D51 | **El Mapa 1 se inspira en la Laguna de Tota** (Boyacá): playa de arena blanca, islas, laderas con cultivos y páramo, pueblo pesquero, trucha | Una referencia concreta para el terreno y el ambiente | 2026-11-18 |
+| D52 | **Con solo dos mapas, el lago es el inicio y la isla queda libre:** las partidas nuevas empiezan en el lago; a la isla se puede viajar desde el principio, pero sus licencias intermedia y avanzada piden los niveles de la isla. Las partidas actuales siguen en la isla. Se ajusta cuando existan los mapas 2 a 5 | Sin mapas intermedios, el nivel 51 de las bandas dejaría la isla inalcanzable | 2026-11-18 |
 
 ---
 
@@ -653,6 +656,31 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   Partida 1 con su progreso, borrar con confirmación desde la pantalla de inicio (corregido: el clic de borrar
   arrancaba el juego), panel, escribir el nombre sin activar atajos.
 
+## 7d. Plan del Mapa 1 · Lago (D50–D52)
+
+**Lo que encontramos en el motor (2026-11-18):**
+- **Sirve tal cual:** el agua (el océano en preajuste "Calma", sin oleaje de fondo ni rompiente, se comporta como
+  lago), los peces procedurales (cada especie es anatomía en números + patrón de piel: no hacen falta modelos 3D),
+  la vegetación procedural, el pueblo, el muelle, los vendedores, el bote, los perfiles, la Fase 1 y el sonido de
+  bosque (`bird_forest.ogg`).
+- **Cuesta:** el terreno de la isla es un generador escrito a mano para un volcán con bahía (~1,000 líneas): el
+  lago necesita el suyo. Además 21 archivos leen la distribución de la isla (`WorldLayout.js`: muelle, arrecife,
+  pueblo…), así que primero la isla tiene que pasar a ser "un mapa de un registro".
+
+**Entregas:**
+
+| # | Entrega | Contenido | Estado |
+|---|---|---|---|
+| L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | Pendiente |
+| L2 | Viaje | Desde el amarre del bote (E): destinos y costo; vender o soltar la nevera antes de viajar (D20) | Pendiente |
+| L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | Pendiente |
+| L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | Pendiente |
+| L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | Pendiente |
+| Pulido | Por capas | Vegetación fría (pinos, eucaliptos, frailejones, juncos), pieles de peces de agua dulce, sonido de montaña, niebla y cielo de altura | Después |
+
+**A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
+(D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -741,3 +769,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   pantalla de inicio y en el panel (jugar, crear, borrar). 10 tests nuevos (todos pasan).
 - **2026-11-18** · Decidido: la bienvenida sale solo la primera vez que se abre el juego, no en cada partida nueva
   (así funciona ya; sin cambios de código).
+- **2026-11-18** · Empieza el Mapa 1. Revisado el motor (agua, peces y vegetación sirven; el terreno y la
+  distribución de la isla hay que generalizarlos). Decididos D50 (prototipo jugable primero), D51 (inspirado en la
+  Laguna de Tota) y D52 (lago como inicio, isla libre). Plan de 5 entregas (L1–L5) más pulido.
