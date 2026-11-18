@@ -9,7 +9,8 @@
 // Secciones: peces (probabilidad de sacar cada especie), zonas (qué pica dónde y cuándo),
 // dinero ($/min por zona y equipo), nevera (minutos hasta llenarla), alcance (profundidad que
 // alcanza cada caña desde el muelle y distancia del muelle a aguas profundas), progreso (cuánto
-// cuesta todo y cuánto se tarda en pagarlo).
+// cuesta todo y cuánto se tarda en pagarlo), fase1 (reglas de src/game/Progression.js: clases de tamaño, XP,
+// licencias; dinero y XP por spot y licencia, y horas estimadas para cada nivel).
 //
 // Los resultados son reproducibles: Math.random se sustituye por un generador con semilla, así
 // que dos ejecuciones con la misma semilla dan lo mismo y un cambio en los datos del juego se ve
@@ -46,6 +47,7 @@ const { FISH, FISH_IDS, fishValue } = await import( '../../src/game/FishTable.js
 const { habitatAt, pickSpecies, rollWeight, biteDelay } = await import( '../../src/game/Bites.js' );
 const { CatchMinigame } = await import( '../../src/game/CatchMinigame.js' );
 const { UPGRADES, FUEL_PRICE, fuelBurn } = await import( '../../src/game/Gear.js' );
+const P = await import( '../../src/game/Progression.js' );
 
 const LINES = UPGRADES.line.levels, REELS = UPGRADES.reel.levels;
 
@@ -323,5 +325,55 @@ if ( show( 'progreso' ) ) {
 		console.log( `- En ${ z } con ${ gear } (${ money( r.perMin ) }/min): ${ ( total / r.perMin ).toFixed( 0 ) } min de pesca para comprarlo todo (sin contar viajes ni ventas).` );
 
 	}
+
+}
+
+// ---------------------------------------------------------------- fase1
+if ( show( 'fase1' ) ) {
+
+	title( '7. Fase 1 (reglas de src/game/Progression.js): por spot y licencia, equipo inicial, nevera de 30 kg' );
+	console.log( 'Con viajes a vender cuando se llena la nevera (orilla y muelle 1 min, bahía 2, arrecife 2.5, profundo 5).' );
+	console.log( 'Los juveniles y los peces sin licencia se sueltan (dan XP). Todavía no está conectado al juego.\n' );
+	const TRIP = { orilla: 1, muelle: 1, arrecife: 2.5, bahía: 2, profundo: 5 };
+	const session = ( spotName, tier, minutes = 180 ) => {
+
+		const h = habitatAt( SPOTS[ spotName ] );
+		let t = 0, money = 0, xp = 0, kg = 0;
+		const seen = new Set();
+		while ( t < minutes * 60 ) {
+
+			const sp = pickSpecies( h, 12 );
+			const w = rollWeight( sp );
+			const r = fight( sp, w, 0, 0, 'humano' );
+			t += CAST_S + biteDelay( h, 12 ) + NIBBLE_S + r.t;
+			if ( r.state !== 'caught' ) continue;
+			t += CARD_S;
+			xp += P.catchXp( sp, w, { newSpecies: ! seen.has( sp ) } );
+			seen.add( sp );
+			if ( ! P.canKeep( sp, w, tier ) ) continue;
+			if ( kg + w > 30 ) { t += TRIP[ spotName ] * 60; kg = 0; }
+			kg += w;
+			money += P.classValue( sp, w );
+
+		}
+
+		const hrs = t / 3600;
+		return { xpH: xp / hrs, perDay: money / hrs * P.DAY_SECONDS / 3600 };
+
+	};
+	const rows = [];
+	const best = {};
+	for ( const tier of [ 1, 2, 3 ] ) for ( const sn of Object.keys( SPOTS ) ) {
+
+		const r = session( sn, tier );
+		rows.push( [ [ '', 'básica', 'intermedia', 'avanzada' ][ tier ], sn, Math.round( r.xpH ), money( r.perDay ), money( r.perDay - P.LICENSES[ tier ].price ) ] );
+		best[ tier ] = Math.max( best[ tier ] || 0, r.xpH );
+
+	}
+
+	table( [ 'Licencia', 'Spot', 'XP/h', '$/día de juego (24 min)', 'Neto tras pagar la licencia' ], rows );
+	const xph = ( best[ 1 ] + best[ 2 ] + best[ 3 ] ) / 3;
+	console.log( `\nNiveles (curva ${ P.LEVEL_BASE_XP } × ${ P.LEVEL_GROWTH }^(N − 1)), a ~${ Math.round( xph ) } XP/h (media de los mejores spots):` );
+	for ( const L of [ 4, 7, 10, 20 ] ) console.log( `- Nivel ${ L }: ${ P.totalXpForLevel( L ).toLocaleString( 'es' ) } XP · ~${ ( P.totalXpForLevel( L ) / xph ).toFixed( 1 ) } h` );
 
 }

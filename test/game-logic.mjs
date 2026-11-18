@@ -4,6 +4,8 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from '../src/game/Bites
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState } from '../src/game/GameState.js';
 import { gearStats, defaultUpgrades, UPGRADES } from '../src/game/Gear.js';
+import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
+	LICENSES, LICENSE_SECONDS, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
 
 let fails = 0;
 const ok = ( c, msg ) => {
@@ -169,6 +171,64 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	st.money = 1000;
 	ok( st.buy( 'fuel' ) && st.fuelL === 80, 'a new tank comes full' );
 	ok( st.buy( 'fishFinder' ) && st.stats.finder === true && st.buy( 'fishFinder' ) === null, 'fish finder: one level' );
+
+}
+
+// ---- Phase 1 progression rules (src/game/Progression.js, docs/DISENO.md)
+{
+
+	// size classes by position in the species' weight range (grunt: 0.3–1.2 kg)
+	ok( sizeClass( 'grunt', 0.3 ).id === 'juvenile' && sizeClass( 'grunt', 0.43 ).id === 'juvenile', 'class: the lightest 15 % are juveniles' );
+	ok( sizeClass( 'grunt', 0.5 ).id === 'common' && sizeClass( 'grunt', 0.92 ).id === 'common', 'class: up to 70 % are common' );
+	ok( sizeClass( 'grunt', 1.0 ).id === 'trophy' && sizeClass( 'grunt', 1.12 ).id === 'trophy', 'class: up to 92 % are trophies' );
+	ok( sizeClass( 'grunt', 1.15 ).id === 'unique' && sizeClass( 'grunt', 5 ).id === 'unique', 'class: the last 8 % (and beyond) are unique' );
+	ok( sizeClass( 'grunt', 0.01 ).id === 'juvenile', 'class: below the range is still a juvenile' );
+	// class frequencies with the game's own weight distribution: ~42 / 43 / 11 / 4 %
+	const cnt = {};
+	let n = 0;
+	for ( const id of FISH_IDS ) for ( let i = 0; i < 1500; i ++ ) { const c = sizeClass( id, rollWeight( id, rng ) ).id; cnt[ c ] = ( cnt[ c ] || 0 ) + 1; n ++; }
+	const pct = ( c ) => cnt[ c ] / n * 100;
+	ok( Math.abs( pct( 'juvenile' ) - 42 ) < 3 && Math.abs( pct( 'common' ) - 43 ) < 3 && Math.abs( pct( 'trophy' ) - 11 ) < 2 && Math.abs( pct( 'unique' ) - 4 ) < 1.5,
+		`class frequencies ${ SIZE_CLASSES.map( ( c ) => `${ c.id } ${ pct( c.id ).toFixed( 1 ) }%` ).join( ', ' ) }` );
+
+	// value: price × kg × class multiplier, juveniles worth nothing
+	ok( classValue( 'grunt', 0.35 ) === 0, 'value: juveniles are worth $0' );
+	ok( classValue( 'grunt', 0.8 ) === Math.round( 7 * 0.8 ) && classValue( 'grunt', 1.0 ) === Math.round( 7 * 1.0 * 1.5 ) && classValue( 'grunt', 1.2 ) === Math.round( 7 * 1.2 * 3 ), 'value: common ×1, trophy ×1.5, unique ×3' );
+
+	// XP: ( class XP × difficulty + 3/kg + 20 if new ) × map multiplier
+	ok( Math.abs( difficulty( 'grunt' ) - 1.5 ) < 1e-9 && Math.abs( difficulty( 'tarpon' ) - 3 ) < 1e-9, 'XP: difficulty 1 + 2 × fight' );
+	ok( catchXp( 'grunt', 0.8 ) === Math.round( 3 * 1.5 + 3 * 0.8 ), 'XP: a common grunt' );
+	ok( catchXp( 'grunt', 0.8, { newSpecies: true } ) === Math.round( 3 * 1.5 + 3 * 0.8 + 20 ), 'XP: +20 for a new species' );
+	ok( catchXp( 'grunt', 0.35 ) >= 1, 'XP: juveniles still give XP' );
+	ok( Math.abs( mapXpMultiplier( 5 ) - 3.0517578125 ) < 1e-9 && catchXp( 'grunt', 0.8, { mapIndex: 1 } ) === Math.round( ( 3 * 1.5 + 3 * 0.8 ) * 1.25 ), 'XP: ×1.25 per map along the chain' );
+
+	// levels: 600 × 1.03^(N − 1) to go from N to N + 1
+	ok( xpToNext( 1 ) === 600 && xpToNext( 2 ) === 618 && xpToNext( 10 ) === Math.round( 600 * 1.03 ** 9 ), 'levels: XP to the next level' );
+	ok( Math.abs( totalXpForLevel( 10 ) - 6095 ) < 15 && Math.abs( totalXpForLevel( 60 ) - 94400 ) < 300, `levels: level 10 at ${ totalXpForLevel( 10 ) } XP, level 60 at ${ totalXpForLevel( 60 ) } XP` );
+	ok( levelFromXp( 0 ).level === 1 && levelFromXp( 599 ).level === 1 && levelFromXp( 600 ).level === 2 && levelFromXp( 600 ).into === 0, 'levels: thresholds' );
+	let roundTrip = true;
+	for ( const L of [ 1, 2, 7, 23, 60, 100 ] ) if ( levelFromXp( totalXpForLevel( L ) ).level !== L || levelFromXp( totalXpForLevel( L ) - 1 ).level !== Math.max( 1, L - 1 ) ) roundTrip = false;
+	ok( roundTrip, 'levels: total XP and level agree (no cap)' );
+
+	// licences: tiers per species, cumulative, one game day of played time, extendable
+	ok( FISH_IDS.every( ( id ) => [ 1, 2, 3 ].includes( licenseTierOf( id ) ) ), 'licences: every island species has a tier' );
+	ok( licenseTierOf( 'grunt' ) === 1 && licenseTierOf( 'yellowtail' ) === 2 && licenseTierOf( 'tuna' ) === 3 && licenseTierOf( 'tarpon' ) === 3, 'licences: tiers follow D14' );
+	ok( LICENSES[ 2 ].minLevel === 4 && LICENSES[ 3 ].minLevel === 7 && LICENSES[ 1 ].price < LICENSES[ 2 ].price && LICENSES[ 2 ].price < LICENSES[ 3 ].price, 'licences: levels 4 and 7, rising prices' );
+	const start = starterLicences();
+	ok( activeLicenseTier( start, 0 ) === 1 && activeLicenseTier( start, LICENSE_SECONDS - 1 ) === 1 && activeLicenseTier( start, LICENSE_SECONDS ) === 0, 'licences: the free basic one lasts one game day (24 min played)' );
+	let lic = withLicense( start, 3, 100 );
+	ok( activeLicenseTier( lic, 200 ) === 3 && licenseSecondsLeft( lic, 200 ) === 100 + LICENSE_SECONDS - 200, 'licences: the highest running tier counts' );
+	lic = withLicense( lic, 3, 500 );
+	ok( lic[ 3 ] === 100 + 2 * LICENSE_SECONDS, 'licences: buying again while it runs adds another day' );
+	ok( withLicense( { 2: 50 }, 2, 1000 )[ 2 ] === 1000 + LICENSE_SECONDS, 'licences: an expired one starts again from now' );
+
+	// keeping a catch
+	ok( canKeep( 'grunt', 0.8, 1 ) && ! canKeep( 'yellowtail', 1.0, 1 ) && canKeep( 'yellowtail', 1.0, 2 ) && canKeep( 'grunt', 0.8, 3 ), 'keep: needs the tier or higher (cumulative)' );
+	ok( ! canKeep( 'grunt', 0.35, 3 ) && releaseReason( 'grunt', 0.35, 3 ) === 'juvenile', 'keep: juveniles always go back' );
+	ok( releaseReason( 'tuna', 8, 2 ) === 'license' && releaseReason( 'tuna', 8, 3 ) === null, 'keep: release reason' );
+	FISH.grunt.protected = true;
+	ok( ! canKeep( 'grunt', 0.8, 3 ) && releaseReason( 'grunt', 0.8, 3 ) === 'protected' && classValue( 'grunt', 0.8 ) === 0, 'keep: protected species are catch and release only' );
+	delete FISH.grunt.protected;
 
 }
 console.log( `value check ${ value }` );

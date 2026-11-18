@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** la Fase 1 está definida (D8–D44). Siguiente paso: planificar cómo programarla. Todavía no se ha escrito código de jugabilidad nuevo.
+**Estado:** programando la Fase 1. Entrega 1 de 6 hecha (reglas en `src/game/Progression.js`, todavía sin conectar al juego).
 
 ---
 
@@ -98,6 +98,7 @@ hacia arriba (mapas de nivel más alto).
 | D42 | **La hora del panel de ajustes (H) queda bloqueada en el juego:** el reloj avanza solo (D16). Solo se puede mover en el modo foto | Sacar fotos al atardecer sin hacer trampa con la hora de los peces | 2026-11-18 |
 | D43 | **Mientras la isla sea el inicio (D25):** los seis grados de aparejo y de bodega se compran solo con dinero, sin nivel mínimo; las licencias intermedia y avanzada piden los niveles 4 y 7. Cuando exista la cadena, cada grado se ata a su mapa | El jugador de la isla necesita poder llegar al equipo de la isla | 2026-11-18 |
 | D44 | **Guardado versión 2:** se conservan dinero, nevera y registro; cada mejora vieja pasa al grado más parecido por su valor (sedal y caña al aparejo de flotador, nevera a la bodega equivalente); el nivel inicial se calcula con la XP que habrían dado los peces del registro. Nadie pierde nada | Compatibilidad con las partidas actuales | 2026-11-18 |
+| D45 | **Mientras la isla sea el mapa de inicio, su multiplicador de XP es ×1.0** (el del primer mapa de la cadena). Cuando haya mapas por debajo, pasa a ×3.05 | Coherente con D25: el multiplicador depende de la posición del mapa en la cadena | 2026-11-18 |
 
 ---
 
@@ -534,6 +535,26 @@ mejora se desbloquea en cada nivel.
 
 ---
 
+## 7b. Plan de programación de la Fase 1
+
+Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda jugable entre una y otra.
+
+| # | Entrega | Contenido | Estado |
+|---|---|---|---|
+| 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de 24 min jugados, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
+| 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | Pendiente |
+| 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | Pendiente |
+| 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | Pendiente |
+| 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
+| 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
+
+**Medición de la entrega 1** (`npm run balance -- --solo=fase1`, reglas reales, isla como inicio): básica ~$220 por
+día en la orilla; intermedia ~$470–490 en el arrecife y la bahía; avanzada ~$1,190 en el profundo (~$990 neto).
+Con la XP de la isla (×1.0, D45), el nivel 4 llega en ~0.9 h, el 7 en ~1.8 h y el 10 en ~2.9 h: más rápido que las
+~5 h de la meta, porque la curva se calibró con la XP del lago y la isla da más XP por hora. Es aceptable mientras la
+isla sea el inicio; se recalibra cuando exista el lago. Con la básica, el profundo es el spot que más XP da (se
+sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -596,3 +617,6 @@ mejora se desbloquea en cada nivel.
 - **2026-11-18** · Decididos D41 (la pausa no detiene la licencia), D42 (hora bloqueada salvo en el modo foto),
   D43 (en la isla como inicio, grados por dinero y licencias en los niveles 4 y 7) y D44 (guardado versión 2 con
   conversión). **La Fase 1 queda definida.**
+- **2026-11-18** · Empieza la programación de la Fase 1. **Entrega 1 hecha:** reglas en `src/game/Progression.js`,
+  licencia por especie en `FishTable.js`, 31 tests nuevos (todos pasan), sección `fase1` en el simulador. Decidido
+  D45 (la isla como inicio usa XP ×1.0). El juego todavía no usa estas reglas.
