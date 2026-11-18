@@ -175,6 +175,58 @@ la progresión y después se construyen hacia abajo los mapas de inicio, empezan
 
 Cada mapa tiene sus propias licencias básica, intermedia y avanzada (D11, D20), con niveles mínimos dentro de su banda.
 
+### Mapa 1 · Lago de montaña (propuesta, 2026-11-17)
+
+Inspirado en los lagos andinos (Tota, Neusa, Tominé en Colombia; Titicaca en Perú y Bolivia). Agua dulce, fría,
+quieta y clara. Medido contra la isla con `node --no-warnings tools/balance/mapa1-propuesta.mjs`.
+
+**Especies** (tamaños, precios y relación largo-peso **aproximados, por validar**):
+
+| Especie | Licencia | kg | $/kg | Fuerza | Hora | $/pez medio | XP/pez medio |
+|---|---|---|---|---|---|---|---|
+| Guapucha | Básica | 0.005–0.02 | 2 | Mínima | Día | $0 | 4.5 |
+| Carachi | Básica | 0.02–0.15 | 3 | Mínima | Día | $0.1 | 4.6 |
+| Pejerrey | Básica | 0.1–1.2 | 4 | Baja | Día | $2.1 | 7.2 |
+| Capitán de la sabana | **Protegida** (solo XP) | 0.1–0.8 | — | Baja | Noche | — | 7.8 |
+| Trucha arcoíris | Intermedia | 0.2–4 | 6 | Media | Alba y ocaso | $10.4 | 12.7 |
+| Carpa común | Intermedia | 0.5–12 | 2 | Media-alta | Siempre | $10.1 | 21.2 |
+| Trucha café | Avanzada | 0.5–6 | 8 | Media-alta | Alba y ocaso | $21.4 | 16.1 |
+
+**Spots:** orilla de juncos (guapucha, carachi, capitán), muelle del pueblo (pejerrey, carachi, trucha pequeña),
+desembocadura de la quebrada (trucha arcoíris, algo de trucha café), bahía de lodo (carpa, capitán), centro
+profundo en bote (truchas grandes, trucha café, carpa).
+
+**Resultados frente a la isla** (equipo inicial, nevera de 30 kg, jugador humano):
+
+| | Lago: XP/h | Isla: XP/h | Lago: $/día | Isla: $/día |
+|---|---|---|---|---|
+| Licencia básica | 760–2,160 | 1,360–2,540 | $3–55 | $70–216 |
+| Licencia intermedia | 660–1,580 | 1,320–2,190 | $19–259 | $89–554 |
+| Licencia avanzada | 710–1,550 | 1,190–1,410 | $21–294 | $294–1,382 |
+
+**Hallazgos:**
+- **El dinero escala bien:** el lago da ~20–40 % de lo que da la isla con la misma licencia.
+- **La XP casi no escala:** el lago da ~70–85 % de la XP de la isla, porque la XP depende sobre todo de la
+  cantidad de peces (en los dos mapas salen ~100–140 por hora). Hace falta que la XP crezca con el mapa.
+- **La carpa da la XP más alta del lago** (pesa mucho) pero pide licencia intermedia: con la básica conviene
+  pescar carpa y soltarla para subir de nivel (efecto de D13). Aceptable, pero hay que tenerlo en cuenta.
+- **Guapucha y carachi no valen dinero** (son del tamaño de una carnada). Idea para la Fase 2: que sirvan como
+  **carnada viva** en lugar de venderse.
+- **Todo se saca con el sedal inicial:** correcto para el mapa de inicio.
+- **Idea nueva: especies protegidas.** El capitán de la sabana es vulnerable en la vida real: en el juego solo
+  se puede pescar y soltar (da XP, no dinero). Lo mismo podría aplicarse a otras especies amenazadas.
+
+### Bandas de niveles: propuesta de modelo (2026-11-17)
+
+Con la XP actual, una curva global 100 × (N − 1)² haría que la banda de la isla (50–60) tarde ~50 horas frente
+a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
+
+| Pieza | Propuesta |
+|---|---|
+| **Multiplicador de XP por mapa** | ×1.25 por cada mapa: lago ×1.0, lago cálido ×1.25, río ×1.56, ciénaga ×1.95, laguna ×2.44, isla ×3.05 |
+| **XP para pasar del nivel N al N+1** | 600 × 1.03^(N − 1): nivel 10 ≈ 6,100 XP acumulados; nivel 50 ≈ 65,100; nivel 60 ≈ 94,400 |
+| **Resultado estimado** | ~5 horas de juego por mapa (lago: ~6,100 XP a ~1,200 XP/h; isla: ~30,000 XP a ~5,500 XP/h) y ~30 horas hasta la isla. Mejorar el equipo dentro de cada mapa lo acorta |
+
 ### Investigación: biomas acuáticos del Caribe, de la montaña al mar (2026-11-17)
 
 Fuentes: estudios científicos (USGS, GCFI, revistas de pesca y ecología), DRNA de Puerto Rico, prensa dominicana.
@@ -396,3 +448,6 @@ mejora se desbloquea en cada nivel.
 - **2026-11-17** · Decididos D27 (cinco mapas por debajo de la isla), D28 (lugares inspirados, no reales) y D29
   (orden de construcción: laguna costera, manglar, lago cálido, río, lago de montaña). La isla pasa a la banda
   50–60. Hoja de ruta y cadena de mapas actualizadas.
+- **2026-11-17** · Diseñado y medido el Mapa 1 · Lago de montaña (`tools/balance/mapa1-propuesta.mjs`):
+  7 especies, 5 spots, especie protegida. El dinero escala bien frente a la isla, la XP no. Propuesto un modelo de
+  bandas: multiplicador de XP ×1.25 por mapa y curva 600 × 1.03^(N − 1) por nivel (~5 horas por mapa).
