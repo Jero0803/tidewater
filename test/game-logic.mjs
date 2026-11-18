@@ -1,6 +1,8 @@
 // Plain-node tests of the fishing game logic (no GPU): bites, the catch fight, inventory, save.
 import { FISH, FISH_IDS, fishValue, fishLengthCm } from '../src/game/FishTable.js';
-import { habitatAt, pickSpecies, rollWeight, biteDelay } from '../src/game/Bites.js';
+import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, lureHitOutcome, HOOKING } from '../src/game/Bites.js';
+import { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, STARTER_RIG, rigStats, rigProblems, rigReady, biteMul, hookTooSmall } from '../src/game/Tackle.js';
+import { catalogEntry } from '../src/maps/catalog.js';
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
@@ -545,6 +547,59 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	st.homeMap = 'lake';
 	travel( st, 'lake', MAPS );
 	ok( st.homeMap === null && st.toJSON().map === 'lake', 'travel: a real trip ends a test visit (?map=)' );
+
+}
+// ---- tackle by pieces (E1: D63–D66, D72, D74; src/game/Tackle.js and the hooking rules in Bites.js)
+{
+
+	const lake = catalogEntry( 'lake' ).species;
+	const all = { ...BAITS, ...LURES };
+	ok( Object.values( RODS ).every( ( r ) => POWERS[ r.power ] && [ 'float', 'spin', 'bottom' ].includes( r.tech ) && r.cost >= 0 && r.level >= 1 ), 'tackle: every rod has a known power, technique, price and level' );
+	ok( Object.values( POWERS ).every( ( p, i, a ) => p.line[ 0 ] < p.line[ 1 ] && p.lure[ 0 ] < p.lure[ 1 ] && ( i === 0 || p.stiff > a[ i - 1 ].stiff ) ), 'tackle: power ranges are ordered and stiffness grows with power' );
+	ok( Object.values( LINES ).every( ( l ) => l.kg > 0 && l.d > 0 && l.vis > 0 && l.vis <= 1 ), 'tackle: lines have strength, diameter and visibility' );
+	ok( lake.every( ( id ) => PREFS[ id ] ), 'tackle: every lake species has its preferences' );
+	ok( Object.values( PREFS ).every( ( p ) => [ ...p.best, ...p.ok ].every( ( b ) => all[ b ] ) && p.hook[ 0 ] < p.hook[ 1 ] && HOOKS[ p.hook[ 0 ] ] && HOOKS[ p.hook[ 1 ] ] ), 'tackle: preferences name real baits / lures and hook sizes that exist' );
+
+	// the starter rod (D72)
+	const s = rigStats( STARTER_RIG );
+	ok( rigReady( STARTER_RIG ) && rigProblems( STARTER_RIG ).length === 0, 'tackle: the starter rod is ready, nothing out of range' );
+	ok( s.tech === 'float' && s.lineKg === 2.5 && s.castM === 18 && s.dragMax === 3 && s.lineCap === Math.round( 120 * ( 0.25 / 0.16 ) ** 2 ), 'tackle: starter stats (float, 2.5 kg line, 18 m cast, 3 kg drag, capacity by line diameter)' );
+	ok( RODS[ STARTER_RIG.rod ].cost === 0 && REELS[ STARTER_RIG.reel ].cost === 0, 'tackle: starter rod and reel are free' );
+
+	// what doesn't fit
+	const has = ( rig, p ) => rigProblems( rig ).includes( p );
+	ok( has( { ...STARTER_RIG, hook: null }, 'hook' ) && ! rigReady( { ...STARTER_RIG, hook: null } ), 'tackle: a bait needs a hook' );
+	ok( has( { ...STARTER_RIG, bait: 'spin2' }, 'lureTech' ) && has( { rod: 'spinL', reel: 'r2500', line: 'm20', hook: 6, bait: 'worm' }, 'lureTech' ), 'tackle: lures go on spinning rods, baits on float / bottom rods' );
+	ok( has( { rod: 'bottomM', reel: 'r4000', line: 'm30', hook: 4, bait: 'corn' }, 'sinker' ) && has( { ...STARTER_RIG, float: null }, 'float' ), 'tackle: bottom rods need a sinker, float rods a float' );
+	const heavy = { ...STARTER_RIG, line: 'm40' };
+	ok( has( heavy, 'lineHeavy' ) && rigReady( heavy ), 'tackle: line too heavy for the rod is a warning, not a block' );
+	ok( rigReady( { rod: 'spinL', reel: 'r2500', line: 'f18', bait: 'spin2' } ), 'tackle: a lure carries its own hook' );
+	ok( has( { rod: 'spinUL', reel: 'r1000', line: 'm16', bait: 'spoon' }, 'castHeavy' ), 'tackle: a lure too heavy for the rod is flagged' );
+
+	// how much each species bites on a rig (D64)
+	const trout = { rod: 'spinL', reel: 'r2500', line: 'f18', bait: 'spin2' };
+	const carpRig = { rod: 'bottomM', reel: 'r4000', line: 'm30', hook: 4, sinker: 40, bait: 'corn' };
+	const near = ( a, b ) => Math.abs( a - b ) < 0.01;
+	ok( biteMul( 'rainbowTrout', trout ).total === 1 && biteMul( 'carp', carpRig ).total === 1, 'tackle: each fish bites fully on its own rig' );
+	ok( near( biteMul( 'rainbowTrout', carpRig ).total, 0.16 ), 'tackle: a trout on the carp rig bites ×0.16 (thick line ×0.4, corn only acceptable ×0.4)' );
+	ok( near( biteMul( 'guapucha', STARTER_RIG ).total, 0.9 ) && biteMul( 'pejerrey', STARTER_RIG ).total === 1, 'tackle: the starter rod suits the small lake fish' );
+	ok( near( biteMul( 'guapucha', { ...STARTER_RIG, hook: 4 } ).total, 0.9 * 0.2 ), 'tackle: a hook too big for its mouth: ×0.4 bites, half of them missed' );
+	ok( biteMul( 'brownTrout', STARTER_RIG ).bait === 0.05, 'tackle: a bait it does not eat: ×0.05' );
+	ok( biteMul( 'rainbowTrout', { ...trout, line: 'm25' } ).line < biteMul( 'rainbowTrout', trout ).line && biteMul( 'rainbowTrout', { ...trout, line: 'f22' } ).line === 1, 'tackle: thicker mono puts a trout off; fluorocarbon of the same strength does not' );
+	ok( biteMul( 'tuna', carpRig ).total === 1, 'tackle: species without preferences bite as before' );
+	ok( hookTooSmall( 'carp', STARTER_RIG ) && ! hookTooSmall( 'guapucha', STARTER_RIG ), 'tackle: a hook too small for the fish is detected (it comes out more in the fight)' );
+
+	// not every bite hooks (D74)
+	const rate = ( f, n = 4000 ) => { let k = 0; for ( let i = 0; i < n; i ++ ) if ( f() ) k ++; return k / n; };
+	ok( Math.abs( rate( () => strikeOutcome( 'take', 0.2, rng ) === 'hooked' ) - HOOKING.hookFirst ) < 0.03 && Math.abs( rate( () => strikeOutcome( 'take', 0.8, rng ) === 'hooked' ) - HOOKING.hookLate ) < 0.03, 'hooking: striking early in the window hooks ~75 %, late ~55 %' );
+	ok( Math.abs( rate( () => strikeOutcome( 'nibble', 0, rng ) === 'spooked' ) - HOOKING.spook ) < 0.03 && strikeOutcome( 'wait', 0, rng ) === 'early', 'hooking: striking on a nibble spooks the fish ~60 %' );
+	ok( Math.abs( rate( () => nibbleOutcome( {}, rng ) === 'steal' ) - HOOKING.steal ) < 0.03 && rate( () => nibbleOutcome( { lure: true }, rng ) === 'steal' ) === 0, 'hooking: nibbles steal the bait ~15 %, never a lure' );
+	ok( rate( () => nibbleOutcome( { bigHook: true }, rng ) === 'steal' ) > HOOKING.steal * 1.3, 'hooking: more bait stolen with a hook too big' );
+	ok( Math.abs( rate( () => lureHitOutcome( null, rng ) === 'hooked' ) - HOOKING.spinSelf ) < 0.03 && Math.abs( rate( () => lureHitOutcome( 0.3, rng ) === 'hooked' ) - HOOKING.hookFirst ) < 0.03, 'hooking: a lure hit hooks itself ~30 % if not struck' );
+	let a = 99; const r1 = () => ( ( a = ( a * 1664525 + 1013904223 ) >>> 0 ) / 4294967296 );
+	let b = 99; const r2 = () => ( ( b = ( b * 1664525 + 1013904223 ) >>> 0 ) / 4294967296 );
+	const hab = { shallows: 1 };
+	ok( Math.abs( biteDelayFor( hab, 12, 0.5, r1 ) - biteDelay( hab, 12, r2 ) * HOOKING.waitMul / 0.5 ) < 1e-9, 'hooking: the wait is ×3.5 and divided by the rig\'s bite multiplier' );
 
 }
 console.log( `value check ${ value }` );

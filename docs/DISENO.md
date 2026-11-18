@@ -1213,14 +1213,14 @@ más y se siente más.
 
 ### Entregas propuestas (después de decidir)
 
-| Entrega | Qué |
-|---|---|
-| E1 | Datos: catálogo de piezas del lago, preferencias por especie, picada con recelo, anzuelo y cebo; picada que no siempre engancha (D74); valores por hora (D75) con `npm run balance` puesto al día; tests |
-| E2 | Pelea: al menos 1 minuto (D73), fuerza realista del pez, la potencia de la caña amortigua o desgarra, la pieza más débil manda, rotura de caña; tres barras de carga, metros fuera, freno como dial |
-| E3 | Tienda nueva por pestañas con filtro por pez, fichas, paquetes por especie, comprar y equipar, vender al 50 %; guardado versión 4 |
-| E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario |
-| E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa |
-| E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) |
+| Entrega | Qué | Estado |
+|---|---|---|
+| E1 | Datos y reglas, sin cambiar el juego: `src/game/Tackle.js` (catálogo del lago, preferencias por especie, caña armada, problemas de armado, multiplicador de picada) y el enganche de D74 en `Bites.js`; `equipo-lago.mjs` lee de ahí; 28 tests | **Hecha** (2026-11-18) |
+| E2 | Pelea: al menos 1 minuto (D73), fuerza realista del pez, la potencia de la caña amortigua o desgarra, la pieza más débil manda, rotura de caña; tres barras de carga, metros fuera, freno como dial; el juego empieza a usar la picada y el enganche de E1; valores por hora (D75) con `npm run balance` puesto al día | Pendiente |
+| E3 | Tienda nueva por pestañas con filtro por pez, fichas, paquetes por especie, comprar y equipar, vender al 50 %; guardado versión 4 | Pendiente |
+| E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
+| E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa | Pendiente |
+| E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) | Pendiente |
 
 **Respuestas (2026-11-18):** con el equipo de carpa la trucha salía demasiado fácil; piezas separadas (D63); tres
 cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fijar el catálogo del lago con números
@@ -1389,3 +1389,6 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   de pelea; barra de nivel que se llena con la XP, desglose de la XP, liberar o llevar, atajo al modo foto.
 - **2026-11-18** · Decidido D76 (los trofeos del mar pelean de 5 a 15 min). Anotado en 7h el perfil de Fishing Planet
   (récord por especie con el cebo, conteo por clase, retos por técnica).
+- **2026-11-18** · **E1 hecha:** `src/game/Tackle.js` con el catálogo del lago, las preferencias de cada especie, la caña
+  armada (estadísticas y problemas de armado) y el multiplicador de picada; el enganche de D74 en `Bites.js`. El juego
+  no cambia todavía: la picada nueva, la pelea larga y los valores por hora (D75) entran juntos en E2. 28 tests nuevos.

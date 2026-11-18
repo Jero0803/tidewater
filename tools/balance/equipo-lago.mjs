@@ -1,4 +1,4 @@
-// Catálogo de equipo por piezas del lago (docs/DISENO.md 7h, D63–D72; propuesta, todavía no implementada). Uso:
+// Catálogo de equipo por piezas del lago (docs/DISENO.md 7h, D63–D76; el catálogo vive en src/game/Tackle.js). Uso:
 //   node --no-warnings tools/balance/equipo-lago.mjs
 //
 // Mide, con la pelea real de CatchMinigame y el modelo nuevo encima:
@@ -15,82 +15,9 @@ const { CatchMinigame } = await import( '../../src/game/CatchMinigame.js' );
 let seed = 11;
 const rng = () => ( ( seed = ( seed * 16807 ) % 2147483647 ) / 2147483647 );
 
-// ---------------------------------------------------------------- catálogo
-// Potencia: rango de sedal (kg), rango de cebo (g), rigidez (0 blanda .. 1 rígida: cuánto del tirón llega al anzuelo)
-export const POWERS = {
-	UL: { name: 'ultraligera', line: [ 1, 3 ], lure: [ 1, 5 ], stiff: 0.2 },
-	L: { name: 'ligera', line: [ 2, 5 ], lure: [ 3, 12 ], stiff: 0.35 },
-	ML: { name: 'media-ligera', line: [ 3, 7 ], lure: [ 5, 20 ], stiff: 0.5 },
-	M: { name: 'media', line: [ 5, 10 ], lure: [ 10, 40 ], stiff: 0.65 },
-	MH: { name: 'media-pesada', line: [ 7, 14 ], lure: [ 20, 80 ], stiff: 0.8 },
-};
-
-export const RODS = {
-	floatUL: { name: 'Telescópica de flotador 3 m', tech: 'flotador', power: 'UL', castM: 18, cost: 0, level: 1 },
-	floatL: { name: 'Telescópica de flotador 4 m', tech: 'flotador', power: 'L', castM: 22, cost: 60, level: 2 },
-	spinUL: { name: 'Spinning 1.8 m', tech: 'spinning', power: 'UL', castM: 24, cost: 70, level: 2 },
-	spinL: { name: 'Spinning 2.1 m', tech: 'spinning', power: 'L', castM: 30, cost: 120, level: 3 },
-	spinML: { name: 'Spinning 2.4 m', tech: 'spinning', power: 'ML', castM: 34, cost: 150, level: 5 },
-	bottomM: { name: 'Fondo 3 m', tech: 'fondo', power: 'M', castM: 40, cost: 130, level: 4 },
-	bottomMH: { name: 'Fondo 3.6 m', tech: 'fondo', power: 'MH', castM: 45, cost: 220, level: 7 },
-};
-
-// recogida (m/s), freno máximo (kg), capacidad (m de sedal de 0.25 mm; con otro grosor escala con el área)
-export const REELS = {
-	r1000: { name: 'Carrete 1000', reel: 0.9, dragMax: 3, cap25: 120, cost: 0, level: 1 },
-	r2000: { name: 'Carrete 2000', reel: 1.0, dragMax: 4, cap25: 150, cost: 50, level: 2 },
-	r2500: { name: 'Carrete 2500', reel: 1.1, dragMax: 6, cap25: 180, cost: 90, level: 3 },
-	r3000: { name: 'Carrete 3000', reel: 1.2, dragMax: 8, cap25: 200, cost: 110, level: 5 },
-	r4000: { name: 'Carrete de fondo 4000', reel: 1.3, dragMax: 12, cap25: 250, cost: 150, level: 6 },
-};
-
-// bobinas de 150 m; vis = grosor aparente (el fluorocarbono se ve como uno más fino)
-export const LINES = {
-	m12: { name: 'Monofilamento 0.12 mm', kg: 1.5, d: 0.12, vis: 1, cost: 8, level: 1 },
-	m16: { name: 'Monofilamento 0.16 mm', kg: 2.5, d: 0.16, vis: 1, cost: 0, level: 1 },
-	m20: { name: 'Monofilamento 0.20 mm', kg: 3.5, d: 0.20, vis: 1, cost: 12, level: 2 },
-	m25: { name: 'Monofilamento 0.25 mm', kg: 5, d: 0.25, vis: 1, cost: 15, level: 3 },
-	m30: { name: 'Monofilamento 0.30 mm', kg: 7, d: 0.30, vis: 1, cost: 18, level: 4 },
-	m35: { name: 'Monofilamento 0.35 mm', kg: 9, d: 0.35, vis: 1, cost: 22, level: 5 },
-	m40: { name: 'Monofilamento 0.40 mm', kg: 12, d: 0.40, vis: 1, cost: 26, level: 6 },
-	f18: { name: 'Fluorocarbono 0.18 mm', kg: 3, d: 0.18, vis: 0.65, cost: 30, level: 4 },
-	f22: { name: 'Fluorocarbono 0.22 mm', kg: 4.5, d: 0.22, vis: 0.65, cost: 36, level: 5 },
-};
-
-// sobres de 10 anzuelos; número de anzuelo: más alto = más pequeño (#14 diminuto, #1 grande)
-export const HOOKS = { 14: 3, 12: 3, 10: 3, 8: 4, 6: 4, 4: 5, 2: 5, 1: 6 };
-// boyas (g) y plomos (g), sobres de 5
-export const FLOATS = { 1: 2, 3: 3, 6: 4 };
-export const SINKERS = { 20: 2, 40: 3, 60: 4 };
-
-// carnadas: paquete (unidades, $); se gasta una por picada (pez sacado o perdido)
-export const BAITS = {
-	larva: { name: 'Larvas', n: 30, cost: 4, level: 1, g: 1 },
-	worm: { name: 'Lombrices', n: 20, cost: 5, level: 1, g: 2 },
-	corn: { name: 'Maíz', n: 40, cost: 3, level: 2, g: 1 },
-	bread: { name: 'Masa de pan', n: 25, cost: 3, level: 1, g: 1 },
-	pellet: { name: 'Pellet de trucha', n: 30, cost: 6, level: 3, g: 1 },
-};
-// señuelos: por unidad; se pierden si se corta el sedal o se enredan
-export const LURES = {
-	spin1: { name: 'Cucharilla giratoria #1 (3 g)', g: 3, cost: 8, level: 2 },
-	spin2: { name: 'Cucharilla giratoria #2 (6 g)', g: 6, cost: 10, level: 3 },
-	spoon: { name: 'Cucharilla ondulante (8 g)', g: 8, cost: 10, level: 4 },
-	minnow: { name: 'Pececito 5 cm (6 g)', g: 6, cost: 14, level: 5 },
-	soft: { name: 'Plástico blando 7 cm + cabeza 5 g', g: 5, cost: 6, level: 4 },
-};
-
-// preferencias por especie: preferidos (×1), aceptables (×0.4), el resto ×0.05; anzuelo [grande, pequeño];
-// sedal ideal (mm), recelo (0..1), boca (cuánto aguanta el anzuelo antes de desgarrarse), fuerza (sedal realista)
-export const PREFS = {
-	guapucha: { best: [ 'larva', 'bread' ], ok: [ 'worm' ], hook: [ 10, 14 ], lineD: 0.12, wary: 0.2, mouth: 1.2 },
-	carachi: { best: [ 'larva', 'worm' ], ok: [ 'bread' ], hook: [ 8, 12 ], lineD: 0.14, wary: 0.3, mouth: 1.4 },
-	pejerrey: { best: [ 'larva', 'spin1' ], ok: [ 'worm', 'spin2' ], hook: [ 6, 10 ], lineD: 0.16, wary: 0.5, mouth: 1.3 },
-	capitan: { best: [ 'worm' ], ok: [ 'larva' ], hook: [ 4, 8 ], lineD: 0.25, wary: 0.3, mouth: 2.2 },
-	rainbowTrout: { best: [ 'spin2', 'spin1', 'pellet' ], ok: [ 'worm', 'spoon', 'corn' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5 },
-	carp: { best: [ 'corn', 'bread' ], ok: [ 'worm', 'pellet' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4 },
-	brownTrout: { best: [ 'minnow', 'spoon' ], ok: [ 'worm', 'soft', 'spin2' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6 },
-};
+// ---------------------------------------------------------------- catálogo (src/game/Tackle.js, E1)
+const { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, biteMul } = await import( '../../src/game/Tackle.js' );
+const kitHookCost = ( h ) => HOOKS[ h ].cost;
 
 // ---------------------------------------------------------------- modelo
 // fuerza del pez con sedales realistas (la de P1 está pensada para sedales de 7 a 50 kg)
@@ -107,18 +34,6 @@ export const staminaOf = ( id, kg ) => {
 
 };
 
-export function biteMul( id, kit ) {
-
-	const p = PREFS[ id ], line = LINES[ kit.line ];
-	const d = line.d * line.vis;
-	const lineMul = d <= p.lineD ? 1 : Math.max( 0.25, 1 - p.wary * ( d / p.lineD - 1 ) * 1.5 );
-	const baitMul = p.best.includes( kit.bait ) ? 1 : p.ok.includes( kit.bait ) ? 0.4 : 0.05;
-	const [ big, small ] = p.hook, h = kit.hook;
-	// más grande que su rango: pica menos y la mitad se escapa al clavar; más pequeño: pica normal
-	const hookMul = h < big ? 0.4 * 0.5 : 1;
-	return { lineMul, baitMul, hookMul, total: lineMul * baitMul * hookMul };
-
-}
 
 export function fightKit( id, kg, kit, player ) {
 
@@ -227,7 +142,7 @@ for ( const [ id, kg ] of CASES ) {
 }
 
 console.log( '\n## 3. Precios\n' );
-const kitCost = ( k ) => RODS[ k.rod ].cost + REELS[ k.reel ].cost + LINES[ k.line ].cost + HOOKS[ k.hook ] + ( BAITS[ k.bait ]?.cost ?? LURES[ k.bait ].cost * 2 );
+const kitCost = ( k ) => RODS[ k.rod ].cost + REELS[ k.reel ].cost + LINES[ k.line ].cost + kitHookCost( k.hook ) + ( BAITS[ k.bait ]?.cost ?? LURES[ k.bait ].cost * 2 );
 console.log( '| Equipo | Costo de armarlo | Nivel |' );
 console.log( '|---|---|---|' );
 for ( const [ name, kit ] of Object.entries( KITS ) ) {
@@ -272,9 +187,9 @@ for ( const [ id, kit ] of Object.entries( RIGHT ) ) {
 // Antes (P1): cada picada terminaba en pez si se clavaba con la boya hundida; ~7 s de espera en un buen spot.
 // Ahora: espera más larga (y dividida por la picada del equipo), robo de carnada en los toques, clavar antes de
 // tiempo espanta, clavar a tiempo engancha con una probabilidad.
-const { biteDelay, rollWeight } = await import( '../../src/game/Bites.js' );
+const { biteDelay, rollWeight, HOOKING } = await import( '../../src/game/Bites.js' );
 const { fishValue } = await import( '../../src/game/FishTable.js' );
-export const RHYTHM = { waitMul: arg( 'wait', 3.5 ), steal: 0.15, early: 0.1, spook: 0.6, hookFirst: 0.75, hookLate: 0.55, lateShare: 0.3, rebait: 2 };
+export const RHYTHM = { ...HOOKING, waitMul: arg( 'wait', HOOKING.waitMul ), early: 0.1, lateShare: 0.3, rebait: 2 };
 const CAST = 3, NIBBLES = 2.5, CARD = 4;
 const goodSpot = { a: 1 };
 const fightOld = ( id, kg ) => {

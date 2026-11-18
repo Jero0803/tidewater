@@ -92,6 +92,50 @@ export function biteDelay( habitat, hour, rng = Math.random ) {
 
 }
 
+// ---- not every bite hooks a fish (docs/DISENO.md D74; defined in E1, used by the game from E2)
+//   waitMul    the wait for a bite is this many times today's (and divided by the rig's biteMul, Tackle.js)
+//   steal      chance a nibbling fish takes the bait without pulling the bobber under (baits only; ×1.5 with a hook
+//              too big for it); the bait is gone, reel in and bait up again
+//   spook      striking on a nibble scares the fish off this often (else it keeps nibbling)
+//   hookFirst  striking while the bobber is under hooks it this often in the first half of the window…
+//   hookLate   …and this often in the second half
+//   spinWindow seconds to strike when a fish hits a lure on the retrieve; spinSelf: it hooks itself if you don't
+export const HOOKING = { waitMul: 3.5, steal: 0.15, bigHookSteal: 1.5, spook: 0.6, hookFirst: 0.75, hookLate: 0.55, spinWindow: 0.6, spinSelf: 0.3 };
+
+// seconds until the next bite with the rig's bite multiplier (Tackle.biteMul( species, rig ).total)
+export function biteDelayFor( habitat, hour, mul = 1, rng = Math.random ) {
+
+	return biteDelay( habitat, hour, rng ) * HOOKING.waitMul / Math.max( mul, 0.01 );
+
+}
+
+// a nibble: 'steal' (bait gone) or 'nibble' (keeps going). lure: true for lures (never stolen)
+export function nibbleOutcome( { lure = false, bigHook = false } = {}, rng = Math.random ) {
+
+	if ( lure ) return 'nibble';
+	return rng() < HOOKING.steal * ( bigHook ? HOOKING.bigHookSteal : 1 ) ? 'steal' : 'nibble';
+
+}
+
+// the strike: phase 'nibble' (too early) -> 'spooked' | 'early'; phase 'take' -> 'hooked' | 'missed'.
+// frac: how far into the take window (0 just pulled under .. 1 about to let go)
+export function strikeOutcome( phase, frac = 0, rng = Math.random ) {
+
+	if ( phase === 'nibble' ) return rng() < HOOKING.spook ? 'spooked' : 'early';
+	if ( phase !== 'take' ) return 'early';
+	return rng() < ( frac < 0.5 ? HOOKING.hookFirst : HOOKING.hookLate ) ? 'hooked' : 'missed';
+
+}
+
+// a fish hitting a lure on the retrieve: struck within the window -> 'hooked' / 'missed'; not struck -> it may hook
+// itself ('hooked') or let go ('missed'). struckAt: seconds after the hit, or null
+export function lureHitOutcome( struckAt, rng = Math.random ) {
+
+	if ( struckAt != null && struckAt <= HOOKING.spinWindow ) return rng() < HOOKING.hookFirst ? 'hooked' : 'missed';
+	return rng() < HOOKING.spinSelf ? 'hooked' : 'missed';
+
+}
+
 function smooth( e0, e1, x ) {
 
 	const t = Math.min( 1, Math.max( 0, ( x - e0 ) / ( e1 - e0 ) ) );
