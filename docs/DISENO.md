@@ -908,7 +908,7 @@ oficial):
 
 | Entrega | Qué | Estado |
 |---|---|---|
-| P1 | Motor de la pelea: freno, recoger, mover la caña, saltos, comportamiento por especie; pantalla nueva; tests | Pendiente |
+| P1 | Motor de la pelea: freno (rueda / + −, 10 posiciones hasta el 95 % del sedal, también entre peleas), recoger y recoger rápido (Shift), tirar (clic derecho), la caña sigue la vista (contra la carrera cansa más), saltos (soltar el clic derecho), fondo con enredo (carpa, trucha café, mero, pargo), estilo por especie (`FishTable.js` STYLES), capacidad del carrete según el sedal (120 a 270 m); la boya sigue al pez y salta con él; pantalla nueva (tensión con la marca del freno, freno, hilo, hacia dónde corre, avisos); mensajes que explican por qué se perdió; `tools/balance/fight.mjs` simula peleas; tests | **Hecha** (2026-11-18) |
 | P2 | El pez 3D visible en el agua durante la pelea: carreras, olas y espuma, saltos | Pendiente |
 | P3 | La red para sacarlo y los sonidos (clic del freno, carrete); ajuste fino de cada especie | Pendiente |
 
@@ -1043,3 +1043,6 @@ oficial):
   motor y 4 niveles de detalle); el lago ya no tiene peces tropicales. Anotado A1 (aparejos distintos por grado).
 - **2026-11-18** · Decidido D62: la pelea profunda se adelanta (freno con la rueda, mover la caña, pez visible con
   saltos y red, cada especie distinta). Plan P1 a P3 en 7g.
+- **2026-11-18** · **P1 hecha:** la pelea nueva con los controles de Fishing Planet (freno con la rueda, Shift, clic
+  derecho para tirar, caña contra la carrera, saltos, enredos en el fondo, cada especie a su manera). Pendiente:
+  recalibrar `npm run balance` (su jugador simulado solo mantiene el clic).

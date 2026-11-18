@@ -3,7 +3,7 @@ import { Vector3, Color } from '../engine/index.js';
 import { WORLD } from '../world/WorldLayout.js';
 import { FISH } from './FishTable.js';
 import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
-import { CatchMinigame } from './CatchMinigame.js';
+import { CatchMinigame, rodSide, DRAG_STEPS } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
 import { activeMap, mapOverride, MAPS } from '../maps/registry.js';
@@ -63,6 +63,7 @@ export class Game {
 		this._sonar = null;
 		this.hud = null;
 		this.fight = null; // CatchMinigame while a fish is on
+		this.dragPos = 5; // the reel's drag (1 .. 10): mouse wheel or + / -, also between fights
 		this.bite = null; // { phase: 'wait' | 'nibble' | 'take', t, nibbles, species, kg }
 		this._lmb = false;
 		this._rmb = false;
@@ -370,6 +371,17 @@ export class Game {
 		this._rmb = rmb;
 		const panelOpen = this.hud && ( this.hud.invOpen || this.hud.standOpen );
 
+		// the drag (Fishing Planet: mouse wheel up / + tightens, down / - loosens), set any time the rod is out
+		const wheel = inp.consumeWheel();
+		let dd = - wheel + ( inp.hit( 'Equal' ) || inp.hit( 'NumpadAdd' ) ? 1 : 0 ) - ( inp.hit( 'Minus' ) || inp.hit( 'NumpadSubtract' ) ? 1 : 0 );
+		if ( dd && rod.equipped && ! panelOpen ) {
+
+			this.dragPos = Math.max( 1, Math.min( DRAG_STEPS, this.dragPos + Math.sign( dd ) ) );
+			if ( this.fight ) this.fight.setDrag( this.dragPos );
+			if ( ! this.fight ) this.toast( loc( `Drag ${ this.dragPos } / ${ DRAG_STEPS }`, `Freno ${ this.dragPos } / ${ DRAG_STEPS }` ), 900 );
+
+		}
+
 		if ( rod.equipped && ! panelOpen ) {
 
 			if ( rod.state === 'idle' && lDown ) rod.startWindup();
@@ -391,7 +403,11 @@ export class Game {
 		// bites and the fight
 		if ( rod.state === 'floating' ) this.updateBite( dt );
 		else if ( ! this.fight ) rod.dip = Math.max( 0, rod.dip - dt * 4 );
-		if ( this.fight ) this.updateFight( dt, lmb && ! panelOpen );
+		if ( this.fight ) this.updateFight( dt, {
+			reel: lmb && ! panelOpen,
+			fast: inp.down( 'ShiftLeft' ) || inp.down( 'ShiftRight' ),
+			pull: rmb && ! panelOpen,
+		} );
 
 		rod.update( dt, { visible: can, fight: this.fight } );
 		// the landed fish hangs on the end of the line, turned to face you, then goes in the cooler. With
@@ -489,9 +505,7 @@ export class Game {
 				if ( b && b.phase === 'nibble' ) return { key: '…', text: loc( 'Something\'s nibbling · wait until the bobber is pulled under', 'Algo está picando · espera a que la boya se hunda' ) };
 				return { key: loc( 'RMB', 'Clic der' ), text: loc( 'Waiting for a bite · right-click to reel the line in', 'Esperando una picada · clic derecho para recoger el sedal' ) };
 			case 'retrieving': return { key: loc( 'RMB', 'Clic der' ), text: loc( 'Reeling in', 'Recogiendo' ) };
-			case 'fighting': return this.fight && this.fight.tension > this.fight.band[ 1 ]
-				? { key: loc( 'LMB', 'Clic izq' ), text: loc( 'Too much tension · let go!', 'Demasiada tensión · ¡suelta!' ) }
-				: { key: loc( 'LMB', 'Clic izq' ), text: loc( 'Hold to reel · let go when the tension goes red', 'Mantén para recoger · suelta cuando la tensión llegue al rojo' ) };
+			case 'fighting': return { key: loc( 'Wheel', 'Rueda' ), text: loc( 'Drag: loosen it when the needle nears red, tighten it when the fish takes too much line', 'Freno: aflójalo si la aguja se acerca al rojo, apriétalo si el pez se lleva mucho hilo' ) };
 			case 'landing': return null;
 			default: return null;
 
@@ -701,21 +715,33 @@ export class Game {
 		}
 
 		const g = this.state.stats;
-		this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: g.lineKg, reelSpeed: g.reelSpeed, distance: Math.max( 3, this.rod.lineOut ) } );
+		// the spool holds more line with heavier gear (120 m on the starter rig, 270 m on the top one)
+		this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: g.lineKg, reelSpeed: g.reelSpeed, distance: Math.max( 3, this.rod.lineOut ), drag: this.dragPos, lineCap: 120 + g.lineKg * 3 } );
+		// where it was hooked: the fight's sideways angle turns from this bearing (atan2( x, z ))
+		const pp = this.app.player.position, bb = this.rod.bobber;
+		this.fight.bearing0 = Math.atan2( bb.x - pp.x, bb.z - pp.z );
 		this.bite = null;
 		this.rod.hook();
 		this.toast( loc( 'Fish on!', '¡Pez enganchado!' ), 1200 );
 
 	}
 
-	updateFight( dt, reeling ) {
+	updateFight( dt, input ) {
 
 		const f = this.fight;
-		const st = f.update( dt, reeling );
-		// the fish thrashes at the surface as each run starts
+		// the rod follows the view: its sideways offset from the line to the fish
+		const cam = this.app.camera, e = cam.matrixWorld.elements;
+		const view = Math.atan2( - e[ 8 ], - e[ 10 ] );
+		input.side = rodSide( view, f.bearing0 + f.angle );
+		f.pullHeld = input.pull;
+		const wasMode = f.mode;
+		const st = f.update( dt, input );
+		// the fish thrashes at the surface as each run starts, and as it leaves and hits the water in a jump
 		const au = this.app.audio;
-		if ( f.surge > 0.6 && ! f._splashed && au && au.fishSplash ) au.fishSplash( this.rod.bobber, 0.3 + 0.5 * Math.min( 1, f.kg / 8 ) );
+		const big = 0.3 + 0.5 * Math.min( 1, f.kg / 8 );
+		if ( f.surge > 0.6 && ! f._splashed && au && au.fishSplash ) au.fishSplash( this.rod.bobber, big );
 		f._splashed = f.surge > 0.6 ? true : f.surge < 0.3 ? false : f._splashed;
+		if ( au && au.fishSplash && ( ( f.mode === 'jump' && wasMode !== 'jump' ) || ( wasMode === 'jump' && f.mode !== 'jump' ) ) ) au.fishSplash( this.rod.bobber, big + 0.2 );
 		if ( st === 'fighting' ) return;
 		this.fight = null;
 		this.rod.dip = 0;
@@ -741,13 +767,17 @@ export class Game {
 
 		} else if ( st === 'snapped' ) {
 
-			this.toast( loc( 'Snap! The line broke', '¡Zas! Se rompió el sedal' ), 2400 );
+			const why = f.cause === 'spooled' ? loc( 'It took all the line on the reel · tighten the drag sooner', 'Se llevó todo el hilo del carrete · aprieta el freno antes' )
+				: f.cause === 'snag' ? loc( 'It wrapped the line in the weeds · pull (right click) when it dives', 'Enredó el hilo en el fondo · tira con el clic derecho cuando baja' )
+					: loc( 'Snap! The line broke · loosen the drag on its runs', '¡Zas! Se rompió el sedal · afloja el freno en sus carreras' );
+			this.toast( why, 3200 );
 			if ( au && au.lineSnap ) au.lineSnap();
 			this.rod.setState( 'idle' );
 
 		} else {
 
-			this.toast( loc( 'It threw the hook', 'Se soltó del anzuelo' ), 2000 );
+			this.toast( f.cause === 'jump' ? loc( 'It threw the hook in the jump · let go of the right click when it jumps', 'Se soltó en el salto · suelta el clic derecho cuando salta' )
+				: loc( 'It threw the hook · slack line, keep reeling', 'Se soltó del anzuelo · el sedal quedó flojo, sigue recogiendo' ), 3000 );
 			this.rod.endFight();
 
 		}

@@ -84,7 +84,7 @@ const CARDS_EN = [
 			${ row( k( 'R' ), 'Take out the rod (by the water or on the boat)' ) }
 			${ row( k( 'Hold', 'LMB' ), 'Wind up, release to cast. Hold longer to cast farther' ) }
 			${ row( k( 'LMB' ), 'Strike when the bobber is <b>pulled under</b> (dips are only nibbles)' ) }
-			${ row( k( 'Hold', 'LMB' ), 'Reel in. <b>Let go when the tension turns red</b>, or the line snaps' ) }
+			${ row( k( 'Hold', 'LMB' ), 'Reel in (<b>Shift</b> fast). <b>Right click</b> pulls, the <b>wheel</b> sets the drag' ) }
 			${ row( k( 'RMB' ), 'Reel an empty line back in' ) }
 			${ row( k( 'I' ), 'Your cooler and fish log' ) }
 		</div>`,
@@ -108,7 +108,7 @@ const CARDS_EN = [
 const TIPS_EN = {
 	rodOut: 'Hold the <b>left mouse button</b> to wind up and release to cast. Try deeper water, around the pier or over the reef.',
 	nibble: 'The bobber is dipping: something is <b>nibbling</b>. Wait until it is <b>pulled under</b>, then click to strike.',
-	fishOn: '<b>Hold the left mouse button</b> to reel. When the tension needle nears the <b>red</b>, let go until it settles, then reel again.',
+	fishOn: '<b>Left click</b> reels in (<b>Shift</b> fast), <b>right click</b> pulls. The <b>wheel</b> sets the drag: loosen it when the needle nears the red, tighten it if the fish takes too much line. Turn the rod against its runs, and let go of the right click when it jumps.',
 	caught: 'Into the cooler (<kbd>I</kbd>). Sell your catch to <b>Joe</b> at the fish stand by the pier: he is on the map.',
 	full: 'Your cooler is <b>full</b>. Sell to Joe, or buy a bigger hold from Marta at the chandlery.',
 	boat: 'Your boat. <kbd>E</kbd> to board, <kbd>E</kbd> again at the wheel to drive (<kbd>W</kbd><kbd>S</kbd> throttle, <kbd>A</kbd><kbd>D</kbd> steer). Diesel is sold by Marta.',
@@ -130,7 +130,7 @@ const CARDS_ES = [
 			${ row( k( 'R' ), 'Saca la caña (junto al agua o en el bote)' ) }
 			${ row( k( 'Mantén', 'Clic izq' ), 'Carga y suelta para lanzar. Mantén más tiempo para llegar más lejos' ) }
 			${ row( k( 'Clic izq' ), 'Clava cuando la boya <b>se hunda</b> (los saltitos son solo piquitos)' ) }
-			${ row( k( 'Mantén', 'Clic izq' ), 'Recoge. <b>Suelta cuando la tensión se ponga roja</b>, o se rompe el sedal' ) }
+			${ row( k( 'Mantén', 'Clic izq' ), 'Recoge (<b>Shift</b> rápido). El <b>clic derecho</b> tira y la <b>rueda</b> ajusta el freno' ) }
 			${ row( k( 'Clic der' ), 'Recoge el sedal vacío' ) }
 			${ row( k( 'I' ), 'Tu nevera y el registro de pesca' ) }
 		</div>`,
@@ -154,7 +154,7 @@ const CARDS_ES = [
 const TIPS_ES = {
 	rodOut: 'Mantén el <b>clic izquierdo</b> para cargar y suelta para lanzar. Prueba en aguas más hondas, alrededor del muelle o sobre el arrecife.',
 	nibble: 'La boya está saltando: algo está <b>picoteando</b>. Espera a que <b>se hunda</b> y haz clic para clavar.',
-	fishOn: '<b>Mantén el clic izquierdo</b> para recoger. Cuando la aguja de tensión se acerque al <b>rojo</b>, suelta hasta que baje y vuelve a recoger.',
+	fishOn: 'El <b>clic izquierdo</b> recoge (<b>Shift</b> rápido) y el <b>derecho</b> tira. La <b>rueda</b> ajusta el freno: aflójalo si la aguja se acerca al rojo y apriétalo si el pez se lleva mucho hilo. Gira la caña contra sus carreras y suelta el clic derecho cuando salta.',
 	caught: 'A la nevera (<kbd>I</kbd>). Véndele tu pesca a <b>Joe</b> en el puesto de pescado junto al muelle: está en el mapa.',
 	full: 'Tu nevera está <b>llena</b>. Véndele a Joe, o cómprale una bodega más grande a Marta en la tienda náutica.',
 	boat: 'Tu bote. <kbd>E</kbd> para subir, <kbd>E</kbd> otra vez en el timón para manejar (<kbd>W</kbd><kbd>S</kbd> acelerador, <kbd>A</kbd><kbd>D</kbd> timón). Marta vende el diésel.',

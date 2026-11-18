@@ -43,6 +43,14 @@ const CSS = /* css */`
 .gm-stamina { margin-top: var(--tw-2); display: flex; align-items: center; gap: var(--tw-2); color: var(--tw-ink-3); font-size: var(--tw-fs-sm); }
 .gm-stamina-bar { flex: 1; height: calc(4 * var(--tw-u)); border-radius: 99px; background: var(--tw-fill-2); overflow: hidden; }
 .gm-stamina-bar > span { display: block; height: 100%; background: var(--tw-sun); }
+.gm-drag-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--tw-sun); box-shadow: 0 0 6px rgba(255, 200, 80, 0.7); }
+.gm-fight-row { margin-top: var(--tw-2); display: flex; justify-content: space-between; align-items: center; gap: var(--tw-3); color: var(--tw-ink-2); font-size: var(--tw-fs-sm); font-family: var(--tw-mono); }
+.gm-fight-row b { color: var(--tw-ink); font-weight: 600; }
+.gm-fight-row .is-low { color: var(--tw-coral); }
+.gm-run { min-width: calc(70 * var(--tw-u)); text-align: center; font-family: var(--tw-font); font-weight: 600; color: var(--tw-coral); opacity: 0; transition: opacity var(--tw-fast) var(--tw-ease); }
+.gm-run.is-on { opacity: 1; }
+.gm-fight-keys { margin-top: var(--tw-2); color: var(--tw-ink-3); font-size: var(--tw-fs-xs); text-align: center; }
+.gm-fight-keys kbd { font: 600 var(--tw-fs-xs) var(--tw-mono); padding: 0 4px; border-radius: 3px; border: 1px solid var(--tw-line); background: var(--tw-fill-2); }
 .gm-bite { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) scale(0.6); font: 800 calc(56 * var(--tw-u)) var(--tw-font);
 	color: var(--tw-sun); text-shadow: 0 0 18px rgba(var(--tw-sun-rgb), 0.8), 0 2px 4px rgba(0,0,0,0.5); opacity: 0; pointer-events: none;
 	transition: opacity 120ms, transform 200ms var(--tw-ease); }
@@ -265,11 +273,16 @@ export class GameHUD {
 
 		this.fight = h( 'div', 'gm-fight tw-glass', `
 			<div class="gm-fight-head"><span class="gm-fight-call">${ loc( 'Fish on!', '¡Pez enganchado!' ) }</span><span class="gm-fight-dist">0 m</span></div>
-			<div class="gm-tension"><span class="gm-band"></span><span class="gm-danger"></span><span class="gm-needle"></span></div>
-			<div class="gm-stamina"><span>${ loc( 'Fish', 'Pez' ) }</span><span class="gm-stamina-bar"><span></span></span></div>` );
+			<div class="gm-tension"><span class="gm-danger"></span><span class="gm-drag-mark"></span><span class="gm-needle"></span></div>
+			<div class="gm-fight-row"><span class="gm-drag">${ loc( 'Drag', 'Freno' ) } <b>5</b>/10</span><span class="gm-run"></span><span class="gm-line">${ loc( 'Line', 'Hilo' ) } <b>0</b> m</span></div>
+			<div class="gm-stamina"><span>${ loc( 'Fish', 'Pez' ) }</span><span class="gm-stamina-bar"><span></span></span></div>
+			<div class="gm-fight-keys"><kbd>${ loc( 'LMB', 'Clic izq' ) }</kbd> ${ loc( 'reel', 'recoger' ) } · <kbd>Shift</kbd> ${ loc( 'fast', 'rápido' ) } · <kbd>${ loc( 'RMB', 'Clic der' ) }</kbd> ${ loc( 'pull', 'tirar' ) } · <kbd>${ loc( 'Wheel', 'Rueda' ) }</kbd> ${ loc( 'drag', 'freno' ) } · ${ loc( 'turn the rod against its run', 'gira la caña contra su carrera' ) }</div>` );
 		this.fCall = this.fight.querySelector( '.gm-fight-call' );
 		this.fDist = this.fight.querySelector( '.gm-fight-dist' );
-		this.fBand = this.fight.querySelector( '.gm-band' );
+		this.fDragMark = this.fight.querySelector( '.gm-drag-mark' );
+		this.fDrag = this.fight.querySelector( '.gm-drag > b' );
+		this.fLine = this.fight.querySelector( '.gm-line > b' );
+		this.fRun = this.fight.querySelector( '.gm-run' );
 		this.fNeedle = this.fight.querySelector( '.gm-needle' );
 		this.fStam = this.fight.querySelector( '.gm-stamina-bar > span' );
 
@@ -399,18 +412,31 @@ export class GameHUD {
 		this.fight.classList.toggle( 'is-on', !! fight );
 		if ( fight ) {
 
+			// tension of the line against its strength (the needle), the drag (the yellow mark), the break (red end)
 			const T = Math.min( fight.tension, 1.05 );
 			this.fNeedle.style.left = `${ T / 1.05 * 100 }%`;
-			this.fNeedle.classList.toggle( 'is-hot', fight.tension > fight.band[ 1 ] );
-			this.fBand.style.left = `${ fight.band[ 0 ] / 1.05 * 100 }%`;
-			this.fBand.style.width = `${ ( fight.band[ 1 ] - fight.band[ 0 ] ) / 1.05 * 100 }%`;
+			this.fNeedle.classList.toggle( 'is-hot', fight.tension > 0.85 );
+			this.fDragMark.style.left = `${ Math.min( 1, fight.dragKg / fight.lineKg ) / 1.05 * 100 }%`;
 			this.fStam.style.width = `${ fight.stamina * 100 }%`;
 			this.fDist.textContent = `${ fight.distance.toFixed( 1 ) } m`;
+			this.fDrag.textContent = fight.drag;
+			this.fLine.textContent = Math.round( fight.lineLeft );
+			this.fLine.classList.toggle( 'is-low', fight.lineLeft < 25 );
+			// which way it runs on screen (its bearing grows to the left of the view, see Game.updateFight)
+			const running = fight.mode === 'run';
+			this.fRun.classList.toggle( 'is-on', running );
+			if ( running ) this.fRun.textContent = fight.runDir > 0 ? loc( '◀ running', '◀ corre' ) : loc( 'running ▶', 'corre ▶' );
 			let call = loc( 'Reel in', 'Recoge' ), cls = '';
-			if ( fight.tension > 0.88 ) { call = loc( 'Ease off!', '¡Afloja!' ); cls = 'is-warn'; }
-			else if ( fight.surge > 0.55 ) { call = loc( 'It\'s running!', '¡Está corriendo!' ); cls = 'is-warn'; }
-			else if ( fight.tension < 0.15 ) { call = loc( 'Slack line!', '¡Sedal flojo!' ); cls = 'is-warn'; }
-			else if ( fight.tension >= fight.band[ 0 ] && fight.tension <= fight.band[ 1 ] ) { call = loc( 'Good pressure', 'Buena presión' ); cls = 'is-good'; }
+			if ( fight.mode === 'jump' ) { call = loc( 'It jumps! Let go of the right click', '¡Salta! Suelta el clic derecho' ); cls = 'is-warn'; }
+			else if ( fight.tension > 0.85 ) { call = loc( 'Too tight! Loosen the drag', '¡Muy tenso! Afloja el freno' ); cls = 'is-warn'; }
+			else if ( fight.mode === 'dive' && fight.style.snag ) { call = loc( 'Heading for the weeds! Pull (right click)', '¡Va al fondo! Tira con el clic derecho' ); cls = 'is-warn'; }
+			else if ( running ) { call = fight.runDir > 0 ? loc( 'It runs left · turn the rod right', 'Corre a la izquierda · gira la caña a la derecha' ) : loc( 'It runs right · turn the rod left', 'Corre a la derecha · gira la caña a la izquierda' ); cls = 'is-warn'; }
+			else if ( fight.mode === 'come' ) { call = loc( 'Coming at you! Reel fast (Shift)', '¡Viene hacia ti! Recoge rápido (Shift)' ); cls = 'is-warn'; }
+			else if ( fight.tension < 0.05 ) { call = loc( 'Slack line! Reel in', '¡Sedal flojo! Recoge' ); cls = 'is-warn'; }
+			else if ( fight.lineLeft < 25 ) { call = loc( 'Almost out of line! Tighten the drag', '¡Se acaba el hilo! Aprieta el freno' ); cls = 'is-warn'; }
+			else if ( fight.stamina < 0.35 ) { call = loc( 'It\'s tiring · bring it in', 'Está cansado · tráelo' ); cls = 'is-good'; }
+			else if ( fight.slipping ) { call = loc( 'The reel gives line', 'El carrete suelta hilo' ); }
+			else { call = loc( 'Good pressure', 'Buena presión' ); cls = 'is-good'; }
 			this.fCall.textContent = call;
 			this.fCall.className = 'gm-fight-call ' + cls;
 

@@ -315,7 +315,7 @@ export class FishingRod {
 		let elev = p.elev, side = p.side;
 		if ( this.state === 'fighting' && fight ) {
 
-			elev += - 0.35 * fight.surge + 0.12 * Math.sin( this.t * 2.3 );
+			elev += - 0.35 * fight.surge + 0.12 * Math.sin( this.t * 2.3 ) + ( fight.pullHeld ? 0.45 : 0 );
 			side += 0.12 * Math.sin( this.t * 1.1 + fight.surge * 2 );
 
 		}
@@ -480,17 +480,26 @@ export class FishingRod {
 
 		} else if ( this.state === 'fighting' && fight ) {
 
-			// the fish runs about at the fight's distance, the bobber dragged under near it
-			this._wander += dt * ( 0.4 + fight.surge * 1.5 );
-			_v.copy( this.fishPos ).sub( this.tip ).setY( 0 );
-			const d0 = _v.length() || 1;
-			_v.multiplyScalar( 1 / d0 );
-			const sideways = _x.set( - _v.z, 0, _v.x ).multiplyScalar( Math.sin( this._wander ) * 0.9 * dt * ( 1 + fight.surge ) );
+			// the fish at the fight's distance and bearing (it swings round on its runs); the bobber dragged under
+			// near it, thrown out of the water when it jumps
 			const dist = Math.max( 1, fight.distance );
-			this.fishPos.set( this.tip.x + _v.x * dist, 0, this.tip.z + _v.z * dist ).add( sideways );
+			if ( fight.bearing0 !== undefined ) {
+
+				const b = fight.bearing0 + fight.angle;
+				_v.set( Math.sin( b ), 0, Math.cos( b ) );
+
+			} else {
+
+				_v.copy( this.fishPos ).sub( this.tip ).setY( 0 );
+				_v.multiplyScalar( 1 / ( _v.length() || 1 ) );
+
+			}
+
+			this.fishPos.set( this.tip.x + _v.x * dist, 0, this.tip.z + _v.z * dist );
 			this.bobber.x += ( this.fishPos.x - this.bobber.x ) * ( 1 - Math.exp( - dt * 6 ) );
 			this.bobber.z += ( this.fishPos.z - this.bobber.z ) * ( 1 - Math.exp( - dt * 6 ) );
-			this.bobber.y += ( this.waterY - 0.05 - 0.2 * fight.surge - this.bobber.y ) * ( 1 - Math.exp( - dt * 8 ) );
+			const jumpY = fight.mode === 'jump' ? Math.sin( Math.min( 1, Math.max( 0, ( 0.9 - fight.modeT ) / 0.8 ) ) * Math.PI ) * ( 0.4 + 0.3 * Math.min( 1, fight.kg / 4 ) ) : 0;
+			this.bobber.y += ( this.waterY - 0.05 - 0.2 * fight.surge + jumpY - this.bobber.y ) * ( 1 - Math.exp( - dt * ( jumpY > 0 ? 14 : 8 ) ) );
 
 		} else if ( this.state === 'landing' ) {
 

@@ -77,39 +77,69 @@ for ( const id of FISH_IDS ) {
 }
 ok( fishValue( 'redSnapper', 5 ) > fishValue( 'redSnapper', 2 ), 'bigger fish is worth more' );
 
-// ---- the fight: three players
+// ---- the fight (D62): drag, reel, fast reel, pull, the rod against the run, jumps, snags
+const lineCapOf = ( lineKg ) => 120 + lineKg * 3;
 const policies = {
-	careful: ( g ) => g.tension < 0.68 && g.surge < 0.6,
-	mash: () => true,
-	idle: () => false,
+	// reels when the spool isn't slipping, pulls on holds and dives, lets go in jumps, rod against the run, works the drag
+	good: ( g ) => {
+
+		if ( g.tension > 0.8 && g.drag > 2 ) g.setDrag( g.drag - 1 );
+		else if ( g.tension < 0.3 && ! g.slipping && g.drag < 7 ) g.setDrag( g.drag + 1 );
+		return { reel: ! g.slipping || g.mode === 'come', fast: g.mode === 'come', pull: g.mode === 'dive' || g.mode === 'hold', side: g.mode === 'run' ? - g.runDir * 0.8 : 0 };
+
+	},
+	lazy: () => ( { reel: true } ),
+	tight: ( g ) => ( g.setDrag( 10 ), { reel: ! g.slipping, pull: g.mode === 'dive' } ),
+	idle: () => ( {} ),
+	alwaysPull: ( g ) => ( { reel: ! g.slipping, pull: true } ),
+	pullButJumps: ( g ) => ( { reel: ! g.slipping, pull: g.mode !== 'jump' } ),
 };
 const fight = ( species, kg, policy, lineKg = 7, reelSpeed = 1.1 ) => {
 
-	const g = new CatchMinigame( { species, kg, lineKg, reelSpeed, distance: 18, rng } );
+	const g = new CatchMinigame( { species, kg, lineKg, reelSpeed, distance: 18, lineCap: lineCapOf( lineKg ), rng } );
 	let st = 'fighting';
-	for ( let i = 0; i < 60 * 180 && st === 'fighting'; i ++ ) st = g.update( 1 / 60, policy( g ) );
-	return { st, t: g.time };
+	for ( let i = 0; i < 60 * 240 && st === 'fighting'; i ++ ) st = g.update( 1 / 60, policy( g ) );
+	return { st, cause: g.cause, t: g.time };
 
 };
-const table = {};
-for ( const [ species, kg ] of [ [ 'grunt', 0.8 ], [ 'yellowtail', 1.2 ], [ 'jack', 6 ], [ 'redSnapper', 5 ], [ 'tuna', 6 ], [ 'tuna', 13 ], [ 'tarpon', 35 ] ] ) {
+const runs = ( n, ...a ) => {
 
-	for ( const p of Object.keys( policies ) ) {
+	const out = { caught: 0 };
+	for ( let k = 0; k < n; k ++ ) {
 
-		const r = fight( species, kg, policies[ p ] );
-		table[ `${ species }/${ p }` ] = r;
-		console.log( `     ${ species } ${ kg } kg, ${ p }: ${ r.st } after ${ r.t.toFixed( 1 ) } s` );
+		const r = fight( ...a );
+		const key = r.st === 'caught' ? 'caught' : r.cause || 'timeout';
+		out[ key ] = ( out[ key ] || 0 ) + 1;
 
 	}
 
+	return out;
+
+};
+for ( const [ sp, kg, pol, line ] of [ [ 'pejerrey', 0.8, 'good', 7 ], [ 'rainbowTrout', 3.5, 'good', 7 ], [ 'carp', 3, 'lazy', 7 ], [ 'carp', 10, 'tight', 7 ], [ 'carp', 10, 'good', 13 ], [ 'tarpon', 35, 'good', 7 ] ] ) console.log( `     ${ sp } ${ kg } kg, ${ line } kg line, ${ pol }:`, JSON.stringify( runs( 12, sp, kg, policies[ pol ], line ) ) );
+ok( [ [ 'guapucha', 0.015 ], [ 'pejerrey', 0.8 ], [ 'grunt', 0.8 ], [ 'rainbowTrout', 1.5 ] ].every( ( [ s, k ] ) => runs( 8, s, k, policies.good ).caught === 8 ), 'small fish and a small trout are landed' );
+ok( runs( 12, 'rainbowTrout', 3.5, policies.good ).caught >= 11, 'a 3.5 kg trout is landed on the starter line with a good fight' );
+ok( runs( 20, 'carp', 3, policies.lazy ).snag > 0, 'never pulling lets a carp reach the weeds (snag)' );
+ok( runs( 12, 'carp', 3, policies.good ).caught === 12, 'pulling on its dives lands the carp' );
+ok( runs( 12, 'carp', 10, policies.tight ).line >= 10, 'a screwed-down drag on a big fish breaks the line' );
+ok( runs( 12, 'carp', 10, policies.good, 13, 1.5 ).caught >= 11, 'a 10 kg carp on the 13 kg line with the drag worked' );
+ok( runs( 12, 'tarpon', 35, policies.good ).caught === 0, 'a 35 kg tarpon beats the starter line' );
+ok( runs( 12, 'tuna', 13, policies.good, 26, 1.9 ).caught >= 11, 'a 13 kg tuna on the 26 kg line' );
+ok( runs( 12, 'grunt', 0.8, policies.idle ).caught === 0, 'never reeling never lands it' );
+{
+
+	const always = runs( 30, 'rainbowTrout', 2.5, policies.alwaysPull ), careful = runs( 30, 'rainbowTrout', 2.5, policies.pullButJumps );
+	console.log( '     trout jumps: always pulling', JSON.stringify( always ), '| letting go in jumps', JSON.stringify( careful ) );
+	ok( ( always.jump || 0 ) > 0 && ! careful.jump, 'a lifted rod in a jump throws the hook; letting go keeps it' );
+
 }
-ok( table[ 'grunt/careful' ].st === 'caught' && table[ 'yellowtail/careful' ].st === 'caught', 'careful reeling lands small fish' );
-ok( table[ 'jack/careful' ].st === 'caught', 'careful reeling lands a 6 kg jack on the starter line' );
-ok( table[ 'tuna/mash' ].st === 'snapped' && table[ 'tarpon/mash' ].st === 'snapped', 'holding reel on a big fish snaps the line' );
-ok( table[ 'tuna/careful' ].st !== 'caught' && fight( 'tuna', 13, policies.careful, 26, 1.6 ).st === 'caught', 'a 13 kg tuna needs the 30 lb line' );
-ok( [ 'escaped' ].includes( table[ 'grunt/idle' ].st ), 'never reeling loses the fish' );
-ok( fight( 'tarpon', 35, policies.careful ).st !== 'caught', 'a 35 kg tarpon beats the starter line' );
-ok( fight( 'tarpon', 35, policies.careful, 50, 2.2 ).st === 'caught', 'the top line and reel land it' );
+{
+
+	const g = new CatchMinigame( { species: 'carp', kg: 5, lineKg: 13, rng } );
+	g.setDrag( 0 ); const lo = g.drag; g.setDrag( 99 ); const hi = g.drag;
+	ok( lo === 1 && hi === 10 && Math.abs( g.dragKg - 13 * 0.95 ) < 1e-9, 'the drag has 10 positions up to 95 % of the line' );
+
+}
 
 // ---- inventory, wallet, save round trip
 const mem = new Map();

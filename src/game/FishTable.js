@@ -46,6 +46,34 @@ export const FISH = {
 	brownTrout: { name: loc( 'Brown trout', 'Trucha café' ), sci: 'Salmo trutta', lw: [ 0.0105, 3.0 ], model: 'brownTrout', habitat: { river: 0.15, deep: 0.45 }, kg: [ 0.5, 6 ], price: 8, fight: 0.55, stamina: 8, time: 'dawnDusk', rarity: 1, license: 3 },
 };
 
+// How each species fights (CatchMinigame.js, D62): runs (how often), speed (how fast its runs are), jumps (chance of a
+// jump after a run: let go of the right click), dive (how often it heads for the bottom), snag (a dive reaching the
+// weeds or rocks cuts the line unless you pull), come (how often it swims at you). Missing values follow from fight.
+const STYLES = {
+	// the lake
+	guapucha: { runs: 0.1, speed: 0.1, come: 0.05 },
+	carachi: { runs: 0.2, speed: 0.15 },
+	pejerrey: { runs: 0.55, speed: 0.55, come: 0.2 },
+	capitan: { runs: 0.15, speed: 0.2, dive: 0.8 },
+	rainbowTrout: { runs: 0.8, speed: 0.8, jumps: 0.55, come: 0.25 },
+	brownTrout: { runs: 0.6, speed: 0.6, jumps: 0.25, dive: 0.35, snag: true },
+	carp: { runs: 0.45, speed: 0.45, dive: 0.7, snag: true },
+	// the island
+	needlefish: { runs: 0.7, speed: 0.8, jumps: 0.45 },
+	mullet: { runs: 0.6, speed: 0.6, jumps: 0.2 },
+	grunt: { dive: 0.3 },
+	parrot: { dive: 0.3 },
+	angel: { dive: 0.3 },
+	grouper: { runs: 0.3, speed: 0.5, dive: 0.9, snag: true },
+	redSnapper: { runs: 0.5, speed: 0.6, dive: 0.5, snag: true },
+	jack: { runs: 0.85, speed: 0.85, dive: 0.2 },
+	barracuda: { runs: 0.7, speed: 1.0, jumps: 0.2 },
+	tuna: { runs: 0.9, speed: 0.95, dive: 0.4 },
+	mahi: { runs: 0.85, speed: 0.9, jumps: 0.5, come: 0.25 },
+	tarpon: { runs: 0.8, speed: 0.85, jumps: 0.8 },
+};
+for ( const k in STYLES ) if ( FISH[ k ] ) FISH[ k ].style = STYLES[ k ];
+
 export const FISH_IDS = Object.keys( FISH );
 
 // $ value of a fish; trophy-sized ones fetch a bit more per kg
