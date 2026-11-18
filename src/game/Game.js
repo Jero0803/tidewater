@@ -2,8 +2,9 @@ import { loc } from '../i18n.js';
 import { Vector3, Color } from '../engine/index.js';
 import { WORLD } from '../world/WorldLayout.js';
 import { FISH } from './FishTable.js';
-import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome } from './Bites.js';
-import { gradeRig, rigStats, fightTackle } from './Tackle.js';
+import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, biteMulHere } from './Bites.js';
+import { rigStats, fightTackle, biteMul } from './Tackle.js';
+import { rigIssues, rigCastable, TABLES } from './TackleBag.js';
 import { CatchMinigame, rodSide, DRAG_STEPS } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
@@ -385,7 +386,13 @@ export class Game {
 
 		if ( rod.equipped && ! panelOpen ) {
 
-			if ( rod.state === 'idle' && lDown ) rod.startWindup();
+			if ( rod.state === 'idle' && lDown ) {
+
+				const why = this.castBlock();
+				if ( why ) this.toast( why, 2600 );
+				else rod.startWindup();
+
+			}
 			else if ( rod.state === 'windup' && lUp ) rod.release();
 			else if ( rod.state === 'floating' ) {
 
@@ -651,18 +658,50 @@ export class Game {
 
 	}
 
-	// the rig in hand: until the new shop (E3) each float rig grade stands for a rod of the catalogue (Tackle.js)
+	// the rod in hand: the active one of the three assembled rods (TackleBag.js, E3)
 	rig() {
 
-		return gradeRig( this.state.upgrades.rig );
+		return this.state.rig;
 
 	}
 
-	// seconds to the next bite: on maps with tackle by pieces the wait is longer (D74); the bite multiplier of the
-	// bait stays off until baits can be chosen (E3)
+	// the rig's bite multiplier for a species (D64), or null on maps without tackle by pieces
+	biteMulFn() {
+
+		const rig = this.rig();
+		return this.map.tackle && rig ? ( id ) => biteMul( id, rig ).total : null;
+
+	}
+
+	// seconds to the next bite: on maps with tackle by pieces the wait is longer (D74) and divided by how much what
+	// lives here likes the rig (D64)
 	nextBiteDelay( hab ) {
 
-		return this.map.tackle ? biteDelayFor( hab, this.hour, 1 ) : biteDelay( hab, this.hour );
+		if ( ! this.map.tackle ) return biteDelay( hab, this.hour );
+		return biteDelayFor( hab, this.hour, biteMulHere( hab, this.hour, this.biteMulFn() ) );
+
+	}
+
+	// what keeps the active rod from being cast, worded for a toast (null when it can be cast)
+	castBlock() {
+
+		if ( ! this.map.tackle ) return null;
+		const t = this.state.tackle;
+		if ( rigCastable( t ) ) return null;
+		const issues = rigIssues( t ), r = t.rigs[ t.active ];
+		const name = ( kind, id ) => TABLES[ kind ][ id ]?.name ?? '';
+		const words = {
+			empty: loc( 'This rod slot is empty · assemble a rod in the shop', 'Esta caña no está armada · ármala en la tienda' ),
+			rod: loc( 'No rod on it', 'Le falta la caña' ), reel: loc( 'No reel on it', 'Le falta el carrete' ), line: loc( 'No line on the reel', 'Le falta el sedal' ),
+			bait: loc( 'No bait or lure on it', 'Le falta la carnada o el señuelo' ), hook: loc( 'A bait needs a hook', 'La carnada necesita un anzuelo' ),
+			float: loc( 'The float rod needs a float', 'La caña de flotador necesita una boya' ), sinker: loc( 'The bottom rod needs a sinker', 'La caña de fondo necesita un plomo' ),
+			lureTech: loc( 'Lures go on a spinning rod, baits on a float or bottom rod', 'Los señuelos van en caña de spinning; las carnadas, en caña de flotador o de fondo' ),
+			noBait: `${ loc( 'Out of', 'Se acabó:' ) } ${ r && r.bait ? name( r.bait in TABLES.lure ? 'lure' : 'bait', r.bait ) : '' }`,
+			noHook: `${ loc( 'Out of hooks', 'Se acabaron los anzuelos' ) } #${ r && r.hook }`,
+			noFloat: loc( 'Out of floats', 'Se acabaron las boyas' ), noSinker: loc( 'Out of sinkers', 'Se acabaron los plomos' ),
+		};
+		const first = issues.find( ( i ) => words[ i ] );
+		return first ? `${ words[ first ] } · ${ loc( 'shop: Marta', 'tienda: Marta' ) }` : loc( 'This rod is not ready', 'Esta caña no está lista' );
 
 	}
 
@@ -688,7 +727,7 @@ export class Game {
 		if ( b.phase === 'wait' ) {
 
 			const h = this.habitat();
-			const species = pickSpecies( h, this.hour );
+			const species = pickSpecies( h, this.hour, Math.random, this.biteMulFn() );
 			if ( ! species ) {
 
 				b.t = 8;
@@ -708,8 +747,11 @@ export class Game {
 			b.nibbles --;
 			b.pulse = 0;
 			// D74: a nibbling fish can take the bait without pulling the bobber under
-			if ( this.map.tackle && nibbleOutcome( {}, Math.random ) === 'steal' ) {
+			const rg = this.rig();
+			const lure = !! ( rg && rg.bait && rg.bait in TABLES.lure );
+			if ( this.map.tackle && nibbleOutcome( { lure }, Math.random ) === 'steal' ) {
 
+				this.state.spendTackle( 'bite' );
 				this.bite = { phase: 'empty' };
 				this.toast( loc( 'It stole the bait · reel in (right click) and cast again', 'Se robó la carnada · recoge (clic derecho) y vuelve a lanzar' ), 2600 );
 				return;
@@ -729,6 +771,7 @@ export class Game {
 		} else if ( b.phase === 'take' ) {
 
 			this.toast( loc( 'It took the bait and ran', 'Se llevó la carnada y escapó' ), 1800 );
+			if ( this.map.tackle ) this.state.spendTackle( 'bite' );
 			this.bite = this.map.tackle ? { phase: 'empty' } : { phase: 'wait', t: this.nextBiteDelay( this.habitat() ) };
 
 		}
@@ -760,6 +803,7 @@ export class Game {
 		// not every strike hooks it (D74): better early in the window
 		if ( tackle && strikeOutcome( 'take', 1 - b.t / ( b.window || 2 ), Math.random ) === 'missed' ) {
 
+			this.state.spendTackle( 'bite' );
 			this.bite = { phase: 'empty' };
 			this.toast( loc( 'Missed it · the bait is gone, reel in and cast again', 'Falló el enganche · se fue la carnada, recoge y vuelve a lanzar' ), 2600 );
 			return;
@@ -807,6 +851,15 @@ export class Game {
 		this.fight = null;
 		this.rod.dip = 0;
 		const name = FISH[ f.species ].name;
+		// what the outcome costs the rod (D66): a bait for any fish landed or lost; the end of the line with a snapped
+		// line; the rod too when it broke
+		let lostText = '';
+		if ( this.map.tackle ) {
+
+			const lost = this.state.spendTackle( st === 'snapped' ? ( f.cause === 'rod' ? 'rod' : 'snap' ) : 'bite' );
+			if ( st === 'snapped' && lost.length ) lostText = ` · ${ loc( 'Lost', 'Perdiste' ) }: ${ lost.map( ( [ k, id ] ) => ( k === 'hook' ? `${ loc( 'hook', 'anzuelo' ) } #${ id }` : k === 'float' ? `${ loc( 'float', 'boya' ) } ${ id } g` : k === 'sinker' ? `${ loc( 'sinker', 'plomo' ) } ${ id } g` : TABLES[ k ][ id ]?.name ?? '' ) ).join( ', ' ) }`;
+
+		}
 		if ( st === 'caught' ) {
 
 			const entry = this.state.addFish( f.species, f.kg, this.hour );
@@ -828,11 +881,11 @@ export class Game {
 
 		} else if ( st === 'snapped' ) {
 
-			const why = f.cause === 'rod' ? loc( 'The rod broke! · the fish was too much for it: loosen the drag', '¡Se rompió la caña! · el pez era demasiado para ella: afloja el freno' )
+			const why = f.cause === 'rod' ? loc( 'The rod broke! · the fish was too much for it: loosen the drag. Buy another one at the shop', '¡Se rompió la caña! · el pez era demasiado para ella: afloja el freno. Compra otra en la tienda' )
 				: f.cause === 'spooled' ? loc( 'It took all the line on the reel · tighten the drag sooner', 'Se llevó todo el hilo del carrete · aprieta el freno antes' )
 				: f.cause === 'snag' ? loc( 'It wrapped the line in the weeds · pull (right click) when it dives', 'Enredó el hilo en el fondo · tira con el clic derecho cuando baja' )
 					: loc( 'Snap! The line broke · loosen the drag on its runs', '¡Zas! Se rompió el sedal · afloja el freno en sus carreras' );
-			this.toast( why, 3200 );
+			this.toast( why + lostText, 4200 );
 			if ( au && au.lineSnap ) au.lineSnap();
 			this.rod.setState( 'idle' );
 

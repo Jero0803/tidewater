@@ -39,9 +39,9 @@ export function activity( pref, hour ) {
 
 }
 
-// Weighted pick of the species that bites here; null when nothing lives here.
-// rng: () => [0, 1)
-export function pickSpecies( habitat, hour, rng = Math.random ) {
+// how much each species of the map bites here and now (habitat × rarity × time of day), times mul( id ) (the rig's
+// bite multiplier for that species, Tackle.biteMul; 1 when not given)
+function speciesWeights( habitat, hour, mul ) {
 
 	let total = 0;
 	const w = [];
@@ -50,11 +50,29 @@ export function pickSpecies( habitat, hour, rng = Math.random ) {
 		const f = FISH[ id ];
 		let hw = 0;
 		for ( const k in f.habitat ) hw += f.habitat[ k ] * habitat[ k ];
-		const x = hw * f.rarity * activity( f.time, hour );
+		const x = hw * f.rarity * activity( f.time, hour ) * ( mul ? mul( id ) : 1 );
 		w.push( x );
 		total += x;
 
 	}
+
+	return { w, total };
+
+}
+
+// the rig's bite multiplier averaged over what lives here (D64): the wait for a bite is divided by it
+export function biteMulHere( habitat, hour, mul ) {
+
+	const base = speciesWeights( habitat, hour, null ).total;
+	return base < 1e-4 ? 1 : speciesWeights( habitat, hour, mul ).total / base;
+
+}
+
+// Weighted pick of the species that bites here; null when nothing lives here.
+// rng: () => [0, 1); mul: optional ( id ) => the rig's bite multiplier for that species
+export function pickSpecies( habitat, hour, rng = Math.random, mul = null ) {
+
+	const { w, total } = speciesWeights( habitat, hour, mul );
 
 	if ( total < 1e-4 ) return null;
 	let r = rng() * total;

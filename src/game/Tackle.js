@@ -73,6 +73,8 @@ export const BAITS = {
 	pellet: { name: loc( 'Trout pellets', 'Pellet de trucha' ), n: 30, cost: 6, level: 3, g: 1 },
 	grasshopper: { name: loc( 'Grasshoppers', 'Saltamontes' ), n: 20, cost: 6, level: 2, g: 1 },
 	eggs: { name: loc( 'Artificial trout eggs', 'Huevas de trucha artificiales' ), n: 30, cost: 7, level: 3, g: 1 },
+	// D79: small fish as live bait (caught guapuchas and carachis go in the bucket, or bought)
+	livebait: { name: loc( 'Live baitfish', 'Pez carnada vivo' ), n: 10, cost: 8, level: 4, g: 3 },
 };
 // lures: bought one by one, lost with a snapped line; they carry their own hook
 export const LURES = {
@@ -90,15 +92,16 @@ export const isLure = ( id ) => id in LURES;
 //   hook        [ biggest, smallest ] hook size that fits its mouth
 //   lineD       the thickest line (mm) it doesn't notice; wary 0..1, how much a thicker one puts it off
 //   mouth       how much the hook holds before tearing out (× weight^0.6, used by the fight from E2)
+//   power       the rod powers that suit it (the shop's "for which fish")
 export const PREFS = {
-	guapucha: { best: [ 'larva', 'bread' ], ok: [ 'worm' ], hook: [ 10, 14 ], lineD: 0.12, wary: 0.2, mouth: 1.2 },
-	carachi: { best: [ 'larva', 'worm' ], ok: [ 'bread' ], hook: [ 8, 12 ], lineD: 0.14, wary: 0.3, mouth: 1.4 },
-	pejerrey: { best: [ 'larva', 'spin1' ], ok: [ 'worm', 'spin2' ], hook: [ 6, 10 ], lineD: 0.16, wary: 0.5, mouth: 1.3 },
-	capitan: { best: [ 'worm' ], ok: [ 'larva' ], hook: [ 4, 8 ], lineD: 0.25, wary: 0.3, mouth: 2.2 },
+	guapucha: { best: [ 'larva', 'bread' ], ok: [ 'worm' ], hook: [ 10, 14 ], lineD: 0.12, wary: 0.2, mouth: 1.2, power: [ 'UL' ] },
+	carachi: { best: [ 'larva', 'worm' ], ok: [ 'bread' ], hook: [ 8, 12 ], lineD: 0.14, wary: 0.3, mouth: 1.4, power: [ 'UL', 'L' ] },
+	pejerrey: { best: [ 'larva', 'spin1' ], ok: [ 'worm', 'spin2' ], hook: [ 6, 10 ], lineD: 0.16, wary: 0.5, mouth: 1.3, power: [ 'UL', 'L' ] },
+	capitan: { best: [ 'worm' ], ok: [ 'larva' ], hook: [ 4, 8 ], lineD: 0.25, wary: 0.3, mouth: 2.2, power: [ 'L', 'ML' ] },
 	// reference: a trout lake of Fishing Planet (level 5): insects, eggs and small spinners first (2026-11-18)
-	rainbowTrout: { best: [ 'spin1', 'spin2', 'eggs', 'grasshopper' ], ok: [ 'worm', 'larva', 'spoon', 'soft', 'pellet', 'corn' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5 },
-	carp: { best: [ 'corn', 'bread' ], ok: [ 'worm', 'pellet' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4 },
-	brownTrout: { best: [ 'minnow', 'spoon' ], ok: [ 'worm', 'soft', 'spin2', 'grasshopper' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6 },
+	rainbowTrout: { best: [ 'spin1', 'spin2', 'eggs', 'grasshopper' ], ok: [ 'worm', 'larva', 'spoon', 'soft', 'pellet', 'corn', 'livebait' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5, power: [ 'L', 'ML' ] },
+	carp: { best: [ 'corn', 'bread' ], ok: [ 'worm', 'pellet' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4, power: [ 'M', 'MH' ] },
+	brownTrout: { best: [ 'minnow', 'spoon', 'livebait' ], ok: [ 'worm', 'soft', 'spin2', 'grasshopper' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6, power: [ 'ML', 'M' ] },
 };
 
 export const BITE = { ok: 0.4, other: 0.05, lineMin: 0.25, lineSlope: 1.5, bigHook: 0.4, bigHookMiss: 0.5 };
@@ -189,14 +192,14 @@ export function fightTackle( species, rig ) {
 
 }
 
-// Until the new shop (E3) the float rig grades stand for these rods of the catalogue (the lake): the starter rod, then
-// stronger rods, reels and lines. Bait stays maggots and the bite multiplier is off until baits can be chosen.
+// The float rig grades of the Phase 1 shop as rods of the catalogue (the lake): the starter rod, then stronger rods,
+// reels and lines. Saves from before tackle by pieces get the rod of their grade (TackleBag.tackleFromGrade).
 export const GRADE_RIGS = [
 	STARTER_RIG,
 	{ rod: 'floatL', reel: 'r2000', line: 'm20', hook: 8, float: 3, sinker: null, bait: 'larva' },
 	{ rod: 'floatL', reel: 'r2500', line: 'm25', hook: 6, float: 6, sinker: null, bait: 'larva' },
-	{ rod: 'spinML', reel: 'r3000', line: 'm30', hook: 4, float: 6, sinker: null, bait: 'larva' },
-	{ rod: 'bottomM', reel: 'r4000', line: 'm35', hook: 4, float: null, sinker: 40, bait: 'larva' },
+	{ rod: 'spinML', reel: 'r3000', line: 'm30', hook: null, float: null, sinker: null, bait: 'spin2' },
+	{ rod: 'bottomM', reel: 'r4000', line: 'm35', hook: 4, float: null, sinker: 20, bait: 'larva' },
 	{ rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 2, float: null, sinker: 60, bait: 'larva' },
 	{ rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 1, float: null, sinker: 60, bait: 'larva' },
 ];

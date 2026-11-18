@@ -98,14 +98,18 @@ export function licenseSecondsLeft( licences, playedSeconds ) {
 
 // buy (or extend) a tier: a new licence starts now, buying again while it runs adds another day.
 // Returns the new licences object (the input is not changed).
-export function withLicense( licences, tier, playedSeconds ) {
+export function withLicense( licences, tier, playedSeconds, days = 1 ) {
 
-	const until = Math.max( playedSeconds, licences?.[ tier ] ?? 0 ) + LICENSE_SECONDS;
+	const until = Math.max( playedSeconds, licences?.[ tier ] ?? 0 ) + LICENSE_SECONDS * days;
 	return { ...licences, [ tier ]: until };
 
 }
 
-// a new game starts with the basic licence for its first day (D18)
+// licences by days (D80): 1, 3 or 7 game days of play, the longer ones cheaper per day (as in Fishing Planet)
+export const LICENSE_DAYS = [ { days: 1, mul: 1 }, { days: 3, mul: 2.8 }, { days: 7, mul: 6.3 } ];
+export const licensePrice = ( L, days = 1 ) => ( L.free ? 0 : Math.round( L.price * ( LICENSE_DAYS.find( ( d ) => d.days === days )?.mul ?? days ) ) );
+
+// a new game starts with the basic licence for its first day (D18; on the starting map it is free for good, D82)
 export const starterLicences = () => ( { 1: LICENSE_SECONDS } );
 
 // can this catch go in the cooler? Juveniles and protected species are always released (they still give XP, D13,

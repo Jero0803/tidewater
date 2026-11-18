@@ -5,6 +5,7 @@ import { FishPortrait } from './FishPortrait.js';
 import { levelFromXp, LICENSES, LICENSE_WARN_SECONDS, DAY_SECONDS, licenseTierOf, dayPhase } from './Progression.js';
 import { activeMap, MAPS } from '../maps/registry.js';
 import { travelOptions } from './Travel.js';
+import { BAITFISH } from './GameState.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -100,7 +101,7 @@ const CSS = /* css */`
 .gm-shop-row .gm-have { color: var(--tw-ink-3); font-size: var(--tw-fs-sm); }
 .gm-log { margin-top: var(--tw-3); color: var(--tw-ink-3); font-size: var(--tw-fs-sm); line-height: 1.5; }
 .gm-row .gm-cm { font-family: var(--tw-mono); color: var(--tw-ink-3); }
-.gm-row.has-cm { grid-template-columns: 1fr auto auto auto auto; }
+.gm-row.has-cm { grid-template-columns: 1fr auto auto auto auto auto; }
 /* level, XP and licence (Phase 1) */
 .gm-level { display: flex; align-items: center; gap: var(--tw-2); color: var(--tw-ink-2); font-size: var(--tw-fs-md); }
 .gm-level b { font-family: var(--tw-mono); font-weight: 600; color: var(--tw-ink); }
@@ -214,6 +215,7 @@ export const className = ( id ) => ( { juvenile: loc( 'Juvenile', 'Juvenil' ), c
 // time left: "1 h 35 min" / "12 min"
 const minutes = ( sec ) => {
 
+	if ( ! Number.isFinite( sec ) ) return loc( 'no expiry', 'sin vencimiento' ); // the free basic licence (D82)
 	const m = Math.ceil( sec / 60 );
 	return m >= 60 ? `${ Math.floor( m / 60 ) } h${ m % 60 ? ` ${ m % 60 } min` : '' }` : `${ m } min`;
 
@@ -587,7 +589,7 @@ export class GameHUD {
 
 		const s = this.game.state;
 		const tag = ( f ) => ( f.cls === 'trophy' || f.cls === 'unique' ? `<small class="cls-${ f.cls }">${ className( f.cls ).toLowerCase() }</small>` : '' );
-		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }${ tag( f ) }${ f.record ? '<small>' + loc( 'record', 'récord' ) + '</small>' : '' }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span><button class="gm-mini" data-release="${ f.id }">${ loc( 'Release', 'Soltar' ) }</button></div>` ).join( '' );
+		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }${ tag( f ) }${ f.record ? '<small>' + loc( 'record', 'récord' ) + '</small>' : '' }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span>${ activeMap().tackle && BAITFISH.has( f.species ) ? `<button class="gm-mini" data-bucket="${ f.id }" title="${ loc( 'Keep it alive as bait', 'Guárdalo vivo como carnada' ) }">${ loc( 'To the bucket', 'Al cubo' ) }</button>` : '' }<button class="gm-mini" data-release="${ f.id }">${ loc( 'Release', 'Soltar' ) }</button></div>` ).join( '' );
 		const logged = Object.entries( s.log ).filter( ( [ k ] ) => FISH[ k ] ).map( ( [ k, v ] ) => `${ FISH[ k ].name }: ${ v.count } ${ loc( 'caught, best', 'capturados, mejor' ) } ${ v.bestKg.toFixed( 2 ) } kg · ${ v.bestCm ?? Math.round( fishLengthCm( k, v.bestKg ) ) } cm` ).join( '<br>' );
 		this.inv.innerHTML = `
 			<h2>${ s.upgrades.hold > 0 ? loc( 'Fish hold', 'Bodega' ) : loc( 'Cooler', 'Nevera' ) }</h2>
@@ -598,6 +600,7 @@ export class GameHUD {
 			<div class="gm-foot"><span class="gm-sub">${ loc( 'Sell at the fish stand by the pier', 'Vende en el puesto de pescado junto al muelle' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Close (I)', 'Cerrar (I)' ) }</button></div>`;
 		this.inv.querySelector( '[data-close]' ).onclick = () => this.toggleInventory( false );
 		for ( const b of this.inv.querySelectorAll( '[data-release]' ) ) b.onclick = () => s.release( Number( b.dataset.release ) );
+		for ( const b of this.inv.querySelectorAll( '[data-bucket]' ) ) b.onclick = () => s.toBucket( Number( b.dataset.bucket ) );
 
 	}
 
@@ -703,7 +706,8 @@ GameHUD.prototype.renderShop = function () {
 
 	const s = this.game.state;
 	const v = this.vendor;
-	const rows = Object.entries( UPGRADES ).map( ( [ key, track ] ) => {
+	// on maps with tackle by pieces the float rig grades are gone: rods are bought by pieces (E3)
+	const rows = Object.entries( UPGRADES ).filter( ( [ key ] ) => ! ( key === 'rig' && activeMap().tackle ) ).map( ( [ key, track ] ) => {
 
 		const cur = track.levels[ s.upgrades[ key ] | 0 ];
 		const next = nextLevel( s.upgrades, key );
@@ -722,7 +726,9 @@ GameHUD.prototype.renderShop = function () {
 		const block = s.licenseBlock( L.tier );
 		const status = own ? `${ loc( 'Active', 'Activa' ) } · ${ minutes( s.licences[ L.tier ] - s.playedSeconds ) }${ L.tier < active ? ' · ' + loc( 'covered by a higher one', 'cubierta por una superior' ) : '' }`
 			: block === 'level' ? `${ loc( 'From level', 'Desde el nivel' ) } ${ L.minLevel }` : '';
-		const btn = block === 'level'
+		const btn = L.free
+			? `<span class="gm-have">${ loc( 'Free · no expiry', 'Gratis · sin vencimiento' ) }</span>`
+			: block === 'level'
 			? `<span class="gm-have">${ loc( 'Level', 'Nivel' ) } ${ L.minLevel }</span>`
 			: `<button class="gm-btn" data-lic="${ L.tier }" ${ block ? 'disabled' : '' }>${ own ? loc( '+1 day', '+1 día' ) : loc( 'Buy', 'Comprar' ) } · $${ L.price }</button>`;
 		return `<div class="gm-shop-row${ own ? ' is-active' : '' }"><span>${ loc( `${ licenseName( L.tier ) } licence`, `Licencia ${ licenseName( L.tier ).toLowerCase() }` ) }${ status ? ` · ${ status }` : '' }<small>${ L.tier > 1 ? loc( 'Adds: ', 'Suma: ' ) : '' }${ names }</small></span>${ btn }</div>`;

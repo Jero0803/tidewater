@@ -1,8 +1,14 @@
 import { FISH, fishLengthCm } from './FishTable.js';
 import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE, convertLegacyUpgrades } from './Gear.js';
 import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES,
-	sizeClass, classValue, releaseReason, licenseTierOf } from './Progression.js';
+	sizeClass, classValue, releaseReason, licenseTierOf, licensePrice, LICENSE_DAYS } from './Progression.js';
 import { activeMap } from '../maps/registry.js';
+import { rigStats } from './Tackle.js';
+import { starterTackle, tackleFromGrade, cleanTackle, equip, spendFor, add, canBuy, packPrice, packUnits, canSell, sellPrice,
+	spend, PACKS, packItems, packCost, packLevel, baitKind, TABLES } from './TackleBag.js';
+
+// small fish that can go in the bait bucket instead of the cooler (D79)
+export const BAITFISH = new Set( [ 'guapucha', 'carachi', 'silverside', 'mullet' ] );
 
 // Save version 3 (docs/DISENO.md D20, D44): v2 plus the Phase 1 shop (float rig by grade). Older saves are read from
 // their own keys and converted (v1 -> v2 -> v3); the old keys are left untouched, so going back to an older build
@@ -41,6 +47,8 @@ export class GameState {
 		// | 'license' | 'full' | null), tier (licence tier the species needs) }
 		this.lastCatch = null;
 		this.upgrades = defaultUpgrades();
+		// tackle by pieces (TackleBag.js, E3): the bag and the three assembled rods; travels with the player
+		this.tackle = starterTackle();
 		this.fuel = null; // litres left (null = full tank)
 		this._nextId = 1;
 		this.listeners = new Set();
@@ -77,36 +85,44 @@ export class GameState {
 
 	}
 
-	// ---- licences of the current map
+	// ---- licences of the current map. The basic licence of the starting map is free and never runs out (D82)
+	get basicFree() {
+
+		return !! ( LICENSES[ 1 ] && LICENSES[ 1 ].free );
+
+	}
+
 	get licenseTier() {
 
-		return activeLicenseTier( this.licences, this.playedSeconds );
+		return Math.max( activeLicenseTier( this.licences, this.playedSeconds ), this.basicFree ? 1 : 0 );
 
 	}
 
 	get licenseSecondsLeft() {
 
+		if ( this.basicFree && activeLicenseTier( this.licences, this.playedSeconds ) <= 1 ) return Infinity;
 		return licenseSecondsLeft( this.licences, this.playedSeconds );
 
 	}
 
 	// why a licence can't be bought now ('level' | 'money'), or null when it can
-	licenseBlock( tier ) {
+	licenseBlock( tier, days = 1 ) {
 
 		const L = LICENSES[ tier ];
-		if ( ! L ) return 'unknown';
+		if ( ! L || ! LICENSE_DAYS.some( ( d ) => d.days === days ) ) return 'unknown';
+		if ( L.free ) return 'free';
 		if ( this.level < L.minLevel ) return 'level';
-		if ( this.money < L.price ) return 'money';
+		if ( this.money < licensePrice( L, days ) ) return 'money';
 		return null;
 
 	}
 
-	// buy (or extend by a day) a licence tier of the current map; false when it can't be bought
-	buyLicense( tier ) {
+	// buy (or extend) a licence tier of the current map for 1, 3 or 7 game days (D80); false when it can't be bought
+	buyLicense( tier, days = 1 ) {
 
-		if ( this.licenseBlock( tier ) ) return false;
-		this.money -= LICENSES[ tier ].price;
-		this.licences = withLicense( this.licences, tier, this.playedSeconds );
+		if ( this.licenseBlock( tier, days ) ) return false;
+		this.money -= licensePrice( LICENSES[ tier ], days );
+		this.licences = withLicense( this.licences, tier, this.playedSeconds, days );
 		this.save();
 		this.emit();
 		return true;
@@ -124,7 +140,113 @@ export class GameState {
 
 	get stats() {
 
-		return gearStats( this.upgrades );
+		const s = gearStats( this.upgrades );
+		// on maps with tackle by pieces the assembled rod gives the cast, the line and the reel (E3)
+		const st = activeMap().tackle && this.rig ? rigStats( this.rig ) : null;
+		if ( st ) Object.assign( s, { castM: st.castM, lineKg: st.lineKg, reelSpeed: st.reelSpeed } );
+		return s;
+
+	}
+
+	// ---- tackle by pieces (E3a)
+	get rig() { return this.tackle.rigs[ this.tackle.active ]; }
+
+	// why a piece can't be bought ('unknown' | 'level' | 'money') or null
+	pieceBlock( kind, id ) {
+
+		return canBuy( kind, id, { money: this.money, level: this.level } );
+
+	}
+
+	// buy one purchase of a piece (a pack of baits, one rod…); equip: also put it on the active rod
+	buyPiece( kind, id, { equip: andEquip = false } = {} ) {
+
+		if ( this.pieceBlock( kind, id ) ) return false;
+		this.money -= packPrice( kind, id );
+		add( this.tackle.bag, kind, kind === 'hook' || kind === 'float' || kind === 'sinker' ? Number( id ) : id, packUnits( kind, id ) );
+		if ( andEquip ) equip( this.tackle, kind, id );
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
+	equipPiece( kind, id, slot = this.tackle.active ) {
+
+		const ok = equip( this.tackle, kind, id, slot );
+		if ( ok ) { this.save(); this.emit(); }
+		return ok;
+
+	}
+
+	// sell a rod, reel or spool that is not on a rig for half its price (D68)
+	sellPiece( kind, id ) {
+
+		if ( ! canSell( this.tackle, kind, id ) ) return false;
+		spend( this.tackle.bag, kind, id );
+		this.money += sellPrice( kind, id );
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
+	// a pack by species (D69): every piece of the right rod, 15 % off, assembled on the active rod
+	packBlock( packId ) {
+
+		const p = PACKS[ packId ];
+		if ( ! p ) return 'unknown';
+		if ( this.level < packLevel( p ) ) return 'level';
+		if ( this.money < packCost( p ) ) return 'money';
+		return null;
+
+	}
+
+	buyPack( packId ) {
+
+		if ( this.packBlock( packId ) ) return false;
+		const p = PACKS[ packId ];
+		this.money -= packCost( p );
+		for ( const [ kind, id ] of packItems( p ) ) add( this.tackle.bag, kind, id, packUnits( kind, id ) );
+		const r = p.rig;
+		for ( const kind of [ 'rod', 'reel', 'line' ] ) equip( this.tackle, kind, r[ kind ] );
+		for ( const kind of [ 'hook', 'float', 'sinker' ] ) if ( r[ kind ] ) equip( this.tackle, kind, r[ kind ] );
+		if ( r.bait ) equip( this.tackle, baitKind( r.bait ), r.bait );
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
+	// what a fishing event costs the active rod (D66): 'bite' | 'snap' | 'rod'; returns what was lost
+	spendTackle( event ) {
+
+		const lost = spendFor( this.tackle, event );
+		if ( lost.length ) { this.save(); this.emit(); }
+		return lost;
+
+	}
+
+	// a guapucha or carachi from the cooler goes in the bait bucket (D79)
+	toBucket( id ) {
+
+		const i = this.inventory.findIndex( ( f ) => f.id === id );
+		if ( i < 0 || ! BAITFISH.has( this.inventory[ i ].species ) ) return false;
+		this.inventory.splice( i, 1 );
+		add( this.tackle.bag, 'bait', 'livebait', 1 );
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
+	setActiveRig( slot ) {
+
+		if ( slot < 0 || slot >= this.tackle.rigs.length || slot === this.tackle.active ) return false;
+		this.tackle.active = slot;
+		this.save();
+		this.emit();
+		return true;
 
 	}
 
@@ -298,6 +420,7 @@ export class GameState {
 			v: 3,
 			// travels with the player (D20)
 			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, hour: this.hour, upgrades: this.upgrades, fuel: this.fuel,
+			tackle: this.tackle,
 			inventory: this.inventory, nextId: this._nextId,
 			// per map
 			map: this.homeMap || this.mapId, maps: this.maps,
@@ -329,6 +452,9 @@ export class GameState {
 		this.mapId = typeof d.map === 'string' ? d.map : START_MAP;
 		this.map; // make sure the current map has its data
 		this.upgrades = { ...defaultUpgrades(), ...( d.upgrades || {} ) };
+		// tackle by pieces (E3a): added to version 3 without a new version; a save without it gets the rod of its float
+		// rig grade (and the starter consumables), so nobody loses anything
+		this.tackle = cleanTackle( d.tackle ) || tackleFromGrade( this.upgrades.rig );
 		this.fuel = Number.isFinite( d.fuel ) ? d.fuel : null;
 		this._nextId = Math.max( d.nextId | 0, ...this.inventory.map( ( f ) => f.id + 1 ), 1 );
 		return true;
@@ -380,6 +506,7 @@ export class GameState {
 		this.mapId = activeMap().id;
 		this.maps = { [ this.mapId ]: newMapData() };
 		this.upgrades = defaultUpgrades();
+		this.tackle = starterTackle();
 		this.fuel = null;
 		this.save();
 		this.emit();

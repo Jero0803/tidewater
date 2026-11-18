@@ -63,7 +63,7 @@ export const LAKE = {
 	// advanced $60 at level 7, each ×5)
 	licenses: [
 		null,
-		{ tier: 1, id: 'basic', price: 50, minLevel: 1 },
+		{ tier: 1, id: 'basic', price: 0, minLevel: 1, free: true }, // free and never runs out on the starting map (D82)
 		{ tier: 2, id: 'intermediate', price: 175, minLevel: 4 },
 		{ tier: 3, id: 'advanced', price: 300, minLevel: 7 },
 	],

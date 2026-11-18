@@ -142,7 +142,10 @@ function progressTab( active ) {
 	const lic = d.maps && d.maps[ d.map ] ? d.maps[ d.map ].licences || {} : {};
 	let tier = 0;
 	for ( const [ k, until ] of Object.entries( lic ) ) if ( until > t && Number( k ) > tier ) tier = Number( k );
-	const left = tier ? lic[ tier ] - t : 0;
+	// the basic licence of the starting map is free and never runs out (D82)
+	const freeBasic = !! catalogEntry( d.map )?.freeBasic && tier <= 1;
+	if ( freeBasic ) tier = 1;
+	const left = freeBasic ? Infinity : tier ? lic[ tier ] - t : 0;
 	const up = d.upgrades || {};
 	const rig = UPGRADES.rig.levels[ Math.min( up.rig | 0, UPGRADES.rig.levels.length - 1 ) ];
 	const hold = UPGRADES.hold.levels[ Math.min( up.hold | 0, UPGRADES.hold.levels.length - 1 ) ];
@@ -171,7 +174,7 @@ function progressTab( active ) {
 		<div class="pt-stats">
 			<div><span>${ loc( 'Money', 'Dinero' ) }</span><b>${ money( d.money ) }</b></div>
 			<div><span>${ loc( 'Played', 'Jugado' ) }</span><b>${ played( t ) }</b></div>
-			<div><span>${ loc( 'Licence', 'Licencia' ) }</span><b>${ LICENSE[ tier ] }</b><small>${ tier ? `${ played( left ) } ${ loc( 'left', 'restantes' ) }` : '' }</small></div>
+			<div><span>${ loc( 'Licence', 'Licencia' ) }</span><b>${ LICENSE[ tier ] }</b><small>${ freeBasic ? loc( 'free, no expiry', 'gratis, sin vencimiento' ) : tier ? `${ played( left ) } ${ loc( 'left', 'restantes' ) }` : '' }</small></div>
 		</div>
 		<div class="pt-gear"><span>${ loc( 'Float rig', 'Aparejo de flotador' ) } ${ loc( 'grade', 'grado' ) } ${ rig.grade } · ${ rig.lineKg } kg</span><span>${ esc( hold.label ) }</span>${ extras.length ? `<span>${ extras.join( ' · ' ) }</span>` : '' }</div>
 		${ logs }
@@ -204,7 +207,7 @@ function render() {
 				<div class="pt-card">
 					<div class="pt-card-head"><span>${ sum ? loc( 'Continue', 'Continuar' ) : loc( 'Start', 'Empezar' ) }</span><span>${ sum ? when( active.lastPlayed ) : '' }</span></div>
 					<div class="pt-card-name">${ esc( active.name ) }</div>
-					<div class="pt-card-meta">${ sum ? `${ map ? esc( map.name ) : '' } · ${ loc( 'Level', 'Nivel' ) } <b>${ sum.level }</b> · <b>${ money( sum.money ) }</b> · ${ played( sum.played ) }` : loc( 'A new game: you start on the mountain lake with the basic licence free for your first day.', 'Partida nueva: empiezas en el lago de montaña con la licencia básica regalada el primer día.' ) }</div>
+					<div class="pt-card-meta">${ sum ? `${ map ? esc( map.name ) : '' } · ${ loc( 'Level', 'Nivel' ) } <b>${ sum.level }</b> · <b>${ money( sum.money ) }</b> · ${ played( sum.played ) }` : loc( 'A new game: you start on the mountain lake, where the basic licence is free for good.', 'Partida nueva: empiezas en el lago de montaña, donde la licencia básica es gratis y no vence.' ) }</div>
 					<div class="pt-card-row">
 						<button type="button" class="pt-play" data-play>${ PLAY }<span>${ sum ? loc( 'Play', 'Jugar' ) : loc( 'Start fishing', 'Empezar a pescar' ) }</span></button>
 						<span class="pt-hint">${ loc( 'The game loads in a few seconds', 'El juego carga en unos segundos' ) }</span>

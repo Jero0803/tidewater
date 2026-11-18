@@ -1303,7 +1303,7 @@ llevar (en el panel del destino y la guía) y cada caña en dos o tres largos.
 |---|---|---|
 | E1 | Datos y reglas, sin cambiar el juego: `src/game/Tackle.js` (catálogo del lago, preferencias por especie, caña armada, problemas de armado, multiplicador de picada) y el enganche de D74 en `Bites.js`; `equipo-lago.mjs` lee de ahí; 28 tests | **Hecha** (2026-11-18) |
 | E2 | Pelea con equipo en el lago (`map.tackle`): fuerza realista, aguante de D73, freno tope del carrete, desgarre según la rigidez, caña rota; tres barras de carga por segmentos, metros fuera / capacidad, dial del freno; espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %; `hourMul` y `xpMul` por especie (D75) y clases de D78. Provisional hasta E3: cada grado del aparejo de flotador equivale a una caña del catálogo (`GRADE_RIGS`), el multiplicador de picada por cebo está apagado y la caña rota no se pierde. La isla sigue con la pelea P1 | **Hecha** (2026-11-18) |
-| E3 | Tienda nueva en rejilla (D81) con filtros, panel del artículo, paquetes por especie, comprar y equipar, vender al 50 %; licencias por varios días (D80); pez carnada (D79); el multiplicador de picada por cebo se enciende; guardado versión 4 | Pendiente |
+| E3 | Tienda nueva en rejilla (D81) con filtros, panel del artículo, paquetes por especie, comprar y equipar, vender al 50 %; licencias por varios días (D80); pez carnada (D79); el multiplicador de picada por cebo se enciende; guardado versión 4 | **E3a hecha** (2026-11-18); E3b pendiente |
 | E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
 | E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa | Pendiente |
 | E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) | Pendiente |
@@ -1312,6 +1312,35 @@ llevar (en el panel del destino y la guía) y cada caña en dos o tres largos.
 cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fijar el catálogo del lago con números
 (potencias, sedales, carretes, precios) y medirlo con `fight.mjs` y `npm run balance`. **Hecho** (D72, tabla arriba). Decididos también D67 (sin desgaste), D68 (vender al
 50 %), D69 (paquetes por especie), D70 (misiones de "Primeros pasos") y D71 (pantallas al estilo de FP).
+
+### Plan de E3 (2026-11-18)
+
+**E3a · Datos y reglas (sin pantallas nuevas):**
+- **Mochila de equipo** en el guardado (campo nuevo `tackle`, se agrega sin cambiar la versión 3: los guardados viejos lo
+  reciben al cargar): cañas y carretes por unidades; bobinas de sedal; anzuelos, boyas y plomos por unidades; carnadas por
+  unidades; señuelos por unidades. Y **las cañas armadas** (`rigs`, tres lugares, D65) con la activa.
+- **Conversión:** quien no tiene mochila recibe las piezas de su grado del aparejo de flotador (`GRADE_RIGS`) armadas en la
+  caña 1, más el equipo inicial (sobre de anzuelos #12, boyas de 3 g, 30 larvas y 20 lombrices). Nadie pierde nada.
+- **Qué se gasta:** una carnada por picada (sacada, perdida, robada o fallada); con el sedal cortado se pierden anzuelo, boya
+  o plomo y la carnada o el señuelo; con la caña rota se pierde la caña (D66). Sin carnada, sin anzuelo o con una pieza
+  que falta, la caña no se puede lanzar y el aviso dice qué falta.
+- **La picada por cebo se enciende** (D64): cada especie pica según su multiplicador con la caña activa; la espera se
+  divide por el promedio y la especie se elige con los pesos multiplicados.
+- **Licencias por días** (D80): 1, 3 o 7 días (×1, ×2.8, ×6.3 el precio de un día). **La básica del lago es gratis y sin
+  vencimiento** (D82).
+- **Pez carnada** (D79): una carnada nueva, "pez carnada vivo"; la guapucha y el carachi sacados pueden ir al cubo en vez
+  de a la nevera (un botón en la tarjeta de captura); también se compra. Preferido de la trucha café, aceptable para la
+  trucha arcoíris.
+- **Para qué pez sirve cada pieza:** las preferencias suman la potencia ideal de caña de cada especie, para el filtro y el
+  panel de la tienda.
+- Tests de todo.
+
+**E3b · La tienda en rejilla (D81):** pestañas Principal (paquetes por especie con 15 % de descuento, D69), Cañas,
+Carretes, Sedales, Anzuelos y boyas, Cebos, Señuelos, Bote y bodega, Licencias. Filtros a la izquierda (técnica, potencia,
+para qué pez, solo lo que mi nivel permite), orden por nivel, tarjetas (dibujo sencillo por tipo hasta que haya arte, E6;
+nivel, paquete, precio, Comprar) y panel del artículo (números comparados con la caña activa, para qué especies sirve, con
+qué es compatible, Comprar, Comprar y armar, Vender por el 50 % si sobra, D68). La pestaña de equipo del inventario para
+armar las tres cañas queda para E4.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -1502,3 +1531,10 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
 - **2026-11-18** · Comparada la caña de trucha de Fishing Planet (L, 1.5–3.4 kg, 7–20 g) con nuestra spinning L: coincide;
   queda como está.
 - **2026-11-18** · Decidido D82 (la básica del lago es gratis y sin vencimiento); entra en E3 con la tienda nueva.
+- **2026-11-18** · Plan de E3 en dos partes (E3a datos y reglas, E3b tienda en rejilla) en 7h.
+- **2026-11-18** · **E3a hecha:** mochila de equipo y tres cañas armadas en el guardado (`TackleBag.js`, campo nuevo
+  `tackle` sin cambiar la versión; los guardados viejos reciben la caña de su grado); la picada por cebo encendida; una
+  carnada por picada, el final del sedal al cortarse, la caña al romperse; la caña no se lanza si le falta algo; licencias
+  por 1, 3 o 7 días; la básica del lago gratis y sin vencimiento (el viaje al lago, gratis); pez carnada (botón "Al cubo" en
+  la nevera); paquetes por especie y vender al 50 % listos para la tienda. Mientras llega la tienda nueva (E3b), en el lago
+  la tienda vieja ya no vende grados del aparejo. 30 tests nuevos.

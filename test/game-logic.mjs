@@ -1,6 +1,8 @@
 // Plain-node tests of the fishing game logic (no GPU): bites, the catch fight, inventory, save.
 import { FISH, FISH_IDS, fishValue, fishLengthCm } from '../src/game/FishTable.js';
-import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, lureHitOutcome, HOOKING } from '../src/game/Bites.js';
+import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, lureHitOutcome, HOOKING, biteMulHere } from '../src/game/Bites.js';
+import { starterTackle, tackleFromGrade, cleanTackle, count as tbCount, rigCastable, rigIssues, PACKS, packCost, packFullPrice, goodFor } from '../src/game/TackleBag.js';
+import { licensePrice, withLicense as withLicenseDays } from '../src/game/Progression.js';
 import { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, STARTER_RIG, rigStats, rigProblems, rigReady, biteMul, hookTooSmall, fightTackle, gradeRig, GRADE_RIGS } from '../src/game/Tackle.js';
 import { catalogEntry } from '../src/maps/catalog.js';
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
@@ -8,6 +10,7 @@ import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
 import { Profiles, MAX_PROFILES, INDEX_KEY } from '../src/game/Profiles.js';
 import { MAPS, DEFAULT_MAP, activeMap, mapById, currentMapId } from '../src/maps/registry.js';
+const LAKE_MAP = MAPS.lake || ( Array.isArray( MAPS ) ? MAPS.find( ( m ) => m.id === 'lake' ) : null );
 import { travelOptions, travelBlock, travel, travelCost } from '../src/game/Travel.js';
 import { WORLD } from '../src/world/WorldLayout.js';
 import { gearStats, defaultUpgrades, UPGRADES, convertLegacyUpgrades } from '../src/game/Gear.js';
@@ -531,7 +534,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) };
 	const st = new GameState( sto );
 	st.mapId = 'lake';
-	ok( travelCost( MAPS, 'lake' ) === 50 && travelCost( MAPS, 'island' ) === 175, 'travel: costs a day of the basic licence of the destination' );
+	ok( travelCost( MAPS, 'lake' ) === 0 && travelCost( MAPS, 'island' ) === 175, 'travel: costs a day of the basic licence of the destination (the lake basic is free, D82)' );
 	ok( travelBlock( st, 'lake', MAPS ) === 'here' && travelBlock( st, 'river', MAPS ) === 'planned' && travelBlock( st, 'island', MAPS ) === 'level', 'travel: here, planned maps, and the island locked below level 10' );
 	st.addXp( totalXpForLevel( 10 ) );
 	st.money = 100;
@@ -666,6 +669,100 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	ok( catchXp( 'carp', 3 ) === Math.round( ( sizeClass( 'carp', 3 ).xp * difficulty( 'carp' ) + 3 * 3 ) * FISH.carp.xpMul ), 'values: XP × the species\' xpMul' );
 	ok( activeMap().id !== 'lake' || activeMap().tackle === true, 'maps: the lake fishes with tackle by pieces' );
 	ok( gradeRig( 0 ) === STARTER_RIG && GRADE_RIGS.every( ( g2 ) => rigStats( g2 ) ) && rigStats( gradeRig( 6 ) ).lineKg > rigStats( gradeRig( 0 ) ).lineKg, 'tackle: every float rig grade stands for a rod of the catalogue until the new shop' );
+
+}
+// ---- tackle bag, assembled rods, licences by days, live bait (E3a: D64, D65, D66, D68, D69, D79, D80, D82)
+{
+
+	const mem = () => { const m = new Map(); return { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) }; };
+
+	// the starter tackle and the conversion of older saves
+	const t0 = starterTackle();
+	ok( t0.rigs.length === 3 && t0.active === 0 && t0.rigs[ 0 ].rod === 'floatUL' && rigCastable( t0 ), 'bag: a new game has the starter rod assembled in slot 1, ready to cast' );
+	ok( tbCount( t0.bag, 'bait', 'larva' ) === 30 && tbCount( t0.bag, 'bait', 'worm' ) === 20 && tbCount( t0.bag, 'hook', 12 ) === 10 && tbCount( t0.bag, 'float', 3 ) === 5, 'bag: starter consumables (30 maggots, 20 worms, 10 hooks #12, 5 floats of 3 g)' );
+	ok( GRADE_RIGS.every( ( _, g ) => rigCastable( tackleFromGrade( g ) ) ), 'bag: every old float rig grade converts to a castable rod' );
+	const old = new GameState( mem() );
+	ok( old.fromJSON( { v: 3, money: 10, xp: 0, upgrades: { rig: 3 }, maps: {}, map: 'lake' } ) && old.tackle.rigs[ 0 ].rod === GRADE_RIGS[ 3 ].rod && rigCastable( old.tackle ), 'save: a version 3 save without tackle gets the rod of its grade' );
+	const round = new GameState( mem() );
+	round.fromJSON( JSON.parse( JSON.stringify( old.toJSON() ) ) );
+	ok( JSON.stringify( round.tackle ) === JSON.stringify( old.tackle ), 'save: the tackle survives a save round trip' );
+	ok( cleanTackle( { bag: { rod: { nope: 1, floatUL: 1 }, bait: { larva: - 3 } }, rigs: [ { rod: 'floatUL' }, { rod: 'floatUL' } ] } ).rigs[ 1 ].rod === null, 'save: unknown pieces dropped; two rigs can\'t share one rod' );
+
+	// equip, spend, buy, sell
+	const st = new GameState( mem() );
+	st.money = 2000;
+	st.xp = totalXpForLevel( 8 );
+	const lv1 = new GameState( mem() );
+	lv1.money = 2000;
+	ok( ! lv1.buyPiece( 'rod', 'bottomMH' ) && lv1.pieceBlock( 'rod', 'bottomMH' ) === 'level' && lv1.money === 2000, 'buy: a piece above your level cannot be bought' );
+	ok( st.buyPiece( 'rod', 'spinL' ) && tbCount( st.tackle.bag, 'rod', 'spinL' ) === 1 && st.money === 2000 - RODS.spinL.cost, 'buy: a rod goes in the bag and costs its price' );
+	ok( st.buyPiece( 'bait', 'corn' ) && tbCount( st.tackle.bag, 'bait', 'corn' ) === BAITS.corn.n, 'buy: a pack of bait adds its units' );
+	ok( st.equipPiece( 'rod', 'spinL', 1 ) && st.tackle.rigs[ 1 ].rod === 'spinL' && ! st.equipPiece( 'rod', 'spinL', 2 ), 'equip: one rod can only be on one rig' );
+	ok( ! st.sellPiece( 'rod', 'spinL' ), 'sell: a rod on a rig can\'t be sold' );
+	st.buyPiece( 'rod', 'spinL' );
+	const m0 = st.money;
+	ok( st.sellPiece( 'rod', 'spinL' ) && st.money === m0 + Math.floor( RODS.spinL.cost / 2 ), 'sell: a spare rod fetches half its price (D68)' );
+	const larva0 = tbCount( st.tackle.bag, 'bait', 'larva' );
+	st.spendTackle( 'bite' );
+	ok( tbCount( st.tackle.bag, 'bait', 'larva' ) === larva0 - 1, 'spend: a bite costs one bait' );
+	const h0 = tbCount( st.tackle.bag, 'hook', 12 ), f0 = tbCount( st.tackle.bag, 'float', 3 );
+	st.spendTackle( 'snap' );
+	ok( tbCount( st.tackle.bag, 'hook', 12 ) === h0 - 1 && tbCount( st.tackle.bag, 'float', 3 ) === f0 - 1 && tbCount( st.tackle.bag, 'bait', 'larva' ) === larva0 - 2, 'spend: a snapped line costs hook, float and bait' );
+	st.spendTackle( 'rod' );
+	ok( st.tackle.rigs[ 0 ].rod === null && tbCount( st.tackle.bag, 'rod', 'floatUL' ) === 0 && ! rigCastable( st.tackle ), 'spend: a broken rod is gone and the rig can\'t be cast' );
+	ok( rigIssues( st.tackle ).includes( 'rod' ), 'spend: the rig says what it misses' );
+
+	// a lure is spent only with the line, and needs no hook
+	const sp = new GameState( mem() );
+	sp.money = 500; sp.xp = totalXpForLevel( 5 );
+	sp.buyPiece( 'rod', 'spinL', { equip: true } );
+	sp.buyPiece( 'lure', 'spin2', { equip: true } );
+	ok( rigCastable( sp.tackle ) && sp.rig.bait === 'spin2' && sp.rig.float === null && sp.rig.hook === null, 'equip: a spinning rod with a lure (no float, no hook) is ready' );
+	sp.spendTackle( 'bite' );
+	ok( tbCount( sp.tackle.bag, 'lure', 'spin2' ) === 1, 'spend: a bite does not cost a lure' );
+	sp.spendTackle( 'snap' );
+	ok( tbCount( sp.tackle.bag, 'lure', 'spin2' ) === 0 && rigIssues( sp.tackle ).includes( 'noBait' ), 'spend: a snapped line loses the lure' );
+
+	// packs by species (D69)
+	const pk = new GameState( mem() );
+	pk.money = 2000; pk.xp = totalXpForLevel( 6 );
+	const full = packFullPrice( PACKS.carp );
+	ok( packCost( PACKS.carp ) === Math.round( full * 0.85 ), 'packs: 15 % off the pieces' );
+	ok( pk.buyPack( 'carp' ) && pk.money === 2000 - packCost( PACKS.carp ) && pk.rig.rod === 'bottomM' && pk.rig.bait === 'corn' && rigCastable( pk.tackle ), 'packs: the carp pack is bought and assembled, ready to cast' );
+	ok( biteMul( 'carp', pk.rig ).total === 1, 'packs: the carp bites fully on the carp pack' );
+	ok( Object.values( PACKS ).every( ( p ) => p.species.every( ( s ) => biteMul( s, p.rig ).total === 1 ) ), 'packs: every pack is the right rig for its species' );
+
+	// what pieces are good for (the shop filter)
+	ok( goodFor( 'rod', 'spinL', [ 'rainbowTrout', 'carp' ] ).join() === 'rainbowTrout' && goodFor( 'bait', 'corn', [ 'rainbowTrout', 'carp' ] ).join() === 'carp', 'shop: what each piece is good for' );
+
+	// live bait (D79)
+	const lb = new GameState( mem() );
+	lb.licences = { 1: 1e9, 2: 1e9, 3: 1e9 };
+	lb.addFish( 'carachi', 0.12 );
+	const id = lb.inventory[ 0 ]?.id;
+	ok( id != null && lb.toBucket( id ) && lb.inventory.length === 0 && tbCount( lb.tackle.bag, 'bait', 'livebait' ) === 1, 'live bait: a carachi goes from the cooler to the bait bucket' );
+	ok( PREFS.brownTrout.best.includes( 'livebait' ) && PREFS.rainbowTrout.ok.includes( 'livebait' ), 'live bait: preferred by the brown trout, accepted by the rainbow' );
+
+	// licences by days (D80) and the free basic of the starting map (D82)
+	ok( licensePrice( { price: 100 }, 1 ) === 100 && licensePrice( { price: 100 }, 3 ) === 280 && licensePrice( { price: 100 }, 7 ) === 630 && licensePrice( { price: 100, free: true }, 7 ) === 0, 'licences: 1, 3 and 7 days at ×1, ×2.8, ×6.3' );
+	ok( withLicenseDays( {}, 2, 100, 3 )[ 2 ] === 100 + 3 * LICENSE_SECONDS, 'licences: buying 3 days adds three game days' );
+	ok( LAKE_MAP.licenses[ 1 ].free === true && LAKE_MAP.licenses[ 1 ].price === 0 && catalogEntry( 'lake' ).freeBasic, 'licences: the lake basic is free for good' );
+
+	// the bite by bait (D64): a carp rig makes the carp come up more often than a trout
+	const hab = { mud: 1, deep: 0.5, river: 0.3, pier: 0.3, reeds: 0.3 };
+	const lakeIds = catalogEntry( 'lake' ).species;
+	if ( lakeIds.includes( activeMap().species[ 0 ] ) ) {
+
+		let sd2 = 9; const r2 = () => ( ( sd2 = ( sd2 * 1664525 + 1013904223 ) >>> 0 ) / 4294967296 );
+		const carpRig = PACKS.carp.rig, cnt = { carp: 0, rainbowTrout: 0 };
+		for ( let i = 0; i < 3000; i ++ ) { const s2 = pickSpecies( hab, 12, r2, ( s ) => biteMul( s, carpRig ).total ); if ( s2 in cnt ) cnt[ s2 ] ++; }
+		ok( cnt.carp > cnt.rainbowTrout * 4, `bite: with the carp rig, carp bite far more than trout (${ cnt.carp } vs ${ cnt.rainbowTrout })` );
+
+	}
+
+	const habAny = {};
+	for ( const sid of activeMap().species ) for ( const k in FISH[ sid ].habitat ) habAny[ k ] = 1;
+	ok( Math.abs( biteMulHere( habAny, 12, () => 1 ) - 1 ) < 1e-9 && Math.abs( biteMulHere( habAny, 12, () => 0.5 ) - 0.5 ) < 1e-9, 'bite: the wait multiplier is the rig\'s average over what lives here' );
 
 }
 console.log( `value check ${ value }` );

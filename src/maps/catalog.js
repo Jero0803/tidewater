@@ -6,7 +6,7 @@ import { loc } from '../i18n.js';
 // unlock: the level a game needs to travel there (D57; the island opens at 10 while maps 2–5 don't exist, later 51).
 // The playable maps' full definitions are in maps/<id>.js (maps/registry.js).
 export const MAP_CATALOG = [
-	{ id: 'lake', order: 1, levels: '1–10', unlock: 1, name: loc( 'Mountain lake', 'Lago de montaña' ), place: loc( 'Inspired by Lake Tota, Colombia', 'Inspirado en la Laguna de Tota, Colombia' ), status: 'open',
+	{ id: 'lake', order: 1, levels: '1–10', unlock: 1, freeBasic: true, name: loc( 'Mountain lake', 'Lago de montaña' ), place: loc( 'Inspired by Lake Tota, Colombia', 'Inspirado en la Laguna de Tota, Colombia' ), status: 'open',
 		species: [ 'guapucha', 'carachi', 'pejerrey', 'capitan', 'rainbowTrout', 'carp', 'brownTrout' ] },
 	{ id: 'warmLake', order: 2, levels: '11–20', unlock: 11, name: loc( 'Warm lake', 'Lago cálido' ), place: loc( 'Lakes of Florida, Caribbean dams, Colombian reservoirs', 'Lagos de Florida, presas del Caribe, embalses de Colombia' ), status: 'planned' },
 	{ id: 'river', order: 3, levels: '21–30', unlock: 21, name: loc( 'Tropical river', 'Río tropical' ), place: loc( 'Rivers of the Colombian plains (Llanos)', 'Ríos de los Llanos' ), status: 'planned' },
