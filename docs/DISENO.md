@@ -102,6 +102,7 @@ hacia arriba (mapas de nivel más alto).
 | D46 | **El reloj no se detiene con la tienda, el inventario ni la tarjeta de captura;** solo la pausa T lo detiene (y la licencia sigue corriendo, D41). En el modo foto la hora se puede mover, pero al salir vuelve a la del juego, que siguió corriendo por debajo | Simple y sin trucos con la hora de los peces | 2026-11-18 |
 | D47 | **Un día del juego dura 120 minutos reales** (1 hora del juego = 5 minutos reales; reemplaza D22). La licencia sigue durando un día del juego (D21), o sea 120 min de juego, y **su precio sube ×5** para mantener el equilibrio medido: en la isla básica $175, intermedia $500, avanzada $1,000. El aviso de licencia por vencer salta a los 5 min. Los precios de licencias de los demás mapas (sección 6) están calculados para un día de 24 min: se multiplican ×5 | Con 24 min el día pasaba demasiado rápido | 2026-11-18 |
 | D48 | **Tienda de la Fase 1:** precios de la tabla aprobada ($8,550 en total). Mientras el flotador sea la única técnica usa las estadísticas completas de su grado (×1.0; el ×0.8 de D37 entra en la Fase 2): el grado 0 es el equipo inicial de siempre y el 6 iguala o supera al mejor de antes. **Conversión de mejoras viejas (D44):** lo gastado en sedal, carrete y caña da el grado de flotador más alto que alcance y el resto se devuelve en dinero; bodega, tanque y motor pasan al primer grado de igual o mayor capacidad; sonda y luces se conservan | Nadie pierde nada y la isla sigue alcanzable con una sola técnica | 2026-11-18 |
+| D49 | **Perfiles de partida:** hasta 5 partidas con nombre en el navegador, cada una con su guardado. Se eligen en la pantalla de inicio (partida actual y "Cambiar") y en el panel (H → Juego → Partidas): jugar, crear y borrar (pide confirmar). Cambiar de partida recarga la página, como el idioma. La partida que ya existía pasa a ser "Partida 1" con su guardado de siempre | Ver el avance de cada partida y empezar de cero sin perder la otra | 2026-11-18 |
 
 ---
 
@@ -635,6 +636,23 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - 10 tests nuevos. Probado en el navegador: tienda, conversión de una partida v2 (sedal de 30 lb y cajón de hielo →
   aparejo grado 1 + $90 y bodega de 80 kg), aviso de conversión.
 
+## 7c. Perfiles de partida (D49)
+
+- **Datos** (`src/game/Profiles.js`): índice en `tidewater.profiles` (partida activa y, por cada una, nombre, nivel,
+  dinero, tiempo jugado y última vez jugada, que se actualizan en cada guardado). La Partida 1 (`p1`) usa la clave
+  de siempre (`tidewater.save.v3`) y es la única que lee y convierte los guardados viejos; las demás usan
+  `tidewater.save.v3.pN`. Los ids no se reutilizan; si se borran todas queda una partida nueva.
+- **Interfaz** (`src/game/ProfilesUI.js`): en la pantalla de inicio, bajo "Haz clic para explorar", la partida actual
+  con "Cambiar", que abre la lista; en el panel, H → Juego → Partidas. Cada fila: nombre, "actual", nivel, dinero,
+  tiempo jugado, última vez; Jugar y Borrar (el segundo clic confirma, "¿Borrar del todo?"). Nueva partida con nombre
+  (en blanco: "Partida N"); con 5, avisa que hay que borrar una.
+- Borrar la partida que se está jugando deja de guardarla y carga la siguiente.
+- **Pendiente menor:** la guía de primeras veces (`tidewater.guide`) es común a todas las partidas; una partida
+  nueva no vuelve a mostrar la bienvenida (se puede repetir con F1).
+- 10 tests nuevos. Probado en el navegador: crear "Prueba" (empieza en nivel 1, $0, básica regalada), volver a la
+  Partida 1 con su progreso, borrar con confirmación desde la pantalla de inicio (corregido: el clic de borrar
+  arrancaba el juego), panel, escribir el nombre sin activar atajos.
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -719,3 +737,5 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · Aprobada la tabla de la tienda nueva y decidido D48 (flotador ×1.0 en la Fase 1; conversión por
   valor con devolución). **Entrega 6 hecha:** aparejo de flotador por grados, bodega y bote; guardado versión 3.
   **La Fase 1 queda programada.** 10 tests nuevos (todos pasan).
+- **2026-11-18** · Decidido D49 y programados los **perfiles de partida**: hasta 5 partidas con nombre, en la
+  pantalla de inicio y en el panel (jugar, crear, borrar). 10 tests nuevos (todos pasan).

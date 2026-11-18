@@ -3175,6 +3175,9 @@ export class UI {
 
 			const go = ( e ) => {
 
+				// the saved-games box on the start screen (ProfilesUI) and typing do not start the game
+				if ( e.target && e.target.closest && e.target.closest( '.gm-prof-start' ) ) return;
+				if ( e.type === 'keydown' && isTypingTarget( e.target ) ) return;
 				if ( e.type === 'keydown' ) {
 
 					if ( e.key !== 'Enter' && e.code !== 'Space' ) return;

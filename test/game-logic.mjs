@@ -4,6 +4,7 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from '../src/game/Bites
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
+import { Profiles, MAX_PROFILES, INDEX_KEY } from '../src/game/Profiles.js';
 import { gearStats, defaultUpgrades, UPGRADES, convertLegacyUpgrades } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
 	LICENSES, LICENSE_SECONDS, CLOCK_HOURS_PER_SECOND, dayPhase, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
@@ -406,6 +407,32 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	m.set( 'tidewater.save.v2', JSON.stringify( { v: 2, money: 0, upgrades: { line: 2, rod: 1 }, maps: {} } ) );
 	const st2 = new GameState( sto );
 	ok( st2.load() && st2.money === 235 && ! st2.gearConverted, 'convert: once written as v3, the old save is not read again' );
+
+}
+// ---- save profiles
+{
+
+	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ), removeItem: ( k ) => m.delete( k ) };
+	m.set( 'tidewater.save.v3', JSON.stringify( { v: 3, money: 77, maps: {} } ) ); // a game from before profiles
+	const P = new Profiles( sto );
+	ok( P.list.length === 1 && P.active.id === 'p1' && P.saveKey( 'p1' ) === 'tidewater.save.v3' && P.legacy( 'p1' ), 'profiles: the existing game becomes the first profile, same save' );
+	const g1 = new GameState( sto, { key: P.saveKey( 'p1' ), legacy: true } );
+	ok( g1.load() && g1.money === 77, 'profiles: the first profile loads the old game' );
+	const b = P.create( '  Mi   lago  ' );
+	ok( b.id === 'p2' && b.name === 'Mi lago' && P.saveKey( 'p2' ) === 'tidewater.save.v3.p2' && ! P.legacy( 'p2' ), 'profiles: a new one gets its own key and a cleaned name' );
+	const g2 = new GameState( sto, { key: P.saveKey( 'p2' ), legacy: false } );
+	ok( ! g2.load() && g2.money === 0, 'profiles: a new profile starts empty (does not read the old saves)' );
+	g2.onSaved = ( s ) => P.touch( 'p2', { level: s.level, money: s.money, played: s.playedSeconds } );
+	g2.money = 500; g2.save();
+	ok( P.list[ 1 ].summary.money === 500 && P.list[ 1 ].lastPlayed > 0 && m.has( 'tidewater.save.v3.p2' ), 'profiles: saving updates the menu summary' );
+	ok( P.create( '' ).name && P.create( 'x' ) && P.create( 'y' ) && P.list.length === MAX_PROFILES && P.create( 'z' ) === null && P.full, 'profiles: five at most' );
+	ok( P.setActive( 'p2' ) && new Profiles( sto ).active.id === 'p2', 'profiles: the active one is remembered' );
+	const after = P.remove( 'p2' );
+	ok( ! m.has( 'tidewater.save.v3.p2' ) && after.id === 'p1' && P.list.length === MAX_PROFILES - 1, 'profiles: deleting removes the save and picks another game' );
+	for ( const p of [ ...P.list ] ) P.remove( p.id );
+	ok( P.list.length === 1 && P.active.id === 'p6' && ! m.has( 'tidewater.save.v3' ), 'profiles: deleting them all leaves one new game (ids never reused)' );
+	m.set( INDEX_KEY, '{broken' );
+	ok( new Profiles( sto ).list.length === 1, 'profiles: a broken index starts over with one game' );
 
 }
 console.log( `value check ${ value }` );

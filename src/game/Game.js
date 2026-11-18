@@ -5,6 +5,7 @@ import { FISH } from './FishTable.js';
 import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
 import { CatchMinigame } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
+import { Profiles } from './Profiles.js';
 import { FishingRod } from './FishingRod.js';
 import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
@@ -31,7 +32,11 @@ export class Game {
 	constructor( app ) {
 
 		this.app = app;
-		this.state = new GameState();
+		// the active save profile (Profiles; chosen on the start screen or in the panel, H -> Game)
+		this.profiles = new Profiles();
+		const prof = this.profile = this.profiles.active;
+		this.state = new GameState( undefined, { key: this.profiles.saveKey( prof.id ), legacy: this.profiles.legacy( prof.id ) } );
+		this.state.onSaved = ( s ) => this.profiles.touch( prof.id, { level: s.level, money: s.money, played: Math.round( s.playedSeconds ) } );
 		this.state.load();
 		// the game clock carries on from the saved hour (D16)
 		if ( this.state.hour !== null && ! ( app.qs && app.qs.has( 'bench' ) ) ) app.settings.timeOfDay = this.state.hour;
@@ -116,6 +121,49 @@ export class Game {
 		const r = this.state.buy( key );
 		if ( r ) this.toast( `${ UPGRADES[ key ].name }: ${ r.label }` );
 		return r;
+
+	}
+
+	// ---- save profiles: every change reloads the page into the chosen game (like the language)
+	switchProfile( id ) {
+
+		if ( id === this.profile.id ) return;
+		this.state.save();
+		if ( this.profiles.setActive( id ) ) this._reload();
+
+	}
+
+	newProfile( name ) {
+
+		const p = this.profiles.create( name );
+		if ( ! p ) return null;
+		this.state.save();
+		this.profiles.setActive( p.id );
+		this._reload();
+		return p;
+
+	}
+
+	deleteProfile( id ) {
+
+		if ( id !== this.profile.id ) {
+
+			this.profiles.remove( id );
+			return false;
+
+		}
+
+		// the game being played: stop saving it, then load the next one
+		this.state.storage = null;
+		this.profiles.remove( id );
+		this._reload();
+		return true;
+
+	}
+
+	_reload() {
+
+		if ( typeof location !== 'undefined' ) location.reload();
 
 	}
 

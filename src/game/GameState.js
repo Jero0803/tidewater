@@ -18,9 +18,14 @@ const PLAYED_SAVE_EVERY = 10; // seconds of play between saves of the played-tim
 // access is guarded and the game runs without it.
 export class GameState {
 
-	constructor( storage = safeStorage() ) {
+	// key: where this game is saved (one per profile, see Profiles); legacy: may read and convert the older save
+	// versions (only the first profile, the game from before profiles)
+	constructor( storage = safeStorage(), { key = SAVE_KEY, legacy = true } = {} ) {
 
 		this.storage = storage;
+		this.key = key;
+		this.legacy = legacy;
+		this.onSaved = null; // ( state ) after each save (Profiles keeps the menu summary)
 		this.money = 0;
 		this.xp = 0; // total experience (Progression.levelFromXp gives the level)
 		this.playedSeconds = 0; // time with the game running; licences count down in it (D19, D41)
@@ -334,7 +339,8 @@ export class GameState {
 		this._playedSavedAt = this.playedSeconds;
 		try {
 
-			this.storage.setItem( SAVE_KEY, JSON.stringify( this.toJSON() ) );
+			this.storage.setItem( this.key, JSON.stringify( this.toJSON() ) );
+			if ( this.onSaved ) this.onSaved( this );
 
 		} catch ( e ) { /* storage full or blocked: keep playing */ }
 
@@ -346,8 +352,9 @@ export class GameState {
 		if ( ! this.storage ) return false;
 		try {
 
-			const raw = this.storage.getItem( SAVE_KEY );
+			const raw = this.storage.getItem( this.key );
 			if ( raw ) return this.fromJSON( JSON.parse( raw ) );
+			if ( ! this.legacy ) return false;
 			const old = this.storage.getItem( SAVE_KEY_V2 ) || this.storage.getItem( SAVE_KEY_V1 );
 			if ( ! old || ! this.fromJSON( JSON.parse( old ) ) ) return false;
 			this.save();
