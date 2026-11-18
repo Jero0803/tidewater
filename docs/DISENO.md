@@ -167,6 +167,31 @@ progresión y después se construyen hacia abajo los mapas de inicio.
 
 Cada mapa tiene sus propias licencias básica, intermedia y avanzada (D11, D20), con niveles mínimos dentro de su banda.
 
+### Investigación: biomas acuáticos del Caribe, de la montaña al mar (2026-11-17)
+
+Fuentes: estudios científicos (USGS, GCFI, revistas de pesca y ecología), DRNA de Puerto Rico, prensa dominicana.
+Los nombres comunes varían por país; las listas son un punto de partida, no definitivas.
+
+| Bioma (por altitud) | Características | Especies reales | Notas |
+|---|---|---|---|
+| **Quebrada o río de montaña** | Agua clara y corriente, pozas, rocas | Dajao o lisa de montaña (*Agonostomus monticola*), guabina (*Gobiomorus dormitor*), sirajo o tetí (*Sicydium*), gobio de río (*Awaous banana*) | Casi todos los peces nativos de los ríos de las islas son **anfídromos**: nacen en el río, sus larvas bajan al mar y vuelven de jóvenes. Peces pequeños y escurridizos |
+| **Represa o embalse** | Agua quieta y profunda, hecha por el ser humano en el curso medio | Lobina negra, tucunaré (pavón), bagre de canal, tilapia, biajaca (cíclido nativo de Cuba y La Española) | La mayoría son **introducidas**: en Puerto Rico se siembran lobina y tucunaré. En República Dominicana se pesca lobina y tilapia en las presas. Hay cíclidos invasores |
+| **Río bajo y estuario** | Mezcla de agua dulce y salada, turbia, raíces y jacintos | Róbalo (*Centropomus*), sábalo juvenil, guabina, lisas | Los róbalos jóvenes prefieren aguas turbias y calmas junto a raíces y plantas |
+| **Manglar** | Agua salobre y quieta entre raíces | Pargo de manglar (pargo prieto), mojarra, sábalo y róbalo jóvenes, barracuda juvenil, juveniles de peces de arrecife | Es la **guardería** del arrecife: en el Caribe la mayoría de especies tiene más juveniles en el manglar que en las praderas o el arrecife |
+| **Laguna costera y bajos con praderas** | Agua salada, poco profunda y clara; arena y hierba marina | Macabí (*bonefish*), palometa (*permit*), sábalo, róbalo | Los famosos "flats" del Caribe: pesca a la vista en aguas someras. Los peces se mueven entre praderas, manglar y arrecife |
+| **Costa y arrecife** | Muelle, playa, coral | Las especies actuales de la isla (rabirrubia, ronco, loro, ángel, mero…) | **La isla actual** |
+| **Mar abierto** | Aguas profundas, pelágicos | Atún, dorado, pargo colorado (ya en la isla); a futuro marlín, peto (wahoo), pez vela | República Dominicana es conocida por la pesca de altura. Candidato para mapas por encima de la isla |
+
+**Hallazgos útiles para el diseño:**
+- El orden por altitud (quebrada → represa → estuario → manglar → laguna → arrecife → mar abierto) no es el mejor
+  orden de juego: la represa, con agua quieta y peces fáciles, es mejor inicio que la quebrada.
+- El ciclo de vida conecta los mapas: el sábalo y el róbalo nacen en el mar, crecen en el manglar o el estuario y
+  vuelven al mar. Un mismo pez puede aparecer juvenil en un mapa bajo y adulto en uno alto.
+- Las especies introducidas e invasoras son reales en las represas del Caribe (cíclidos invasores, pez gato
+  africano en Cuba). Idea de juego: especies invasoras sin licencia y con recompensa por sacarlas.
+- La laguna costera es agua salada, quieta y poco profunda: probablemente **el mapa más fácil de construir**
+  después de la isla, porque reutiliza el océano casi tal cual.
+
 ### Mapas: lo que sabemos (2026-11-17)
 
 - **A favor:** el relieve es procedural (código, no imágenes pesadas); las posiciones clave están en
@@ -335,3 +360,5 @@ mejora se desbloquea en cada nivel.
   referencia: se diseña hacia abajo y, en el futuro, hacia arriba), D25 (la isla sigue siendo el inicio hasta que
   exista la represa) y D26 (se construye primero la represa, luego el manglar, el río al final). Reordenada la hoja
   de ruta; niveles de licencias pasan a ser relativos a la banda de cada mapa.
+- **2026-11-17** · Investigados los biomas acuáticos del Caribe de la montaña al mar, con sus especies reales
+  (sección 6). Pendiente decidir cuántos mapas van por debajo de la isla.
