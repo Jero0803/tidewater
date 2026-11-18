@@ -1305,6 +1305,14 @@ carrete 1500, trenzado 0.12 mm de 1.8 kg, cucharilla estrecha de 7 g.
 - **Trucha degollada joven de 0.263 kg, 29 cm: ~30–45 s de pelea** (2 min del juego); $56 y 20 XP. **En FP la clase joven
   se puede guardar y vender;** en nuestro juego el juvenil vale $0 y se suelta. En el chat, otros sacaban truchas de
   0.31–0.33 kg: lo común ahí son truchas chicas.
+- **Segunda trucha (degollada joven, otra vez 0.263 kg): ~35–50 s de pelea; ~4 min reales entre las dos capturas**
+  (tarjeta, lance, espera y pelea; nosotros calculamos un pez cada 2–2.5 min en el lago, con un día 3 veces más corto).
+  Las dos pesaron lo mismo: FP parece usar pocos pesos por clase; nosotros sorteamos el peso en un rango.
+- **Clases en kilos por especie en FP:** trucha degollada joven 0.26–0.29 kg, común 0.62 kg, trofeo 1.34 kg; la degollada de
+  dorso verde es trofeo con 0.47 kg. **Nuestras clases son un porcentaje del rango:** la trucha arcoíris es juvenil hasta
+  0.77 kg y la trucha café hasta 1.33 kg (se sueltan con $0). **Propuesta D84 (por decidir):** clases en kilos por especie
+  donde el porcentaje no sirve (trucha arcoíris: juvenil hasta 0.3 kg, común 0.3–1.2, trofeo 1.2–2.5, único más de 2.5);
+  se vuelven a medir los valores por hora.
 - **Comparación:** nuestra pelea mínima es de 1 minuto para todo pez (D73, pedido del jugador del proyecto); FP saca una
   trucha joven en menos. Queda a decisión del jugador del proyecto si los juveniles pelean menos de 1 minuto.
 
@@ -1571,3 +1579,5 @@ armar las tres cañas queda para E4.
   viaje rápido a los spots de orilla desde el mapa grande. Por decidir.
 - **2026-11-18** · Medición en Fishing Planet con truchas: su día dura ~6 h reales; una trucha joven de 0.26 kg sale en
   ~30–45 s; el corte de sedal quita metros; la clase joven se vende allá.
+- **2026-11-18** · Segunda trucha medida en FP (~35–50 s; ~4 min entre capturas). Propuesta D84: clases de tamaño en
+  kilos por especie. Por decidir.
