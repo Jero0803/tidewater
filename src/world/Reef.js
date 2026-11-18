@@ -255,7 +255,7 @@ const _m = new THREE.Matrix4(), _frustum = new THREE.Frustum(), _box = new THREE
 
 export class Reef {
 
-	constructor( { scene, terrain, shoreField = null } ) {
+	constructor( { scene, terrain, shoreField = null, swimmers = null } ) {
 
 		const t0 = performance.now();
 		this.terrain = terrain;
@@ -283,6 +283,7 @@ export class Reef {
 			floorAt: ( x, z ) => this.floorHeightAt( x, z ),
 			anchors: this.anchors,
 			shoreField, // keeps the bay fish out of the breakers
+			swimmers, // the map's own fish (the lake) instead of the reef and the bay
 		} );
 
 		this.camera = null; // the main camera (seen in onBeforeRender)

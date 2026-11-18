@@ -60,6 +60,8 @@ import { Player } from './player/Player.js';
 import { Game } from './game/Game.js';
 import { CLOCK_HOURS_PER_SECOND } from './game/Progression.js';
 import { STAND } from './game/FishStand.js';
+import { loadSwimModels } from './world/fish/FishSwimModels.js';
+import { swimmerModels } from './world/Fish.js';
 import { CHANDLERY } from './game/Chandlery.js';
 import { BoatController } from './player/BoatController.js';
 import { BoatSpray } from './player/BoatSpray.js';
@@ -144,6 +146,9 @@ export class App {
 		this.colliders = new Colliders();
 		// the village flattens building pads into the heightmap: build it before any terrain
 		// data is derived (shore field, GPU textures, meshes)
+		// a map with its own fish (the lake): their 3D models load before anything uses the fish material (the drying
+		// racks in the village, the fish batch in the reef)
+		if ( this.map.swimmers ) await loadSwimModels( swimmerModels( this.map.swimmers ) );
 		await progress( 0.12, loc( 'Building the village…', 'Construyendo el pueblo…' ) );
 		this.village = new Village( { scene, terrain: this.terrainData, colliders: this.colliders } );
 		if ( ! qs.has( 'noVeg' ) ) {
@@ -167,7 +172,7 @@ export class App {
 		this.rocks.material.appliesHillShadow = true;
 
 		await progress( 0.23, loc( 'Growing the reef…', 'Haciendo crecer el arrecife…' ) );
-		this.reef = new Reef( { scene, terrain: this.terrainData, shoreField: this.shoreField } );
+		this.reef = new Reef( { scene, terrain: this.terrainData, shoreField: this.shoreField, swimmers: this.map.swimmers || null } );
 
 		this.boat = new BoatModel();
 		scene.add( this.boat.group );

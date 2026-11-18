@@ -6,6 +6,7 @@ import { lodFadeModule } from '../../materials/LODFade.js';
 import { SPECIES, SKIN, PATTERN } from './FishSpecies.js';
 import { PART } from './FishGeometry.js';
 import { SKIN_LAYER, SKIN_TINT, skinTexture } from './FishSkins.js';
+import { GLB_LAYER, glbTexture } from './FishSwimModels.js';
 
 // The fish material (WGSL, ported from TSL), shared by the swimming fish (FishSchools) and the
 // fish on the market stall, drying racks and cleaning tables (FishProps).
@@ -63,7 +64,8 @@ function buildTable() {
 			new Vector4( S.lateral, S.arch, 0.5 - S.mouth.corner * L, S.mouth.y ),
 			// illustrated skin: its layer in the skins texture (FishSkins.js), -1 for the procedural skin; 1 for a
 			// black and white drawing that only shades the procedural colours
-			new Vector4( SKIN_LAYER[ name ] ?? - 1, SKIN_TINT[ name ] ?? 0, 0, 0 ),
+			// and the layer of its 3D model's texture (FishSwimModels.js), -1 without a model
+			new Vector4( SKIN_LAYER[ name ] ?? - 1, SKIN_TINT[ name ] ?? 0, GLB_LAYER[ name ] ?? - 1, 0 ),
 		);
 
 	}
@@ -343,7 +345,11 @@ function surface( prop, lodFade ) {
 	let skinL = fishRow( pat, 8 ).x;
 	let skinS = textureSample( fishSkinTex, smpAnisoClamp, vec2f( z + 0.5, 0.5 - y * 2.0 ), i32( max( skinL, 0.0 ) ) );
 	let skinK = select( 0.0, skinS.a, skinL >= 0.0 && ( isBody || isFin ) );
-	let skinN = 1.0 - skinK;
+	// 3D model (D61, FishSwimModels.js): its own texture at the coordinates carried in aData.zw
+	let glbL = fishRow( pat, 8 ).z;
+	let glbS = textureSample( fishGlbTex, smpAnisoRepeat, D.zw, i32( max( glbL, 0.0 ) ) );
+	let glbK = select( 0.0, 1.0, glbL >= 0.0 );
+	let skinN = 1.0 - max( skinK, glbK );
 
 	// ---- counter-shading
 	let tBack = smoothstep( 0.2, 0.75, h );
@@ -557,6 +563,9 @@ function surface( prop, lodFade ) {
 	let skinTint = fishRow( pat, 8 ).y > 0.5;
 	let skinCol = select( skinS.rgb * mix( 1.0, 0.97 + scaleShade * 0.05, bodyK ), c * clamp( pow( skinLum, 0.8 ) * 1.08, 0.0, 1.1 ), skinTint );
 	c = mix( c, skinCol, skinK );
+	// a 3D model: its texture is the whole skin (only a little silver sheen added below)
+	c = mix( c, glbS.rgb, glbK );
+	metal *= 1.0 - glbK * 0.7;
 	// (fins: less light through them near the body, where the painted fin is still thick)
 	transl *= mix( 1.0, smoothstep( 0.0, 0.3, t ) * 0.7 + 0.1, skinK * select( 0.0, 1.0, isFin ) );
 
@@ -591,7 +600,7 @@ function surface( prop, lodFade ) {
 
 	// ---- painted eye (under the dome where there is one)
 	let er = length( vec2f( z - eye.x, y - eye.y ) ) / eye.z;
-	let painted = ( 1.0 - smoothstep( 0.95, 1.1, er ) ) * bodyK;
+	let painted = ( 1.0 - smoothstep( 0.95, 1.1, er ) ) * bodyK * ( 1.0 - glbK );
 	c = mix( c, fishEyeCol( er, atan2( y - eye.y, z - eye.x ), irisC, flags.x ), painted );
 	metal *= 1.0 - painted;
 
@@ -728,7 +737,7 @@ ${ prop ? /* wgsl */`
 ` : '' }
 	// iridescent sheen on silvery skin at grazing angles
 	let cosV = abs( dot( in.N, in.V ) );
-	let irid = r1.w * bodyK * silver * ( 1.0 - cosV );
+	let irid = r1.w * bodyK * silver * ( 1.0 - cosV ) * ( 1.0 - glbK * 0.7 );
 	let hueA = vec3f( 0.55, 0.95, 0.8 ); let hueB = vec3f( 0.95, 0.6, 1.0 );
 	c = mix( c, c * mix( hueA, hueB, cosV ) * 1.25, irid * 0.6 );
 
@@ -741,7 +750,7 @@ ${ prop ? /* wgsl */`
 	// original: with a constant 0.5 it gains exactly the port's highlights). FISH_SPECULAR selects: 'reference' (look of the three.js app) or 'intended' (0.5,
 	// 1.0 on eyes and ice, as the code was written).
 	s.specularIntensity = ${ FISH_SPECULAR === 'reference' ? '0.0 * spec' : 'spec' };
-	s.normal = perturbNormalByHeight( in.P, in.N, dhdx, dhdy, 1.0 );
+	s.normal = perturbNormalByHeight( in.P, in.N, dhdx * ( 1.0 - glbK ), dhdy * ( 1.0 - glbK ), 1.0 );
 	// translucencyNode: lightColor * albedo * transl * 0.5 (the engine multiplies by the light)
 	s.translucency = c * ( transl * 0.5 );
 ${ prop ? '\ts.clearcoat = coat;\n\ts.clearcoatRoughness = 0.2;\n' : '' }`;
@@ -770,7 +779,7 @@ function baseMaterial( batch, name, extra ) {
 		modules: [ fishModule(), batch.module ],
 		attributes: { aData: 'vec4f', aKind: 'f32' },
 		varyings: VARYINGS,
-		textures: { fishSkinTex: skinTexture() },
+		textures: { fishSkinTex: skinTexture(), fishGlbTex: glbTexture() },
 		...extra,
 	} );
 

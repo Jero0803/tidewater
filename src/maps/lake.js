@@ -67,6 +67,22 @@ export const LAKE = {
 	// the minimap and the big map (N) cover the whole valley
 	minimap: { x0: - 1024, z0: - 1024, ext: 2048, res: 1024 },
 
+	// the fish that swim in the lake (world/Fish.js BEHAVIOUR kinds; D30 habitats, D61 3D models): groups per
+	// zone, each a count of fish. Small fish in the shallows, pejerrey schools by the pier and in open water,
+	// trout at the river mouth and in the deep, carp in the mud bay, the capitán on the bottom.
+	swimmers: [
+		{ kind: 'lakeGuapucha', groups: [ 30, 26, 24, 22, 20 ], zone: { x: - 120, z: 20, r: 260 } },
+		{ kind: 'lakeCarachi', groups: [ 8, 7, 6, 6, 5 ], zone: { x: - 200, z: 50, r: 220 } },
+		{ kind: 'lakePejerrey', groups: [ 14, 12 ], zone: { x: 55, z: 30, r: 35 } },
+		{ kind: 'lakePejerrey', groups: [ 16, 12 ], zone: { x: 60, z: 220, r: 120 } },
+		{ kind: 'lakeRainbow', groups: [ 3, 3, 2 ], zone: { x: - 720, z: 230, r: 90, band: [ 1.2, 40 ] } },
+		{ kind: 'lakeRainbow', groups: [ 3, 2 ], zone: { x: 60, z: 420, r: 140 } },
+		{ kind: 'lakeBrown', groups: [ 1, 1, 1 ], zone: { x: 0, z: 450, r: 160 } },
+		{ kind: 'lakeCarp', groups: [ 4, 3, 3 ], zone: { x: 560, z: 150, r: 90 } },
+		{ kind: 'lakeCarp', groups: [ 3 ], zone: { x: 120, z: 60, r: 60 } },
+		{ kind: 'lakeCapitan', groups: [ 1, 1, 1, 1 ], zone: { x: 200, z: 100, r: 300 } },
+	],
+
 	features: { reef: false, surf: false, seabirds: true, whale: false, palms: false },
 
 	// calm fresh water: light breeze, short fetch, no swell and no surf. Colour (per metre, RGB): Tota's water takes

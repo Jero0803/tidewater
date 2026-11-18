@@ -6,6 +6,7 @@ import { SPECIES } from './fish/FishSpecies.js';
 import { fishGeometry } from './fish/FishGeometry.js';
 import { rayGeometry, turtleGeometry } from './fish/CreatureGeometry.js';
 import { createSwimMaterial } from './fish/FishMaterial.js';
+import { swimGeometry } from './fish/FishSwimModels.js';
 import { bandFade } from '../materials/LODFade.js';
 import { WhaleWater } from '../ocean/WhaleWater.js';
 import { FrameUniforms } from '../engine/render/Frame.js';
@@ -80,6 +81,14 @@ const BEHAVIOUR = {
 	pilot: { model: 'jack', length: [ 0.25, 0.4 ], mode: 'escort', cruise: 1.2, max: 3.5, burst: 7, accel: 5, flee: 2, amp: 0.07, freq: [ 1.8, 0.9 ], ceiling: - 0.3, minDepth: 2, band: [ 0, 1e9 ] },
 	juvenile: { model: 'jack', length: [ 0.1, 0.16 ], mode: 'escort', cruise: 1.5, max: 4, burst: 9, accel: 7, flee: 1.5, amp: 0.1, freq: [ 2.5, 1 ], ceiling: - 0.3, minDepth: 2, band: [ 0, 1e9 ] },
 	remora: { model: 'mullet', length: [ 0.35, 0.55 ], mode: 'remora', cruise: 0.5, max: 3, burst: 3, accel: 3, flee: 0, amp: 0.03, freq: [ 0.8, 0.3 ], ceiling: 5, minDepth: 0, band: [ 0, 1e9 ] },
+	// ---- Map 1 · the mountain lake (D30, D61): the lake's own species, drawn with their 3D models when loaded
+	lakeRainbow: { model: 'rainbowTrout', length: [ 0.3, 0.5 ], mode: 'cruise', cruise: 0.55, max: 1.8, burst: 4.5, accel: 2, sep: 1.6, nbr: 3, wSep: 2, wAli: 0.8, wCoh: 0.5, wGoal: 0.8, flee: 5, depth: [ 0.25, 0.65 ], homeRadius: 22, amp: 0.05, freq: [ 1.1, 0.8 ], band: [ 3, 40 ] },
+	lakeBrown: { model: 'brownTrout', length: [ 0.4, 0.6 ], mode: 'lurk', cruise: 0.2, max: 1.4, burst: 4, accel: 1.6, sep: 1, nbr: 2, wSep: 1, wAli: 0, wCoh: 0, wGoal: 0.8, flee: 4, depth: [ 0.03, 0.2 ], homeRadius: 6, amp: 0.045, freq: [ 0.8, 0.7 ], band: [ 4, 40 ] },
+	lakeCarp: { model: 'carp', length: [ 0.4, 0.7 ], mode: 'forage', cruise: 0.4, max: 1.4, burst: 3.5, accel: 1.6, sep: 2, nbr: 5, wSep: 3, wAli: 0.6, wCoh: 0.6, flee: 4.5, depth: [ 0.02, 0.12 ], homeRadius: 16, amp: 0.05, freq: [ 0.9, 0.6 ], band: [ 1.2, 9 ] },
+	lakePejerrey: { model: 'pejerrey', length: [ 0.2, 0.32 ], mode: 'school', cruise: 0.9, max: 2.4, burst: 6, accel: 3.5, sep: 1.8, nbr: 6, wSep: 4, wAli: 2, wCoh: 1.2, wGoal: 0.7, flee: 4.5, depth: [ 0.35, 0.85 ], homeRadius: 14, amp: 0.07, freq: [ 1.8, 0.9 ], band: [ 2, 25 ] },
+	lakeGuapucha: { model: 'guapucha', length: [ 0.05, 0.08 ], mode: 'fry', cruise: 1.8, max: 4, burst: 12, accel: 8, sep: 1.6, nbr: 8, wSep: 7, wAli: 2.4, wCoh: 1.6, wGoal: 0.9, flee: 3, depth: [ 0.3, 0.8 ], homeRadius: 6, amp: 0.1, freq: [ 3.2, 1.1 ], ceiling: - 0.2, minDepth: 0.4, band: [ 0.4, 3 ] },
+	lakeCarachi: { model: 'carachi', length: [ 0.07, 0.12 ], mode: 'hover', cruise: 0.7, max: 2.2, burst: 6, accel: 4, sep: 2, nbr: 6, wAli: 0.6, wCoh: 0.6, flee: 3, depth: [ 0.05, 0.35 ], homeRadius: 3, amp: 0.09, freq: [ 2.2, 0.9 ], band: [ 0.6, 4 ] },
+	lakeCapitan: { model: 'capitan', length: [ 0.15, 0.3 ], mode: 'glide', cruise: 0.3, max: 1, burst: 2.5, accel: 1, sep: 1, nbr: 2, wSep: 1, wAli: 0, wCoh: 0, wGoal: 0.8, flee: 3, depth: [ 0, 0 ], homeRadius: 8, amp: 0.08, freq: [ 1.2, 0.6 ], band: [ 0.8, 8 ] },
 	pierSergeant: { model: 'sergeant', length: [ 0.12, 0.17 ], mode: 'pile', cruise: 0.6, max: 2, burst: 6, accel: 4, wAli: 0.6, wCoh: 0.6, flee: 3.2, depth: [ 0.3, 0.9 ], homeRadius: 1.2, amp: 0.09, freq: [ 2, 0.9 ], band: [ 2, 6 ] },
 };
 for ( const k in BEHAVIOUR ) BEHAVIOUR[ k ] = { name: k, ...base, ...BEHAVIOUR[ k ] };
@@ -102,6 +111,11 @@ function buildModels( names ) {
 
 			const g1 = turtleGeometry( { lod: 1 } );
 			geos = [ turtleGeometry( { lod: 0 } ), g1, g1, g1 ];
+
+		} else if ( swimGeometry( name ) ) {
+
+			// the species' 3D model (FishSwimModels.js), its own levels of detail
+			geos = swimGeometry( name );
 
 		} else {
 
@@ -151,12 +165,17 @@ const _q = new THREE.Quaternion();
 const _v = new THREE.Vector3(), _w = new THREE.Vector3(), _threat = new THREE.Vector3();
 const _frustum = new THREE.Frustum(), _sphere = new THREE.Sphere(), _m = new THREE.Matrix4();
 
+// the models (anatomy names / species) a swimmers list draws: load their 3D models before the fish
+export const swimmerModels = ( swimmers ) => [ ...new Set( swimmers.map( ( s ) => BEHAVIOUR[ s.kind ].model ) ) ];
+
 export class FishSchools {
 
 	// floorAt( x, z ): highest obstacle (seabed or reef); anchors: [ [ x, z ], ... ] coral heads;
 	// bay: also populate the bay, the pier and the beach; shoreField (optional, ShoreField.js)
 	// locates the breakers (without it every beach counts as fully exposed)
-	constructor( { parent, terrain, floorAt = null, center, radius, anchors = [], seed = 23, bay = true, shoreField = null } ) {
+	// swimmers (optional): the map's own fish instead of the reef and the bay (maps/lake.js swimmers):
+	// [ { kind, groups: [ count, ... ], zone: { x, z, r, band? } }, ... ]
+	constructor( { parent, terrain, floorAt = null, center, radius, anchors = [], seed = 23, bay = true, shoreField = null, swimmers = null } ) {
 
 		this.terrain = terrain;
 		this.floorAt = floorAt ?? ( ( x, z ) => terrain.heightAt( x, z ) );
@@ -174,7 +193,8 @@ export class FishSchools {
 		// ---- groups
 		this.groups = [];
 		this.n = 0;
-		this.layout( bay );
+		if ( swimmers ) this.layoutSwimmers( swimmers );
+		else this.layout( bay );
 
 		// ---- models
 		const models = [ ...new Set( this.groups.map( ( g ) => g.sp.model ) ) ];
@@ -334,6 +354,29 @@ export class FishSchools {
 		}
 
 		return best;
+
+	}
+
+	// the map's own fish (see the constructor)
+	layoutSwimmers( swimmers ) {
+
+		const homes = [];
+		this.baitGroups = [];
+		this.escort = [];
+		for ( const s of swimmers ) {
+
+			const sp = BEHAVIOUR[ s.kind ];
+			for ( const c of s.groups ) {
+
+				const z = { ...s.zone, band: s.zone.band || sp.band };
+				const spot = this.pickSpot( sp, z, homes, false );
+				if ( ! spot ) continue;
+				homes.push( spot );
+				this.addGroup( s.kind, c, { ...z, x: spot[ 0 ], z: spot[ 1 ], r: Math.min( z.r, sp.homeRadius * 1.5 + 4 ) } );
+
+			}
+
+		}
 
 	}
 

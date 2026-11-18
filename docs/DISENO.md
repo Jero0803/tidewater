@@ -849,9 +849,10 @@ Blender.
 | M2 | Si M1 convence: ilustraciones para las demás especies del lago (trucha arcoíris, pejerrey; guapucha, capitán y carachi si hay fuente), luego las de la isla | Pendiente |
 | M3 | Prueba de modelo 3D: la trucha arcoíris "Rainbow Trout - Redband" (eb78, Sketchfab, CC-BY) en la tarjeta de captura, reducida de 22 MB a 3,4 MB (`tools/fish/glb_slim.py`); se apaga con `?fishglb=0` para comparar. Comparación en `docs/comparacion-trucha.png` | **Hecha** (2026-11-18): aprobada, ver D61 |
 | M4 | Modelo 3D en la tarjeta de captura: aletas con su color (el brillo metálico limitado), escaneos con luz propia, carpa (escaneo CC0 de ffish.asia, 4,7 MB) además de la trucha (2,1 MB); `glb_slim.py` deja solo el pez que se dibuja. **Pasa a la M5:** el nado con la onda del motor para modelos sin animación (todavía no hay ninguno) | **Hecha** (2026-11-18) |
-| M5 | Modelos 3D en el agua: los peces que nadan usan el modelo (una malla compartida por especie, con la onda del motor; el esqueleto solo en la tarjeta) | Pendiente |
+| M5 | Modelos 3D en el agua: los peces que nadan usan el modelo en pose de reposo, doblado por la onda del motor (sin esqueleto: cientos de peces a la vez), con 4 niveles de detalle hechos al cargar (agrupando vértices). **El lago tiene sus propios peces nadando** (antes nadaban los tropicales de la isla): guapuchas y carachis en la orilla, pejerreyes en el muelle y en aguas abiertas, truchas en la desembocadura y en lo hondo, carpas en la bahía de lodo, capitanes en el fondo (`maps/lake.js` swimmers, 241 peces). La isla no cambia | **Hecha** (2026-11-18) |
 | M6 | Modelos para el resto del lago (lista de candidatos abajo) | Pendiente |
 | M7 | Modelos para la isla | Pendiente |
+| A1 | Aparejos que se vean distintos: hoy hay una sola caña 3D (hecha por código, detallada: carrete animado, pasahilos, la caña se dobla) para los 7 grados de flotador. Cada grado con su caña, carrete y boya; en la Fase 2, señuelos, plomos y anzuelos por técnica | Pendiente (después de los peces) |
 
 **Modelos del lago (todos en 3D en la tarjeta de captura):** sin modelo libre de la especie exacta se usa un
 **doble** parecido; la tarjeta sigue mostrando el nombre y el nombre científico de la especie del juego.
@@ -996,3 +997,5 @@ Los escaneos pesados se simplifican con gltf-transform (dependencia de desarroll
   escaneos CC0 de ffish.asia). `FishModel.js` carga modelos con esqueleto y fijos; `glb_slim.py` convierte
   materiales antiguos y quita lo que no se dibuja.
 - **2026-11-18** · Instalado gltf-transform (solo desarrollo) para simplificar mallas: carpa de 4,7 a 2,7 MB, lisa de 6,2 a 3,0 MB.
+- **2026-11-18** · **M5 hecha:** los peces del lago nadan en 3D (sus modelos en el lote de peces, con la onda del
+  motor y 4 niveles de detalle); el lago ya no tiene peces tropicales. Anotado A1 (aparejos distintos por grado).
