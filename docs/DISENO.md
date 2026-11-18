@@ -1279,6 +1279,14 @@ artificiales); señuelos: cucharillas estrechas, giratorias pequeñas y plástic
 saltamontes y las huevas artificiales al catálogo; la trucha arcoíris los prefiere junto con las cucharillas giratorias,
 y acepta larvas, así que con la caña inicial también pica algo (×0.4 en vez de ×0.05).
 
+**Referencia para la caña de trucha (capturas 21 y 22, 2026-11-18):** en ese lago de truchas (nivel 5), FP recomienda
+"equipo de spinning" desde la descripción del mapa. Sus cañas de spinning van de nivel 3 a 9; la de nivel 5 es ligera
+(L), de 2.3 m, cebo 7–20 g, **sedal 1.5–3.4 kg**, acción moderada-rápida. Cada serie viene en varios largos (190, 200,
+230, 240, 260 cm; más larga, más lance y más cara). **Comparada con la nuestra:** nuestra spinning L (2.1 m, nivel 3) va
+con sedal 2–5 kg y cebo 3–12 g, y la armamos con fluorocarbono de 3 kg: cae dentro de su rango, y nuestra trucha de 4 kg
+tira ~2.1 kg en una carrera. **Queda como está.** Ideas para más adelante: la descripción del mapa dice qué técnica
+llevar (en el panel del destino y la guía) y cada caña en dos o tres largos.
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1490,3 +1498,5 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   con pagos y recorta el equipo de inicio); de FP se toman mecánicas, ritmo y pantallas.
 - **2026-11-18** · Con un lago de truchas de Fishing Planet como referencia: saltamontes y huevas artificiales al
   catálogo; la trucha arcoíris prefiere insectos, huevas y cucharillas giratorias, y acepta larvas.
+- **2026-11-18** · Comparada la caña de trucha de Fishing Planet (L, 1.5–3.4 kg, 7–20 g) con nuestra spinning L: coincide;
+  queda como está.
