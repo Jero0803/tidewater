@@ -1002,7 +1002,7 @@ pequeña y mediana, cucharilla ondulante, pececito (crankbait pequeño), plásti
 | Pejerrey | Larva, cucharilla pequeña | Lombriz | #10–#6 | UL–L |
 | Capitán de la sabana | Lombriz (fondo, de noche) | Larva | #8–#4 | L–ML |
 | Trucha arcoíris | Cucharilla giratoria pequeña y mediana, huevas de trucha artificiales, saltamontes | Lombriz, larvas, cucharilla ondulante, plástico blando, pellet, maíz | #8–#4 | L–ML |
-| Carpa común | Maíz, masa de pan | Lombriz, pellet | #6–#1 | M–MH |
+| Carpa común | Maíz, masa de pan, pellet | Lombriz | #6–#1 | M–MH |
 | Trucha café | Pececito, cucharilla ondulante | Lombriz (de noche), plástico blando, saltamontes | #6–#2 | ML–M |
 
 ### La tienda (al estilo de Fishing Planet)
@@ -1613,3 +1613,6 @@ armar las tres cañas queda para E4.
 - **2026-11-18** · Decididos D84 (clases en kilos por especie en el lago, ~25 / 55 / 16 / 4 %) y D85 (la pelea crece con el
   tamaño: guapucha ~40 s, trucha de 1 kg ~1.5 min, de 3.5 kg ~4 min). Valores por hora medidos de nuevo y aplicados.
 - **2026-11-18** · Comprobado en FP: una trucha común de 0.57 kg pelea ~1.2 min; la nuestra (D85), ~75 s.
+- **2026-11-18** · Referencia de la carpa de Fishing Planet (mapa de nivel 50): 2–14 kg lo típico, hasta 40; cebos
+  preferidos de sémola, maíz, guisantes, pan, boilies y pellets. Nuestra carpa (0.5–12 kg, lago) queda como está; el
+  pellet pasa a preferido.

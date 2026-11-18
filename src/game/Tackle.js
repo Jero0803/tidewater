@@ -100,7 +100,7 @@ export const PREFS = {
 	capitan: { best: [ 'worm' ], ok: [ 'larva' ], hook: [ 4, 8 ], lineD: 0.25, wary: 0.3, mouth: 2.2, power: [ 'L', 'ML' ] },
 	// reference: a trout lake of Fishing Planet (level 5): insects, eggs and small spinners first (2026-11-18)
 	rainbowTrout: { best: [ 'spin1', 'spin2', 'eggs', 'grasshopper' ], ok: [ 'worm', 'larva', 'spoon', 'soft', 'pellet', 'corn', 'livebait' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5, power: [ 'L', 'ML' ] },
-	carp: { best: [ 'corn', 'bread' ], ok: [ 'worm', 'pellet' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4, power: [ 'M', 'MH' ] },
+	carp: { best: [ 'corn', 'bread', 'pellet' ], ok: [ 'worm' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4, power: [ 'M', 'MH' ] },
 	brownTrout: { best: [ 'minnow', 'spoon', 'livebait' ], ok: [ 'worm', 'soft', 'spin2', 'grasshopper' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6, power: [ 'ML', 'M' ] },
 };
 
