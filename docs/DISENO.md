@@ -115,7 +115,7 @@ hacia arriba (mapas de nivel más alto).
 | D59 | **Peces con piel ilustrada, sin cambiar de motor (revisada el 2026-11-18):** cada especie lleva una **ilustración de perfil de dominio público** (U.S. Fish and Wildlife Service, muchas de Duane Raver, en Wikimedia Commons) proyectada de lado sobre el cuerpo y las aletas de nuestro modelo, en los dos costados. La anatomía de la especie (perfil, ojo, boca, aletas, cola) se ajusta a la ilustración para que encajen. El pez hecho con código queda de respaldo para las especies sin ilustración. Créditos en `public/models/fish/skins/CREDITOS.md`. **Antes se pensó en modelos GLB de Sketchfab** (la trucha Redband de E.A.Cornell, CC-BY), pero Sketchfab no deja crear cuenta por edad; se pueden añadir más adelante si alguien con cuenta los baja | Los peces hechos con código se ven de baja calidad; las ilustraciones cubren casi todas las especies de EE. UU. y el Caribe, se bajan sin cuenta y no tienen restricciones | 2026-11-18 |
 | D60 | **Guía de peces de cada mapa, en el juego y en la portada:** una ficha por especie con su imagen, nombre común y científico, dónde pica (spots), a qué hora, licencia que pide, rango de tamaño y tu récord. En el juego es una pestaña del inventario; en la portada va dentro de Progreso. Las imágenes se sacan del propio juego (una por especie), así se ven igual en los dos lados y la portada sigue sin motor. **Todo visible desde el inicio**, también los peces que aún no pescaste | Hoy no hay forma de saber qué peces tiene un mapa ni cómo son | 2026-11-18 |
 | D61 | **Los peces pasan a modelos 3D (GLB) como camino principal (completa D59):** la prueba con la trucha arcoíris de eb78 se ve muy superior a la ilustración (volumen real, nado animado). Cada especie usa un modelo 3D libre (CC0 / CC-BY de Sketchfab; los baja el jugador del proyecto y yo los reduzco con `tools/fish/glb_slim.py`). Un modelo sin esqueleto o sin animación también sirve: el motor lo hace nadar con la misma onda que hoy dobla a los peces. Los escaneos pesados se simplifican. **Las especies sin modelo libre conservan su piel ilustrada** (guapucha, carachi, capitán por ahora). Presupuesto: 2 a 4 MB por especie, y cada mapa carga solo sus especies, cuando se necesitan | La calidad del modelo 3D es muy superior; la ilustración queda de respaldo | 2026-11-18 |
-| D62 | **La pelea profunda se adelanta y va antes que las técnicas (cambia D38):** freno del carrete con la rueda del mouse, mover la caña contra la carrera del pez, el pez 3D visible en el agua con sus saltos y la red al final, y cada especie con su manera de pelear. Las técnicas (spinning, fondo, curricán) siguen en la Fase 2 y usarán esta pelea | Probando el juego, la pelea de hoy (mantener el clic y vigilar una barra) se siente muy básica; con los peces en 3D la pelea es lo que más se nota | 2026-11-18 |
+| D62 | **La pelea profunda se adelanta y va antes que las técnicas (cambia D38):** controles de Fishing Planet (clic izquierdo recoger, Shift rápido, clic derecho tirar, mouse a los lados, rueda o +/− freno, Espacio red), el pez 3D visible en el agua con sus saltos y la red al final, y cada especie con su manera de pelear. Las técnicas (spinning, fondo, curricán) siguen en la Fase 2 y usarán esta pelea | Probando el juego, la pelea de hoy (mantener el clic y vigilar una barra) se siente muy básica; con los peces en 3D la pelea es lo que más se nota | 2026-11-18 |
 
 ---
 
@@ -876,23 +876,35 @@ Los escaneos pesados se simplifican con gltf-transform (dependencia de desarroll
 **Hoy:** se mantiene el clic para recoger; una barra de tensión con una zona verde; el pez da tirones cada pocos
 segundos; si la tensión pasa del límite medio segundo, se corta; si queda flojo mucho rato, se suelta. El pez no se ve.
 
+**Controles: los de Fishing Planet** (pedido del jugador del proyecto; revisados en guías y foros, no hay lista
+oficial):
+
+| Control | Qué hace |
+|---|---|
+| Clic izquierdo mantenido | Recoger hilo |
+| Shift + clic izquierdo | Recoger rápido (cansa menos al pez y sube la tensión) |
+| Clic derecho mantenido | Tirar: levantar la caña, más presión sobre el pez. Bombear: levantar con el clic derecho, bajar recogiendo |
+| Mover el mouse a izquierda / derecha | Mover la caña hacia un lado: contra la carrera del pez lo cansa rápido; hacia el mismo lado casi no |
+| Rueda del mouse, o + / − | Apretar o aflojar el freno (10 posiciones) |
+| Espacio | Sacar el pez con la red, cuando está cerca y cansado |
+
 **La pelea nueva** (lo físico en `CatchMinigame.js`, se puede probar sin el navegador):
 
-- **Freno del carrete (rueda del mouse, 10 posiciones):** si el pez tira más fuerte que el freno, el carrete suelta
-  hilo, con su clic, en vez de romperse. Freno muy apretado: se corta en la carrera. Muy flojo: el pez se lleva el
-  hilo del carrete (hay un largo máximo, según el aparejo) o se suelta. El hilo se rompe por encima de su resistencia
-  (la del aparejo de la tienda: 7 a 50 kg), así que **el grado del aparejo por fin importa**.
-- **Recoger (clic mantenido):** acerca el pez solo cuando el pez no está corriendo más fuerte que el freno.
-- **Mover la caña (A / D):** el pez corre hacia un lado (se ve en el agua y en un indicador). Con la caña hacia el
-  lado contrario se cansa mucho más rápido; hacia el mismo lado casi no se cansa y gana hilo.
-- **Saltos (S para bajar la caña):** las especies que saltan (truchas) salen del agua; con la caña baja durante el
-  salto, bien; con la caña arriba y el hilo tenso, el anzuelo puede soltarse.
+- **Freno del carrete:** si el pez tira más fuerte que el freno, el carrete suelta hilo, con su clic, en vez de
+  romperse. Freno muy apretado: se corta en la carrera. Muy flojo: el pez se lleva el hilo del carrete (hay un largo
+  máximo, según el aparejo) o se suelta. El hilo se rompe por encima de su resistencia (la del aparejo de la tienda:
+  7 a 50 kg), así que **el grado del aparejo por fin importa**.
+- **Recoger** acerca el pez solo cuando no está corriendo más fuerte que el freno.
+- **Saltos:** las especies que saltan (truchas) salen del agua; hay que **soltar el clic derecho** (bajar la caña);
+  con la caña arriba y el hilo tenso durante el salto, el anzuelo puede soltarse.
 - **Cada especie pelea distinto** (datos en `FishTable.js`): fuerza, aguante, rapidez de las carreras, si salta, si
   busca el fondo o la vegetación (la carpa: si llega, el hilo se enreda y se corta), si casi no pelea (guapucha).
+- **El cansancio del pez es claro y estable** (en Fishing Planet los jugadores se quejan de que a veces se cansa y a
+  veces no): se cansa más con presión (caña arriba, caña contra la carrera, tensión alta sin romper).
 - **El pez se ve** al final del hilo: su modelo 3D nada bajo la superficie, hace olas y espuma en las carreras,
-  salta; al final se acerca y **se saca con la red** (la red es un paso corto: cuando el pez está cansado y cerca).
-- **Pantalla:** tensión del hilo con la marca del freno, hilo que queda en el carrete, posición del freno, un
-  indicador de hacia dónde corre el pez. Sonidos del freno y del carrete.
+  salta; al final se acerca y se saca con la red.
+- **Pantalla:** tensión del hilo con la marca del freno, hilo que queda en el carrete, posición del freno, hacia
+  dónde corre el pez. Sonidos del freno y del carrete.
 
 | Entrega | Qué | Estado |
 |---|---|---|
