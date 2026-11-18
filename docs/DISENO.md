@@ -33,7 +33,10 @@ Pasar de un juego relajado de ~30 minutos a uno con **progresión de varias hora
 Fishing Planet** (niveles, clases de tamaño, licencias, equipo que importa, objetivos), sin perder lo que el
 juego hace bien: es bonito, se entiende rápido y no castiga de más.
 
-Más adelante, **varios escenarios o mapas** que se desbloquean con la progresión.
+Más adelante, **varios escenarios o mapas** que se desbloquean con la progresión, en una cadena caribeña de la
+montaña al mar: represa, río, manglar y la isla (D23). Mapas y niveles no tienen fin: **la isla es el punto de
+referencia** (D24). Hoy es el mapa más alto; desde ella se diseña hacia abajo (mapas de inicio) y, en el futuro,
+hacia arriba (mapas de nivel más alto).
 
 ### Principios
 
@@ -72,6 +75,10 @@ Más adelante, **varios escenarios o mapas** que se desbloquean con la progresi�
 | D20 | **Viaje entre mapas aprobado** como se propuso: desde el amarre del bote (E), destinos por nivel, con costo; viajan dinero, nivel, XP y equipo; licencias, registro, récords y vendedores son de cada mapa; los peces de la nevera se venden o sueltan antes de viajar | Separa datos globales y por mapa desde el principio | 2026-11-17 |
 | D21 | **Una licencia dura 1 día del juego jugado** (lo que dure un día simulado mientras se juega) | Se renueva seguido: gasto recurrente sin sentirse corto | 2026-11-17 |
 | D22 | **Un día del juego dura 24 minutos reales** (1 hora del juego = 1 minuto real). Por tanto una licencia dura 24 minutos de juego | Fácil de entender; se vive el ciclo completo del día | 2026-11-17 |
+| D23 | **Cadena de mapas de la montaña al mar, en ambiente caribeño:** represa o lago (inicio) → río o quebrada → manglar o estuario → la isla actual | Como en el género: se empieza en aguas tranquilas y el mar es la meta. El ambiente caribeño reutiliza vegetación y sonidos | 2026-11-17 |
+| D24 | **La isla es el punto de referencia** de todo el diseño. Por ahora es el mapa más alto: los números (peces, precios, XP, licencias) se calibran en ella y se escalan **hacia abajo** para los mapas de inicio y, cuando se agreguen, **hacia arriba** para mapas de nivel más alto | Mapas y niveles son infinitos; hace falta un ancla fija desde la que medir | 2026-11-17 |
+| D25 | **Hasta que exista la represa, la isla sigue siendo donde se empieza**, con su progresión interna de licencias. Cuando la represa esté lista pasa a ser el inicio, la isla se desbloquea por nivel y las partidas que ya estén en la isla se quedan ahí sin perder nada | El juego siempre es jugable mientras se construye la cadena | 2026-11-17 |
+| D26 | **Orden de construcción ≠ orden del juego:** se construye primero la represa (la que más reutiliza: agua quieta), luego el manglar, y el río al final o como opcional (el agua que corre es tecnología nueva) | Empezar por lo de menor riesgo | 2026-11-17 |
 
 ---
 
@@ -133,14 +140,32 @@ lo que importa son las ideas.
 
 ## 6. Hoja de ruta
 
-| Fase | Contenido | Problemas que resuelve | Esfuerzo | Riesgo | Estado |
+Orden de trabajo (reordenado el 2026-11-17 según D23–D26). La isla es el ancla: primero se define en ella la
+progresión y después se construyen hacia abajo los mapas de inicio.
+
+| Orden | Etapa | Contenido | Esfuerzo | Riesgo | Estado |
 |---|---|---|---|---|---|
-| **1. Progresión** | Clases de tamaño; nivel y XP con umbral para el siguiente mapa; desbloqueos por nivel; **spots con su lista de peces**; **licencias por pez** | 1, 6 (y parte de 3) | Medio | Bajo-medio (no toca la pelea; los spots cambian cómo se elige el pez que pica) | **Definiendo** |
-| 2. Consecuencias | Carnadas que se gastan y preferencias por especie; desgaste y reparación | 5, 7 | Medio | Medio | Pendiente |
-| 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | 3, 4 | Alto | Medio | Pendiente |
-| 4. Objetivos | Encargos de Joe; torneo de los 10 más pesados | Variedad y metas | Medio | Bajo | Pendiente |
-| M1. Preparar mapas | Convertir la isla en el primer mapa de un registro (forma, distribución, especies, vendedores por mapa). Debe verse idéntico | Habilita escenarios | Medio | Medio | Pendiente |
-| M2. Primer mapa nuevo | Atolón o mar abierto, reutilizando océano, vegetación y peces | Contenido | Alto | Bajo | Pendiente |
+| 1 | **Fase 1. Progresión (en la isla)** | Clases de tamaño; nivel y XP; licencias por pez; spots con su lista de peces; desbloqueos por nivel; tienda rediseñada. Calibrada en la isla como mapa de referencia, con la escala pensada para mapas por debajo y por encima | Medio | Bajo-medio (no toca la pelea) | **Definiendo** |
+| 2 | **M1. Preparar mapas** | Convertir la isla en el primer mapa de un registro (forma, distribución, especies, vendedores y licencias por mapa); guardado global + por mapa; viaje entre mapas (D20). Debe verse idéntico | Medio | Medio | Pendiente |
+| 3 | **M2. Represa o lago** | Primer mapa de inicio: agua quieta (el océano sin viento ni oleaje, rodeado de tierra; por verificar), peces de agua dulce. Al terminar pasa a ser el inicio del juego (D25) | Alto | Medio | Pendiente |
+| 4 | **M3. Manglar o estuario** | Agua quieta y salobre; mangles nuevos; peces de estuario | Alto | Medio | Pendiente |
+| 5 | **M4. Río o quebrada** | Agua con corriente (tecnología nueva); puede quedar como opcional | Muy alto | Alto | Pendiente |
+| — | Fase 2. Consecuencias | Carnadas que se gastan y preferencias por especie; desgaste y reparación | Medio | Medio | Pendiente, se puede intercalar |
+| — | Fase 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | Alto | Medio | Pendiente, se puede intercalar |
+| — | Fase 4. Objetivos | Encargos de los vendedores; torneo de los 10 más pesados | Medio | Bajo | Pendiente, se puede intercalar |
+| — | Mapas por encima de la isla | Mar abierto, otras islas o atolones de nivel más alto (D24) | Alto | Bajo | Futuro |
+
+### Cadena de mapas (D23, D24)
+
+| Orden en el juego | Mapa | Agua | Peces de ejemplo (por definir) | Banda de niveles (propuesta, por medir) |
+|---|---|---|---|---|
+| 1 | Represa o lago | Quieta, dulce | Tilapia, guapote, lobina negra, bagre, carpa | 1–10 |
+| 2 | Río o quebrada | Con corriente, dulce | Dajao, guabina, lisa de río | 10–20 |
+| 3 | Manglar o estuario | Quieta, salobre | Róbalo, pargo de manglar, mojarra, sábalo joven | 20–30 |
+| 4 | **La isla (referencia)** | Mar | Las 18 especies actuales | 30–40 |
+| 5+ | Mapas futuros de nivel más alto | Mar abierto y otros | Por definir | 40+ |
+
+Cada mapa tiene sus propias licencias básica, intermedia y avanzada (D11, D20), con niveles mínimos dentro de su banda.
 
 ### Mapas: lo que sabemos (2026-11-17)
 
@@ -151,6 +176,8 @@ lo que importa son las ideas.
   la arena dependen de la forma de la playa.
 - **Escenarios por dificultad:** mar abierto (media-baja), otra isla tropical o atolón (media), manglar o
   laguna (media-alta), lago o río de agua dulce (alta: sin olas, especies y plantas nuevas).
+- **Idea a verificar para la represa:** el agua es un plano a nivel 0 con olas que dependen del viento. Un lago
+  podría ser el mismo océano sin viento, sin oleaje ni olas en la orilla, rodeado de tierra. No está probado.
 
 ---
 
@@ -254,9 +281,18 @@ con equipo inicial) y mejorar el equipo da más XP (~2,200 XP/h con equipo medio
 | XP por pez | clase (juvenil 1, común 3, trofeo 10, único 40) × dificultad (1 + 2 × fuerza, de 1 a 3) + **3 por kilo** + 20 por especie nueva | XP pareja entre spots |
 | Curva de niveles | XP total para el nivel N = **100 × (N − 1)²** (nivel 3 = 400, nivel 6 = 2,500, nivel 10 = 8,100, nivel 20 = 36,100) | Nivel 3 ≈ 17 min, nivel 6 ≈ 1.7 h, nivel 10 ≈ 4.5 h (estimado) |
 | Licencia básica | Regalada el primer día; después **$20** por día | ~10–15 % de lo que se gana con ella |
-| Licencia intermedia | **Nivel 3**, **$100** por día | Neto ~$300–465/día, mejor que la básica |
-| Licencia avanzada | **Nivel 6**, **$300** por día | Neto ~$870/día en profundo: ~1.9× la intermedia |
-| Mapa 2 | **Nivel 10** | |
+| Licencia intermedia | **Nivel de entrada + 3**, **$100** por día | Neto ~$300–465/día, mejor que la básica |
+| Licencia avanzada | **Nivel de entrada + 6**, **$300** por día | Neto ~$870/día en profundo: ~1.9× la intermedia |
+| Siguiente mapa | **Nivel de entrada + 10** | |
+
+Desde D24 los niveles de las licencias son **relativos a la banda del mapa**. Mientras la isla sea el inicio
+(D25), su nivel de entrada es 1 (intermedia 4, avanzada 7). Cuando exista la cadena completa, la isla entra en
+el nivel 30 (intermedia 33, avanzada 36, siguiente mapa 40).
+
+- [ ] **Curva por banda o global.** Con una curva global 100 × (N − 1)², cada banda de 10 niveles pide más XP
+  que la anterior (niveles 1→10: 8,100 XP; 30→40: 68,000 XP). Como los peces de cada mapa son más grandes, también
+  dan más XP por kilo; hay que medir que el tiempo por banda quede razonable. Alternativa: curva por banda,
+  calibrada para que cada mapa dure lo mismo.
 
 **Consecuencia a resolver en el siguiente bloque:** con licencia intermedia se ganan ~$1,000–2,000 por hora, y
 todas las mejoras actuales de Marta suman $3,875. Hay que reajustar los precios de la tienda y decidir qué
@@ -295,3 +331,7 @@ mejora se desbloquea en cada nivel.
 - **2026-11-17** · Decidido D22 (día = 24 min). Medidas las clases de tamaño, la XP y las licencias
   (`tools/balance/fase1-propuesta.mjs`). Propuestos: XP con 3 por kilo, curva 100 × (N − 1)², licencias
   $20 / $100 (nivel 3) / $300 (nivel 6), mapa 2 en el nivel 10. Detectado que la tienda necesita nuevos precios.
+- **2026-11-17** · Decididos D23 (cadena de mapas represa → río → manglar → isla), D24 (la isla es el punto de
+  referencia: se diseña hacia abajo y, en el futuro, hacia arriba), D25 (la isla sigue siendo el inicio hasta que
+  exista la represa) y D26 (se construye primero la represa, luego el manglar, el río al final). Reordenada la hoja
+  de ruta; niveles de licencias pasan a ser relativos a la banda de cada mapa.
