@@ -46,7 +46,7 @@ export class Chandlery {
 			position: new Vector3( vx, terrain.heightAt( vx, vz ), vz ),
 			yaw: CHANDLERY.yaw,
 			radius: 3.0,
-			greeting: loc( 'Line, reels, a bigger hold, diesel. What do you need?', 'Sedal, carretes, una bodega más grande, diésel. ¿Qué necesitas?' ),
+			greeting: loc( 'Licences, rigs, a bigger hold, diesel. What do you need?', 'Licencias, aparejos, una bodega más grande, diésel. ¿Qué necesitas?' ),
 			material: this.material,
 			// realistic character (Rocketbox, MIT): the stand-in shows until it has loaded
 			character: { url: ( ( import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/characters/marta.glb', idle: 'idle_neutral_01', talk: 'gestic_talk_neutral_01', greet: 'wave_01' },

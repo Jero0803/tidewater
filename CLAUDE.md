@@ -19,7 +19,7 @@ abiertas. Mantenerlo al día: cada decisión nueva va a su sección 3 y a la bit
 ## Reglas del código
 
 - Textos visibles: `loc( 'inglés', 'español' )` de `src/i18n.js`. El inglés queda idéntico al original.
-- Lógica del juego en `src/game/` (`FishTable`, `Bites`, `CatchMinigame`, `Gear`, `GameState`); se puede importar en Node.
-- Guardado (`tidewater.save.v1`): solo agregar campos y niveles al final; no reordenar ni quitar.
+- Lógica del juego en `src/game/` (`FishTable`, `Bites`, `CatchMinigame`, `Gear`, `GameState`, `Progression`, `Spots`); se puede importar en Node.
+- Guardado (`tidewater.save.v3`; v1 y v2 se leen y convierten, sus claves no se tocan): solo agregar campos y niveles al final; no reordenar ni quitar. Si cambia el formato, subir la versión y convertir.
 - Saltos de línea CRLF en los archivos del repo.
 - Git: `origin` = Jero0803/tidewater (subir a `main` publica en GitHub Pages); `upstream` = original.

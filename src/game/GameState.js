@@ -1,11 +1,13 @@
 import { FISH, fishLengthCm } from './FishTable.js';
-import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE } from './Gear.js';
+import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE, convertLegacyUpgrades } from './Gear.js';
 import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES,
 	sizeClass, classValue, releaseReason, licenseTierOf } from './Progression.js';
 
-// Save version 2 (docs/DISENO.md D20, D44). Version 1 saves are read from their old key and converted; the old key
-// is left untouched, so going back to an older build still finds the old game.
-const SAVE_KEY = 'tidewater.save.v2';
+// Save version 3 (docs/DISENO.md D20, D44): v2 plus the Phase 1 shop (float rig by grade). Older saves are read from
+// their own keys and converted (v1 -> v2 -> v3); the old keys are left untouched, so going back to an older build
+// still finds the old game.
+const SAVE_KEY = 'tidewater.save.v3';
+const SAVE_KEY_V2 = 'tidewater.save.v2';
 const SAVE_KEY_V1 = 'tidewater.save.v1';
 export const START_MAP = 'island';
 const PLAYED_SAVE_EVERY = 10; // seconds of play between saves of the played-time counter
@@ -286,7 +288,7 @@ export class GameState {
 	toJSON() {
 
 		return {
-			v: 2,
+			v: 3,
 			// travels with the player (D20)
 			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, hour: this.hour, upgrades: this.upgrades, fuel: this.fuel,
 			inventory: this.inventory, nextId: this._nextId,
@@ -299,7 +301,14 @@ export class GameState {
 	fromJSON( d ) {
 
 		if ( d && d.v === 1 ) d = convertV1( d );
-		if ( ! d || d.v !== 2 ) return false;
+		if ( d && d.v === 2 ) {
+
+			d = convertV2( d );
+			this.gearConverted = d.gearConverted; // { rig, refund, spent }: told to the player once (Game)
+
+		}
+
+		if ( ! d || d.v !== 3 ) return false;
 		this.money = finite( d.money );
 		this.xp = Math.max( 0, finite( d.xp ) );
 		this.playedSeconds = Math.max( 0, finite( d.playedSeconds ) );
@@ -331,7 +340,7 @@ export class GameState {
 
 	}
 
-	// load the version 2 save; without one, convert a version 1 save (and write it as version 2)
+	// load the version 3 save; without one, convert the newest older save (and write it as version 3)
 	load() {
 
 		if ( ! this.storage ) return false;
@@ -339,7 +348,7 @@ export class GameState {
 
 			const raw = this.storage.getItem( SAVE_KEY );
 			if ( raw ) return this.fromJSON( JSON.parse( raw ) );
-			const old = this.storage.getItem( SAVE_KEY_V1 );
+			const old = this.storage.getItem( SAVE_KEY_V2 ) || this.storage.getItem( SAVE_KEY_V1 );
 			if ( ! old || ! this.fromJSON( JSON.parse( old ) ) ) return false;
 			this.save();
 			return true;
@@ -421,6 +430,15 @@ function convertV1( d ) {
 		inventory: d.inventory, nextId: d.nextId,
 		map: START_MAP, maps: { [ START_MAP ]: { log, licences: starterLicences() } },
 	};
+
+}
+
+// version 2 -> 3 (D44): the old line / reel / rod / hold / tank / engine become the Phase 1 shop; what the old line,
+// reel and rod cost beyond the float rig grade they reach comes back as money (Gear.convertLegacyUpgrades)
+function convertV2( d ) {
+
+	const c = convertLegacyUpgrades( d.upgrades || {} );
+	return { ...d, v: 3, upgrades: c.upgrades, money: finite( d.money ) + c.refund, gearConverted: { rig: c.upgrades.rig, refund: c.refund, spent: c.spent } };
 
 }
 

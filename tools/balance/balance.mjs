@@ -46,7 +46,8 @@ Math.random = () => {
 const { FISH, FISH_IDS, fishValue } = await import( '../../src/game/FishTable.js' );
 const { habitatAt, pickSpecies, rollWeight, biteDelay } = await import( '../../src/game/Bites.js' );
 const { CatchMinigame } = await import( '../../src/game/CatchMinigame.js' );
-const { UPGRADES, FUEL_PRICE, fuelBurn } = await import( '../../src/game/Gear.js' );
+// the audit sections (1–6) describe the original game, so they read its old tracks; the Phase 1 shop is SHOP
+const { UPGRADES: SHOP, LEGACY_UPGRADES: UPGRADES, FUEL_PRICE, fuelBurn } = await import( '../../src/game/Gear.js' );
 const P = await import( '../../src/game/Progression.js' );
 
 const LINES = UPGRADES.line.levels, REELS = UPGRADES.reel.levels;
@@ -325,6 +326,12 @@ if ( show( 'progreso' ) ) {
 		console.log( `- En ${ z } con ${ gear } (${ money( r.perMin ) }/min): ${ ( total / r.perMin ).toFixed( 0 ) } min de pesca para comprarlo todo (sin contar viajes ni ventas).` );
 
 	}
+
+	console.log( '\n**Tienda de la Fase 1** (aparejo de flotador por grados, bodega y bote; D37, D39, D43):\n' );
+	const shopRows = Object.values( SHOP ).map( ( u ) => [ u.name, u.levels.length - 1, money( u.levels.reduce( ( s, l ) => s + l.cost, 0 ) ) ] );
+	const shopTotal = Object.values( SHOP ).reduce( ( s, u ) => s + u.levels.reduce( ( a, l ) => a + l.cost, 0 ), 0 );
+	table( [ 'Mejora', 'Grados a comprar', 'Costo total' ], shopRows );
+	console.log( `\nTodo: ${ money( shopTotal ) } (la tienda original: ${ money( total ) }).` );
 
 }
 

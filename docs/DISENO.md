@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entregas 1 a 5 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias), reloj (día de 120 minutos, D47) y cinco spots con nombre.
+**Estado:** **Fase 1 programada** (6 de 6 entregas, 2026-11-18): clases, XP, niveles, licencias, reloj de 120 minutos, cinco spots con nombre y tienda nueva. Siguiente: jugarla y ajustar; luego la Fase 2.
 
 ---
 
@@ -101,6 +101,7 @@ hacia arriba (mapas de nivel más alto).
 | D45 | **Mientras la isla sea el mapa de inicio, su multiplicador de XP es ×1.0** (el del primer mapa de la cadena). Cuando haya mapas por debajo, pasa a ×3.05 | Coherente con D25: el multiplicador depende de la posición del mapa en la cadena | 2026-11-18 |
 | D46 | **El reloj no se detiene con la tienda, el inventario ni la tarjeta de captura;** solo la pausa T lo detiene (y la licencia sigue corriendo, D41). En el modo foto la hora se puede mover, pero al salir vuelve a la del juego, que siguió corriendo por debajo | Simple y sin trucos con la hora de los peces | 2026-11-18 |
 | D47 | **Un día del juego dura 120 minutos reales** (1 hora del juego = 5 minutos reales; reemplaza D22). La licencia sigue durando un día del juego (D21), o sea 120 min de juego, y **su precio sube ×5** para mantener el equilibrio medido: en la isla básica $175, intermedia $500, avanzada $1,000. El aviso de licencia por vencer salta a los 5 min. Los precios de licencias de los demás mapas (sección 6) están calculados para un día de 24 min: se multiplican ×5 | Con 24 min el día pasaba demasiado rápido | 2026-11-18 |
+| D48 | **Tienda de la Fase 1:** precios de la tabla aprobada ($8,550 en total). Mientras el flotador sea la única técnica usa las estadísticas completas de su grado (×1.0; el ×0.8 de D37 entra en la Fase 2): el grado 0 es el equipo inicial de siempre y el 6 iguala o supera al mejor de antes. **Conversión de mejoras viejas (D44):** lo gastado en sedal, carrete y caña da el grado de flotador más alto que alcance y el resto se devuelve en dinero; bodega, tanque y motor pasan al primer grado de igual o mayor capacidad; sonda y luces se conservan | Nadie pierde nada y la isla sigue alcanzable con una sola técnica | 2026-11-18 |
 
 ---
 
@@ -167,7 +168,7 @@ la progresión y después se construyen hacia abajo los mapas de inicio, empezan
 
 | Orden | Etapa | Contenido | Esfuerzo | Riesgo | Estado |
 |---|---|---|---|---|---|
-| 1 | **Fase 1. Progresión (en la isla)** | Clases de tamaño; nivel y XP; licencias por pez; spots con su lista de peces; desbloqueos por nivel; tienda rediseñada. Calibrada en la isla como mapa de referencia, con la escala pensada para mapas por debajo y por encima | Medio | Bajo-medio (no toca la pelea) | **Definiendo** |
+| 1 | **Fase 1. Progresión (en la isla)** | Clases de tamaño; nivel y XP; licencias por pez; spots con su lista de peces; desbloqueos por nivel; tienda rediseñada. Calibrada en la isla como mapa de referencia, con la escala pensada para mapas por debajo y por encima | Medio | Bajo-medio (no toca la pelea) | **Programada** (2026-11-18) |
 | 2 | **M1. Preparar mapas** | Convertir la isla en el primer mapa de un registro (forma, distribución, especies, vendedores y licencias por mapa); guardado global + por mapa; viaje entre mapas (D20). Debe verse idéntico | Medio | Medio | Pendiente |
 | 3 | **M2. Laguna costera y bajos** (mapa 5 del juego) | Agua salada, quieta y poco profunda; praderas de hierba marina y arena; macabí, palometa, sábalo. Reutiliza el océano casi tal cual | Medio-alto | Bajo | Pendiente |
 | 4 | **M3. Ciénaga y manglar** (mapa 4) | Agua salobre y quieta; mangles nuevos; róbalo, sábalo joven, pargo de manglar, pejelagarto | Alto | Medio | Pendiente |
@@ -548,7 +549,7 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 | 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | **Hecha** (2026-11-18) |
 | 4 | Reloj | Día que avanza solo (120 min, D47); hora del panel bloqueada salvo en el modo foto (D16, D41, D42) | **Hecha** (2026-11-18) |
 | 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | **Hecha** (2026-11-18) |
-| 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
+| 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | **Hecha** (2026-11-18) |
 
 **Medición de la entrega 1** (`npm run balance -- --solo=fase1`, reglas reales, isla como inicio): básica ~$220 por
 día en la orilla; intermedia ~$470–490 en el arrecife y la bahía; avanzada ~$1,190 en el profundo (~$990 neto).
@@ -613,6 +614,26 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **Minimapa:** el nombre de cada spot sobre el mapa (solo los que caben en la ventana) y, encima del minimapa, el
   spot que se está pescando (el de la boya) o sobre el que se está (bote, nadando, vadeando, muelle), en dorado.
 - 4 tests nuevos. Probado en el navegador: muelle, playa, arrecife al lanzar.
+
+**Entrega 6, cómo quedó la tienda** (`src/game/Gear.js`):
+
+| Mejora | Grados (se compran en orden) | Total |
+|---|---|---|
+| Aparejo de flotador (sedal · lance · recogida) | 0: 7 kg · 22 m · 1.1 m/s (inicial) · 1: 10 · 25 · 1.3 $150 · 2: 13 · 29 · 1.5 $200 · 3: 18 · 33 · 1.7 $250 · 4: 26 · 38 · 1.9 $300 · 5: 36 · 43 · 2.1 $350 · 6: 50 · 48 · 2.3 $450 | $1,700 |
+| Bodega | 30 kg (nevera) · 45 $350 · 60 $450 · 80 $550 · 110 $700 · 140 $900 · 180 $1,000 | $3,950 |
+| Tanque | 40 L · 60 $200 · 80 $250 · 110 $300 · 150 $350 | $1,100 |
+| Motor | ×1 · ×1.1 $300 · ×1.2 $450 · ×1.3 $550 | $1,300 |
+| Sonda / luces de cubierta | $250 / $250 | $500 |
+
+- Todo: **$8,550** (la tienda original: $3,875); en la isla, unas 4–6 h de juego.
+- **Guardado versión 3** (`tidewater.save.v3`): convierte v2 (y v1 pasando por v2) con D48; las claves viejas no se
+  tocan. Un aviso único cuenta la conversión ("tu sedal, carrete y caña ahora son un aparejo de flotador grado N ·
+  te devolvimos $X").
+- El simulador muestra la tienda nueva al final de `--solo=progreso`; las secciones 1–6 siguen auditando el juego
+  original (con sus mejoras viejas, `LEGACY_UPGRADES`).
+- La guía de bienvenida y el saludo de Marta mencionan los aparejos y las licencias.
+- 10 tests nuevos. Probado en el navegador: tienda, conversión de una partida v2 (sedal de 30 lb y cajón de hielo →
+  aparejo grado 1 + $90 y bodega de 80 kg), aviso de conversión.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -695,3 +716,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · **Entrega 5 hecha:** cinco spots con nombre (playa de la bahía, muelle, arrecife de la bahía,
   centro de la bahía, mar abierto); nombre al caer la boya y en el minimapa. Mismas picadas que antes. 4 tests
   nuevos (todos pasan).
+- **2026-11-18** · Aprobada la tabla de la tienda nueva y decidido D48 (flotador ×1.0 en la Fase 1; conversión por
+  valor con devolución). **Entrega 6 hecha:** aparejo de flotador por grados, bodega y bote; guardado versión 3.
+  **La Fase 1 queda programada.** 10 tests nuevos (todos pasan).

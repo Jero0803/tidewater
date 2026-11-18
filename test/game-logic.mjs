@@ -4,7 +4,7 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from '../src/game/Bites
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
-import { gearStats, defaultUpgrades, UPGRADES } from '../src/game/Gear.js';
+import { gearStats, defaultUpgrades, UPGRADES, convertLegacyUpgrades } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
 	LICENSES, LICENSE_SECONDS, CLOCK_HOURS_PER_SECOND, dayPhase, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
 
@@ -123,7 +123,7 @@ ok( sale.count === 1 && s.money === a.value && s.inventory.length === 1, 'sellin
 s.upgrades.hold = 1;
 const s2 = new GameState( storage );
 s.save();
-ok( s2.load() && s2.money === s.money && s2.inventory.length === 1 && s2.log.grunt.bestKg === 0.84 && s2.stats.holdKg === 70, 'save / load round trip' );
+ok( s2.load() && s2.money === s.money && s2.inventory.length === 1 && s2.log.grunt.bestKg === 0.84 && s2.stats.holdKg === 45, 'save / load round trip' );
 ok( s2.addFish( 'grunt', 0.5 ).id > b.id, 'ids keep counting after a load' );
 // ---- lengths and the catch card's record logic
 {
@@ -165,14 +165,14 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 
 	const m = new Map();
 	const st = new GameState( { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) } );
-	st.money = 100;
-	ok( st.buy( 'reel' ) && st.upgrades.reel === 1 && st.money === 10 && st.stats.reelSpeed === 1.6, 'buying the reel upgrade' );
-	ok( st.buy( 'reel' ) === null && st.upgrades.reel === 1, 'cannot buy what you cannot afford' );
+	st.money = 200;
+	ok( st.buy( 'rig' ) && st.upgrades.rig === 1 && st.money === 50 && st.stats.reelSpeed === 1.3 && st.stats.lineKg === 10 && st.stats.castM === 25, 'buying float rig grade 1' );
+	ok( st.buy( 'rig' ) === null && st.upgrades.rig === 1, 'cannot buy what you cannot afford' );
 	ok( st.fuelL === 40 && st.burn( 30 ) === 10 && st.refuelCost() === 45, 'fuel burns and costs to refill' );
 	st.money = 20;
 	ok( st.refuel() === 13 && st.money === 0 && Math.abs( st.fuelL - 23 ) < 1e-6, 'refuel stops when the money runs out' );
 	st.money = 1000;
-	ok( st.buy( 'fuel' ) && st.fuelL === 80, 'a new tank comes full' );
+	ok( st.buy( 'fuel' ) && st.fuelL === 60, 'a new tank comes full' );
 	ok( st.buy( 'fishFinder' ) && st.stats.finder === true && st.buy( 'fishFinder' ) === null, 'fish finder: one level' );
 
 }
@@ -279,15 +279,15 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const b = new GameState( sto );
 	ok( b.load() && b.money === a.money && b.xp === a.xp && b.xp > 1234 && b.playedSeconds === 0.75 && b.inventory.length === 1 && b.log.grunt.count === 1
 		&& b.licences[ 1 ] === a.licences[ 1 ], 'v2: save / load round trip keeps XP, played time, log and licences' );
-	ok( JSON.parse( sto.m.get( 'tidewater.save.v2' ) ).maps.island.log.grunt.count === 1 && ! sto.m.has( 'tidewater.save.v1' ), 'v2: written under its own key, log stored per map' );
+	ok( JSON.parse( sto.m.get( 'tidewater.save.v3' ) ).maps.island.log.grunt.count === 1 && ! sto.m.has( 'tidewater.save.v1' ), 'v3: written under its own key, log stored per map' );
 
 	// played time is saved every few seconds, not every frame
 	const ps = store(), p = new GameState( ps );
 	p.save();
 	for ( let i = 0; i < 60; i ++ ) p.addPlayed( 1 / 60 );
-	const saved1 = JSON.parse( ps.m.get( 'tidewater.save.v2' ) ).playedSeconds;
+	const saved1 = JSON.parse( ps.m.get( 'tidewater.save.v3' ) ).playedSeconds;
 	for ( let i = 0; i < 600; i ++ ) p.addPlayed( 1 / 60 );
-	ok( saved1 === 0 && JSON.parse( ps.m.get( 'tidewater.save.v2' ) ).playedSeconds >= 10, 'v2: played time is saved every 10 s of play' );
+	ok( saved1 === 0 && JSON.parse( ps.m.get( 'tidewater.save.v3' ) ).playedSeconds >= 10, 'v2: played time is saved every 10 s of play' );
 
 	// per-map data: log and licences belong to each map; money, XP, gear travel
 	const mp = new GameState( store() );
@@ -306,21 +306,21 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	cs.m.set( 'tidewater.save.v1', JSON.stringify( v1 ) );
 	const c = new GameState( cs );
 	const expectXp = xpFromLog( { grunt: v1.log.grunt, tuna: v1.log.tuna } );
-	ok( c.load() && c.money === 640 && c.inventory.length === 1 && c.inventory[ 0 ].cm === 36 && c.upgrades.line === 2 && c.upgrades.hold === 1
-		&& c.fuel === 12 && c.log.grunt.count === 12 && c.log.tuna.bestKg === 9.5, 'v1 -> v2: money, cooler, gear, fuel and log are kept' );
+	ok( c.load() && c.money === 640 + 90 && c.inventory.length === 1 && c.inventory[ 0 ].cm === 36 && c.upgrades.rig === 1 && c.stats.holdKg === 80
+		&& c.fuel === 12 && c.log.grunt.count === 12 && c.log.tuna.bestKg === 9.5, 'v1 -> v3: money, cooler, fuel and log kept; gear converted (30 lb line -> rig 1 + $90, 70 kg -> 80 kg)' );
 	ok( c.xp === expectXp && c.xp > 0 && c.level >= 1, `v1 -> v2: starting XP from the log (${ c.xp } XP, level ${ c.level })` );
 	ok( xpFromLog( { tuna: { count: 1, bestKg: 9.5 } } ) === catchXp( 'tuna', 9.5, { newSpecies: true } ), 'v1 -> v2: the best fish counts with its real weight and the new species bonus' );
 	ok( c.licenseTier === 1 && c.playedSeconds === 0 && c.addFish( 'grunt', 0.5 ).id >= 9, 'v1 -> v2: basic licence, played time from zero, ids keep counting' );
-	ok( cs.m.has( 'tidewater.save.v2' ) && cs.m.get( 'tidewater.save.v1' ) === JSON.stringify( v1 ), 'v1 -> v2: written as v2, the old save is left untouched' );
+	ok( cs.m.has( 'tidewater.save.v3' ) && cs.m.get( 'tidewater.save.v1' ) === JSON.stringify( v1 ), 'v1 -> v3: written as v3, the old save is left untouched' );
 	const again = new GameState( cs );
-	ok( again.load() && again.xp === c.xp && again.log.grunt.count === 13, 'v1 -> v2: the next load reads v2, not the old save' );
+	ok( again.load() && again.xp === c.xp && again.log.grunt.count === 13 && again.money === c.money, 'v1 -> v3: the next load reads v3, not the old save (no second refund)' );
 
 	// bad data
 	const bad = store();
-	bad.m.set( 'tidewater.save.v2', JSON.stringify( { v: 2, money: 'x', xp: - 5, playedSeconds: null, maps: { island: { log: null, licences: { 1: 'a', 9: 5, 2: 300 } } } } ) );
+	bad.m.set( 'tidewater.save.v3', JSON.stringify( { v: 3, money: 'x', xp: - 5, playedSeconds: null, maps: { island: { log: null, licences: { 1: 'a', 9: 5, 2: 300 } } } } ) );
 	const bd = new GameState( bad );
 	ok( bd.load() && bd.money === 0 && bd.xp === 0 && bd.playedSeconds === 0 && Object.keys( bd.licences ).join() === '2' && bd.licenseTier === 2, 'v2: bad values are cleaned on load' );
-	ok( new GameState( { getItem: () => '{"v":3}', setItem: () => {} } ).load() === false, 'v2: an unknown version is not loaded' );
+	ok( new GameState( { getItem: () => '{"v":4}', setItem: () => {} } ).load() === false, 'v3: an unknown version is not loaded' );
 	const rs = new GameState( store() );
 	rs.addXp( 5000 ); rs.mapId = 'lake'; rs.reset();
 	ok( rs.xp === 0 && rs.mapId === 'island' && Object.keys( rs.maps ).join() === 'island' && rs.licenseTier === 1, 'v2: reset starts over' );
@@ -364,7 +364,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	a.hour = 21.25; a.save();
 	const b = new GameState( sto );
 	ok( b.load() && b.hour === 21.25, 'clock: the hour is saved and loaded' );
-	m.set( 'tidewater.save.v2', JSON.stringify( { ...JSON.parse( m.get( 'tidewater.save.v2' ) ), hour: 25.5 } ) );
+	m.set( 'tidewater.save.v3', JSON.stringify( { ...JSON.parse( m.get( 'tidewater.save.v3' ) ), hour: 25.5 } ) );
 	const c = new GameState( sto );
 	ok( c.load() && c.hour === 1.5, 'clock: a saved hour is wrapped to 0..24' );
 
@@ -377,6 +377,35 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	ok( at( 0.1 ) === null, 'spots: none on the sand' );
 	ok( at( 1.5, 200, 80 ).id === 'shallows' && at( 4, 150, 1 ).id === 'pier' && at( 5, - 10, 150 ).id === 'reef', 'spots: beach, pier and reef' );
 	ok( at( 10 ).id === 'bay' && at( 40 ).id === 'deep' && spotById( 'deep' ) === at( 60 ), 'spots: mid-bay and open sea' );
+
+}
+// ---- Phase 1 shop (delivery 6: D37, D39, D43, D44)
+{
+
+	const total = Object.values( UPGRADES ).reduce( ( s, u ) => s + u.levels.reduce( ( a, l ) => a + l.cost, 0 ), 0 );
+	ok( total === 8550 && UPGRADES.rig.levels.length === 7 && UPGRADES.hold.levels.length === 7, 'shop: six rig and hold grades, $8,550 in all' );
+	const g0 = gearStats( defaultUpgrades() ), g6 = gearStats( { ...defaultUpgrades(), rig: 6 } );
+	ok( g0.lineKg === 7 && g0.castM === 22 && g0.reelSpeed === 1.1 && g0.holdKg === 30, 'shop: grade 0 is the old starting gear' );
+	ok( g6.lineKg === 50 && g6.castM === 48 && g6.reelSpeed === 2.3, 'shop: grade 6 matches or beats the old best gear' );
+	let up = true;
+	for ( const u of Object.values( UPGRADES ) ) for ( let i = 1; i < u.levels.length; i ++ ) if ( ! ( u.levels[ i ].cost > 0 ) ) up = false;
+	ok( up, 'shop: every level above the first costs money' );
+	// conversion of the old tracks (D44)
+	const none = convertLegacyUpgrades( {} );
+	ok( none.refund === 0 && Object.values( none.upgrades ).every( ( v ) => v === 0 ), 'convert: no upgrades -> starting gear, nothing back' );
+	const all = convertLegacyUpgrades( { line: 3, reel: 2, rod: 2, hold: 2, fuel: 2, engine: 2, fishFinder: 1, lights: 1 } );
+	ok( all.spent === 1435 && all.upgrades.rig === 5 && all.refund === 185, 'convert: all old rod gear ($1,435) -> rig grade 5 + $185 back' );
+	ok( all.upgrades.hold === 6 && all.upgrades.fuel === 4 && all.upgrades.engine === 3 && all.upgrades.fishFinder === 1 && all.upgrades.lights === 1, 'convert: 160 kg -> 180 kg hold, 150 L tank, ×1.3 engine, finder and lights kept' );
+	const mid = convertLegacyUpgrades( { reel: 1, hold: 1, fuel: 1, engine: 1 } );
+	ok( mid.upgrades.rig === 0 && mid.refund === 90 && mid.upgrades.hold === 3 && mid.upgrades.fuel === 2 && mid.upgrades.engine === 2, 'convert: under the first grade it all comes back; 70 kg -> 80 kg, 80 L -> 80 L, ×1.15 -> ×1.2' );
+	// a v2 save converts once, with the refund
+	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) };
+	m.set( 'tidewater.save.v2', JSON.stringify( { v: 2, money: 100, xp: 50, playedSeconds: 30, upgrades: { line: 1, rod: 1 }, inventory: [], map: 'island', maps: { island: { log: {}, licences: { 1: 999 } } } } ) );
+	const st = new GameState( sto );
+	ok( st.load() && st.upgrades.rig === 0 && st.money === 235 && st.gearConverted.refund === 135 && st.xp === 50 && st.licences[ 1 ] === 999, 'convert: a v2 save keeps XP and licences; $135 of line and rod comes back' );
+	m.set( 'tidewater.save.v2', JSON.stringify( { v: 2, money: 0, upgrades: { line: 2, rod: 1 }, maps: {} } ) );
+	const st2 = new GameState( sto );
+	ok( st2.load() && st2.money === 235 && ! st2.gearConverted, 'convert: once written as v3, the old save is not read again' );
 
 }
 console.log( `value check ${ value }` );

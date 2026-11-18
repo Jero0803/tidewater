@@ -59,6 +59,8 @@ export class Game {
 		this._pier = WORLD.pier;
 		this._tmp = new Vector3();
 		this._licTier = this.state.licenseTier; // to tell when a licence runs out
+		// an old save's gear was converted to the new shop: say so once the HUD is up (D44)
+		this._gearNote = this.state.gearConverted || null;
 		this._licWarned = false;
 		this.applyGear();
 		this.state.onChange( () => this.applyGear() );
@@ -225,6 +227,14 @@ export class Game {
 		}
 
 		this.updateLicence( dt );
+		if ( this._gearNote && this.hud ) {
+
+			const g = this._gearNote;
+			this._gearNote = null;
+			this.toast( loc( `New shop: your line, reel and rod are now a grade ${ g.rig } float rig${ g.refund ? ` · $${ g.refund } back` : '' }`, `Tienda nueva: tu sedal, carrete y caña ahora son un aparejo de flotador grado ${ g.rig }${ g.refund ? ` · te devolvimos $${ g.refund }` : '' }` ), 7000 );
+
+		}
+
 		const can = this.canFish;
 		if ( inp.hit( 'KeyR' ) && can && ! this.fight ) {
 
