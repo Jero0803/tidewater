@@ -6,7 +6,7 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
 import { CatchMinigame } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
-import { activeMap } from '../maps/registry.js';
+import { activeMap, mapOverride } from '../maps/registry.js';
 import { FishingRod } from './FishingRod.js';
 import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
@@ -41,6 +41,7 @@ export class Game {
 		this.state.load();
 		// the map this page loaded (maps/registry.js): its log and licences become the current ones
 		this.map = activeMap();
+		if ( mapOverride() && this.state.mapId !== this.map.id ) this.state.homeMap = this.state.mapId; // a test visit (?map=)
 		this.state.mapId = this.map.id;
 		// the game clock carries on from the saved hour (D16)
 		if ( this.state.hour !== null && ! ( app.qs && app.qs.has( 'bench' ) ) ) app.settings.timeOfDay = this.state.hour;

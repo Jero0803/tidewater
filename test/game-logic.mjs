@@ -451,6 +451,23 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	ok( new GameState( { getItem: () => null, setItem: () => {} } ).mapId === 'island', 'maps: a new game is on the active map' );
 
 }
+// ---- the lake (L3): registered, its own terrain, a test visit does not move the game
+{
+
+	ok( MAPS.lake && MAPS.lake.features.surf === false && MAPS.lake.features.whale === false && MAPS.lake.water.swell === 0, 'lake: registered, calm water, no surf or whale' );
+	ok( MAPS.lake.layout.pier === MAPS.island.layout.pier && MAPS.lake.vendors === MAPS.island.vendors, 'lake: the village, pier and traders stand where they do on the island' );
+	const { LakeTerrainData } = await import( '../src/world/LakeTerrainData.js' );
+	const T = new LakeTerrainData();
+	const at = ( x, z ) => T.heightAt( x, z );
+	ok( Math.abs( at( 0, - 42 ) ) < 0.6 && at( 55, 40 ) < - 3.5 && at( 55, 40 ) > - 5.5 && at( 40, - 118 ) > 1, 'lake terrain: the beach at the water line, ~4 m under the pier head, the village on dry land' );
+	ok( at( 60, 560 ) < - 25 && at( - 170, 540 ) > 5 && at( 310, 650 ) > 5 && at( 560, 150 ) > - 4 && at( 560, 150 ) < 0, 'lake terrain: a deep centre, two islands, a shallow muddy bay' );
+	ok( at( 0, - 960 ) > 150 && at( 0, 990 ) > 150 && at( 990, 300 ) > 150 && at( - 990, 600 ) > 150, 'lake terrain: mountains all along the edge (the sea beyond is hidden)' );
+	ok( T.coastDistance( 55, 40 ).d > 0 && T.coastDistance( 40, - 118 ).d < 0 && T.pathDistance( 0, 0 ) === Infinity, 'lake terrain: shore distance and no footpaths' );
+	const st = new GameState( { getItem: () => null, setItem: () => {} } );
+	st.mapId = 'lake'; st.homeMap = 'island';
+	ok( st.toJSON().map === 'island', 'lake: a test visit (?map=lake) keeps the game on its own map' );
+
+}
 console.log( `value check ${ value }` );
 console.log( fails ? `${ fails } FAILED` : 'all passed' );
 process.exit( fails ? 1 : 0 );

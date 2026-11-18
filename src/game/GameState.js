@@ -34,6 +34,7 @@ export class GameState {
 		this.hour = null; // game clock (0..24) when last saved; null = the world's default
 		this.inventory = []; // { id, species, kg, cm, value, caughtAt (game hours), record }
 		this.mapId = activeMap().id; // the map being played (saved: the next load opens it, maps/registry.js)
+		this.homeMap = null; // set while visiting a map with ?map= (testing): the save keeps this one as the game's map
 		this.maps = { [ this.mapId ]: newMapData() }; // map id -> { log, licences }
 		// the last addFish (the catch card): { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept,
 		// cls (size class id), xp (gained), level, levelUp (levels gained), reason (why released: 'juvenile' | 'protected'
@@ -299,7 +300,7 @@ export class GameState {
 			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, hour: this.hour, upgrades: this.upgrades, fuel: this.fuel,
 			inventory: this.inventory, nextId: this._nextId,
 			// per map
-			map: this.mapId, maps: this.maps,
+			map: this.homeMap || this.mapId, maps: this.maps,
 		};
 
 	}

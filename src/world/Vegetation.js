@@ -1,4 +1,5 @@
 import * as THREE from '../engine/index.js';
+import { activeMap } from '../maps/registry.js';
 import { G } from '../core/Globals.js';
 import { VegSite, scatterVegetation, buildGrassMask, RULES } from './vegetation/Scatter.js';
 import { VegType, LodLevel } from './vegetation/InstanceLOD.js';
@@ -105,6 +106,8 @@ export class Vegetation {
 		const site = new VegSite( terrain, villageObstacles( village ) );
 		this.site = site;
 		const recs = scatterVegetation( site );
+		// maps without the tropical plants (the mountain lake): no palms, bananas or monsteras
+		if ( ! activeMap().features.palms ) recs.palms = recs.bananas = recs.monsteras = [];
 		this.records = recs;
 		const t1 = performance.now();
 		const grassMask = buildGrassMask( site );

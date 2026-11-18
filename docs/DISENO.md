@@ -676,7 +676,7 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 |---|---|---|---|
 | L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | **Hecha** (2026-11-18) |
 | L2 | Viaje | Desde el amarre del bote (E): destinos y costo; vender o soltar la nevera antes de viajar (D20) | Pendiente |
-| L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | Pendiente |
+| L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | **Hecha** (2026-11-18, prototipo) |
 | L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | Pendiente |
 | L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | Pendiente |
 | Pulido | Por capas | Vegetación fría (pinos, eucaliptos, frailejones, juncos), pieles de peces de agua dulce, sonido de montaña, niebla y cielo de altura | Después |
@@ -695,6 +695,29 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - Las partidas muestran su mapa en el menú ("Partida 1 · La isla · Nv 5 · …").
 - 6 tests nuevos. Probado en el navegador: la isla se ve y rinde igual (168 fps), la partida carga igual; el
   simulador (incluido el terreno en Node) da lo mismo.
+
+**Entrega L3, cómo quedó el lago** (`src/world/LakeTerrainData.js`, `src/maps/lake.js`; se entra con
+`juego.html?map=lake`):
+
+- **Terreno propio** con los mismos datos que la isla (alturas y máscaras), así que todo el motor lo usa sin cambios.
+  Se genera en ~1 s.
+- **Orilla norte = la playa de la isla:** el pueblo, el muelle, los puestos y el bote quedan donde están; la playa
+  es de arena blanca ("Playa Blanca") y la punta del muelle queda sobre ~4.5 m de agua.
+- **El lago:** una isla grande y una chica, un brazo al oeste con la desembocadura de un río (cauce bajo el nivel
+  del agua), una bahía de lodo poco profunda al este (~3 m), un centro de ~37 m y praderas de algas en los bajos.
+- **Montañas** alrededor (250–390 m en los bordes del mapa): tapan el mar que hay más allá (el plano del agua es
+  infinito). Picos con roca desnuda en lo alto.
+- **Agua en calma:** brisa de 2.5 m/s, sin mar de fondo ni rompiente (la simulación de la orilla y las olas que
+  rompen se apagan en los mapas sin rompiente). Sin ballena, sin arrecife, sin palmeras, plátanos ni monsteras.
+- **Visita de prueba:** `?map=lake` no mueve la partida al lago (el guardado sigue apuntando a su mapa; el lago
+  guarda su registro aparte).
+- **Licencias del lago** ya definidas (básica $50, intermedia $175 en nivel 4, avanzada $300 en nivel 7). Las
+  especies y los spots del lago llegan en L4: mientras tanto se pesca como en la isla.
+- 7 tests nuevos. Probado en el navegador: carga sin errores, 180 fps, vistas desde el aire y desde el agua.
+
+**Pendientes del prototipo (para el pulido):** vegetación tropical (árboles de la isla) en vez de pinos, eucaliptos y
+frailejones; el agua todavía tiene el color turquesa del Caribe; laderas lisas y muy empinadas al fondo; sonidos de
+mar (rompiente, gaviotas) en la orilla; peces del arrecife nadando.
 
 **A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
@@ -843,3 +866,5 @@ arranque).
   Partidas; el juego pasa a `juego.html` con "Menú" / "Salir al menú".
 - **2026-11-18** · **P2 hecha:** pestañas Mapas (la cadena con su estado y dónde está la partida) y Progreso (nivel,
   dinero, tiempo, licencia, equipo y registro de especies con récords) en la portada.
+- **2026-11-18** · **L3 hecha (prototipo):** el lago existe y se puede recorrer (`juego.html?map=lake`): cuenca con
+  playa blanca, dos islas, río, bahía de lodo, centro profundo y montañas; agua en calma, sin rompiente ni ballena.

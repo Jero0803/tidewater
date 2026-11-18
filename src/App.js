@@ -186,10 +186,24 @@ export class App {
 		this.surface.detail = this.seaDetail;
 		this.shore = new ShoreWaves( this.terrainGPU );
 		this.surface.shore = this.shore;
+		// the map's water (the lake: calm fresh water, no swell and no surf); the panel starts from these values
+		const W = this.map.water;
+		if ( W ) {
+
+			this.fft.local.windSpeed = W.wind;
+			this.fft.local.fetch = W.fetch;
+			this.fft.swell.scale = W.swell;
+			this.fft.choppiness.value = W.chop;
+			this.fft.updateSpectrumUniforms();
+			this.shore.amplitude.value = W.surf;
+			G.windSpeed.value = W.wind;
+
+		}
 		this.caustics = qs.has( 'noCaustics' ) ? null : new Caustics( renderer, this.fft );
 		if ( this.caustics ) this.caustics.detail = this.seaDetail;
 
-		if ( ! qs.has( 'noSim' ) ) {
+		// the surf zone (wave run-up, swash foam): not on maps without surf (the lake)
+		if ( ! qs.has( 'noSim' ) && this.map.features.surf ) {
 
 			this.shoreSim = new ShoreSim( renderer, { terrainGPU: this.terrainGPU, shore: this.shore } );
 			this.surface.shoreSim = this.shoreSim;
@@ -291,14 +305,16 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 			spray: this.spray, clouds: this.clouds,
 		} );
 		scene.add( this.breakers.mesh );
+		this.breakers.mesh.visible = this.map.features.surf; // no plunging breakers on maps without surf
 		// dust, pollen, salt aerosol, seed fluff and gnats drifting around the camera
 		this.airMotes = new AirMotes( { terrain: this.terrainGPU, clouds: this.clouds, csm: this.csm, reversedDepth: true } );
 		scene.add( this.airMotes.mesh );
 		this.boatCtl = new BoatController( { model: this.boat, query: this.query, terrain: this.terrainData, colliders: this.colliders } );
 		this.boatSpray = new BoatSpray( { boat: this.boatCtl, spray: this.spray } );
-		// humpback cruising the deep water around the island (model fetched from public/models/whale)
-		this.whale = new Whale( { scene, terrain: this.terrainData, query: this.query, spray: this.spray } );
-		try {
+		// humpback cruising the deep water around the island (model fetched from public/models/whale); not on maps
+		// without open sea (the map's features)
+		this.whale = this.map.features.whale ? new Whale( { scene, terrain: this.terrainData, query: this.query, spray: this.spray } ) : null;
+		if ( this.whale ) try {
 
 			await this.whale.load();
 			if ( this.reef && this.reef.setWhale ) this.reef.setWhale( this.whale ); // escort fish, foam and slick
