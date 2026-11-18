@@ -1616,3 +1616,4 @@ armar las tres cañas queda para E4.
 - **2026-11-18** · Referencia de la carpa de Fishing Planet (mapa de nivel 50): 2–14 kg lo típico, hasta 40; cebos
   preferidos de sémola, maíz, guisantes, pan, boilies y pellets. Nuestra carpa (0.5–12 kg, lago) queda como está; el
   pellet pasa a preferido.
+- **2026-11-18** · Comprobado en FP: carpas de 10 kg o más pelean ~4 min; la nuestra de 10 kg (caña de fondo MH), ~4.5 min. Coinciden.
