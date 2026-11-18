@@ -83,6 +83,9 @@ hacia arriba (mapas de nivel más alto).
 | D27 | **Cinco mapas por debajo de la isla**, ordenados por dificultad y tamaño de los peces: 1) lago de montaña (trucha), 2) lago cálido o represa (lobina, mojarras), 3) río tropical (pavón, payara), 4) ciénaga y manglar (róbalo, sábalo joven), 5) laguna costera y bajos (macabí, palometa), 6) la isla. Por encima, mar abierto (7+). La quebrada de isla (dajao, guabina) queda como rincón del río o mapa opcional | Investigación de biomas: cada mapa es un bioma distinto con agua, peces y forma de pescar propias | 2026-11-17 |
 | D28 | **Lugares inspirados, no reales:** cada mapa se basa en sitios reales (Andes colombianos, Florida, Llanos, ciénagas, flats del Caribe) pero con nombre y geografía propios | Libertad de diseño; nadie compara con el lugar real | 2026-11-17 |
 | D29 | **Orden de construcción por reutilización:** laguna costera → ciénaga y manglar → lago cálido → río tropical → lago de montaña. Mientras tanto se empieza por el mapa existente de nivel más bajo | Lo que más reutiliza (agua salada quieta) va primero; el lago de montaña pide más arte nuevo (vegetación fría) y el río, tecnología nueva (agua que corre) | 2026-11-17 |
+| D30 | **Mapa 1 · Lago de montaña aprobado:** 7 especies (guapucha, carachi, pejerrey en la básica; trucha arcoíris y carpa en la intermedia; trucha café en la avanzada; capitán de la sabana protegido) y 5 spots (orilla de juncos, muelle del pueblo, desembocadura, bahía de lodo, centro profundo). Tamaños y precios aproximados, a validar | Medido contra la isla: el dinero escala al 20–40 % de la isla; todo se saca con el equipo inicial | 2026-11-17 |
+| D31 | **Especies protegidas:** algunas especies (por ahora el capitán de la sabana) solo se pescan y se sueltan: dan XP y cuentan en el registro, nunca dinero | Refleja especies amenazadas reales y da variedad sin romper la economía | 2026-11-17 |
+| D32 | **Modelo de bandas:** la XP de cada pez se multiplica por **1.25 por cada mapa** (lago ×1.0 … isla ×3.05) y pasar del nivel N al N+1 pide **600 × 1.03^(N − 1) XP**. Meta: **~5 horas de juego por mapa** (~30 horas hasta la isla) | La XP casi no crecía entre mapas; con la curva cuadrática la isla habría tardado ~50 h frente a ~6 h del lago | 2026-11-17 |
 
 ---
 
@@ -175,7 +178,7 @@ la progresión y después se construyen hacia abajo los mapas de inicio, empezan
 
 Cada mapa tiene sus propias licencias básica, intermedia y avanzada (D11, D20), con niveles mínimos dentro de su banda.
 
-### Mapa 1 · Lago de montaña (propuesta, 2026-11-17)
+### Mapa 1 · Lago de montaña (aprobado, D30, 2026-11-17)
 
 Inspirado en los lagos andinos (Tota, Neusa, Tominé en Colombia; Titicaca en Perú y Bolivia). Agua dulce, fría,
 quieta y clara. Medido contra la isla con `node --no-warnings tools/balance/mapa1-propuesta.mjs`.
@@ -216,7 +219,7 @@ profundo en bote (truchas grandes, trucha café, carpa).
 - **Idea nueva: especies protegidas.** El capitán de la sabana es vulnerable en la vida real: en el juego solo
   se puede pescar y soltar (da XP, no dinero). Lo mismo podría aplicarse a otras especies amenazadas.
 
-### Bandas de niveles: propuesta de modelo (2026-11-17)
+### Bandas de niveles (aprobado, D32, 2026-11-17)
 
 Con la XP actual, una curva global 100 × (N − 1)² haría que la banda de la isla (50–60) tarde ~50 horas frente
 a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
@@ -296,7 +299,7 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
 - [x] ~~¿Cuánto más debe pagar el profundo frente al muelle?~~ Reemplazada por D9 y D10: el equilibrio se
   ajusta con la lista de peces de cada spot y el precio de las licencias. La relación entre spots se sigue
   midiendo con el simulador como referencia.
-- [ ] XP necesaria para abrir el mapa 2, y cómo crece para los siguientes
+- [x] ~~XP para abrir el mapa 2 y cómo crece~~ Resuelto con D32: cada mapa abre 10 niveles después (~5 h por mapa).
 
 **Spots (D9)**
 - [ ] Lista de spots de la isla actual y qué especies tiene cada uno
@@ -384,8 +387,8 @@ con equipo inicial) y mejorar el equipo da más XP (~2,200 XP/h con equipo medio
 
 | Tema | Propuesta | Efecto medido |
 |---|---|---|
-| XP por pez | clase (juvenil 1, común 3, trofeo 10, único 40) × dificultad (1 + 2 × fuerza, de 1 a 3) + **3 por kilo** + 20 por especie nueva | XP pareja entre spots |
-| Curva de niveles | XP total para el nivel N = **100 × (N − 1)²** (nivel 3 = 400, nivel 6 = 2,500, nivel 10 = 8,100, nivel 20 = 36,100) | Nivel 3 ≈ 17 min, nivel 6 ≈ 1.7 h, nivel 10 ≈ 4.5 h (estimado) |
+| XP por pez | (clase (juvenil 1, común 3, trofeo 10, único 40) × dificultad (1 + 2 × fuerza, de 1 a 3) + **3 por kilo** + 20 por especie nueva) × multiplicador del mapa (D32) | XP pareja entre spots |
+| Curva de niveles | ~~100 × (N − 1)²~~ Reemplazada por D32: 600 × 1.03^(N − 1) XP por nivel | ~5 h por mapa |
 | Licencia básica | Regalada el primer día; después **$20** por día | ~10–15 % de lo que se gana con ella |
 | Licencia intermedia | **Nivel de entrada + 3**, **$100** por día | Neto ~$300–465/día, mejor que la básica |
 | Licencia avanzada | **Nivel de entrada + 6**, **$300** por día | Neto ~$870/día en profundo: ~1.9× la intermedia |
@@ -395,10 +398,7 @@ Desde D24 los niveles de las licencias son **relativos a la banda del mapa**. Mi
 (D25), su nivel de entrada es 1 (intermedia 4, avanzada 7). Cuando exista la cadena completa (D27), la isla entra
 en el nivel 50 (intermedia 53, avanzada 56, siguiente mapa 60).
 
-- [ ] **Curva por banda o global.** Con una curva global 100 × (N − 1)², cada banda de 10 niveles pide más XP
-  que la anterior (niveles 1→10: 8,100 XP; 50→60: 108,000 XP). Como los peces de cada mapa son más grandes, también
-  dan más XP por kilo; hay que medir que el tiempo por banda quede razonable. Alternativa: curva por banda,
-  calibrada para que cada mapa dure lo mismo.
+- [x] ~~Curva por banda o global~~ Resuelto con D32 (multiplicador por mapa y curva 600 × 1.03^(N − 1)).
 
 **Consecuencia a resolver en el siguiente bloque:** con licencia intermedia se ganan ~$1,000–2,000 por hora, y
 todas las mejoras actuales de Marta suman $3,875. Hay que reajustar los precios de la tienda y decidir qué
@@ -451,3 +451,5 @@ mejora se desbloquea en cada nivel.
 - **2026-11-17** · Diseñado y medido el Mapa 1 · Lago de montaña (`tools/balance/mapa1-propuesta.mjs`):
   7 especies, 5 spots, especie protegida. El dinero escala bien frente a la isla, la XP no. Propuesto un modelo de
   bandas: multiplicador de XP ×1.25 por mapa y curva 600 × 1.03^(N − 1) por nivel (~5 horas por mapa).
+- **2026-11-17** · Decididos D30 (lago de montaña aprobado), D31 (especies protegidas) y D32 (modelo de bandas:
+  ×1.25 de XP por mapa, curva 600 × 1.03^(N − 1), ~5 h por mapa). Resuelta la pregunta de la curva.
