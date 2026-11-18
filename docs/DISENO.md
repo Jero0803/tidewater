@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entregas 1 y 2 de 6 hechas (reglas en `src/game/Progression.js` y guardado versión 2, todavía sin interfaz).
+**Estado:** programando la Fase 1. Entregas 1, 2 y 3 de 6 hechas: las reglas de progresión ya funcionan en el juego (clases, XP, niveles, licencias).
 
 ---
 
@@ -543,7 +543,7 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 |---|---|---|---|
 | 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de 24 min jugados, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
 | 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | **Hecha** (2026-11-18) |
-| 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | Pendiente |
+| 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | **Hecha** (2026-11-18) |
 | 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | Pendiente |
 | 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
 | 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
@@ -570,6 +570,23 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   cuenta como mucho 1 s.
 - Métodos nuevos, todavía sin usar en el juego: `addXp`, `level`, `licenseTier`, `licenseSecondsLeft`,
   `licenseBlock`, `buyLicense`, `addPlayed`. 24 tests nuevos. Probado en el navegador: una partida v1 se convierte.
+
+**Entrega 3, qué cambió en el juego:**
+
+- **Cada captura** se valora por su clase (juvenil $0, común ×1, trofeo ×1.5, único ×3) y da XP aunque se suelte
+  (D13). Se suelta, con el motivo en la tarjeta, si es juvenil, protegida, sin la licencia de su especie o si no
+  cabe (en ese orden).
+- **HUD (arriba a la derecha):** nivel, barra de XP y licencia activa con los minutos que le quedan (en rojo con
+  menos de 2 min o sin licencia).
+- **Tarjeta de captura:** cuarta casilla "Clase" con la XP ganada; "¡Nivel N!" cuando se sube.
+- **Inventario (I) y tienda:** línea con nivel, barra de XP y licencia.
+- **Tienda de Marta:** sección de licencias arriba (básica $35, intermedia $100 desde el nivel 4, avanzada $200
+  desde el nivel 7), con las especies que suma cada una; comprar de nuevo agrega un día.
+- **Avisos:** licencia con 2 min restantes, licencia vencida, subida de nivel (y qué licencia se abre).
+- El tiempo jugado corre en cada cuadro, también con el día en pausa (T) (D41).
+- La guía de bienvenida menciona las licencias.
+- Probado en el navegador: compra de licencia, tarjeta de juvenil, pez sin licencia con subida de nivel,
+  vencimiento de licencias, inventario. 9 tests nuevos de capturas.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -639,3 +656,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · **Entrega 2 hecha:** guardado versión 2 con datos globales y por mapa, XP, licencias y tiempo
   jugado; conversión de partidas v1 sin perder nada (D44). La conversión del equipo a grados queda para la entrega 6.
   24 tests nuevos (todos pasan). El juego se ve igual.
+- **2026-11-18** · **Entrega 3 hecha:** las reglas de la Fase 1 ya funcionan en el juego: valor por clase, XP en
+  cada captura, motivo al soltar, nivel y licencia en el HUD, licencias a la venta con Marta, avisos de
+  vencimiento. 9 tests nuevos (todos pasan).

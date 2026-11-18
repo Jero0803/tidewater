@@ -110,6 +110,7 @@ ok( fight( 'tarpon', 35, policies.careful, 50, 2.2 ).st === 'caught', 'the top l
 const mem = new Map();
 const storage = { getItem: ( k ) => mem.get( k ) ?? null, setItem: ( k, v ) => mem.set( k, v ) };
 const s = new GameState( storage );
+s.licences = { 3: 1e9 }; // every licence: these tests are about the cooler, not licences
 ok( s.stats.holdKg === 30, 'cooler holds 30 kg' );
 const a = s.addFish( 'grunt', 0.84, 9.5 );
 const b = s.addFish( 'yellowtail', 1.31, 10 );
@@ -139,6 +140,7 @@ ok( s2.addFish( 'grunt', 0.5 ).id > b.id, 'ids keep counting after a load' );
 	ok( Math.abs( fishLengthCm( 'mahi', 10 ) - 108 ) < 3 && Math.abs( fishLengthCm( 'grunt', 0.84 ) - 36 ) < 2, 'length-weight: a 10 kg mahi ~108 cm, a 0.84 kg grunt ~36 cm' );
 	const m = new Map();
 	const st = new GameState( { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) } );
+	st.licences = { 3: 1e9 };
 	const c1 = st.addFish( 'jack', 3.2 ), i1 = st.lastCatch;
 	ok( c1 && i1.newSpecies && ! i1.record && c1.cm === i1.cm && i1.cm > 50, 'first of a species: new species, not a record, length stored' );
 	st.addFish( 'jack', 2.1 );
@@ -273,7 +275,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	a.money = 321; a.addXp( 1234 ); a.addPlayed( 0.75 ); a.addFish( 'grunt', 0.8 ); a.money = 500; a.buyLicense( 1 );
 	a.save();
 	const b = new GameState( sto );
-	ok( b.load() && b.money === a.money && b.xp === 1234 && b.playedSeconds === 0.75 && b.inventory.length === 1 && b.log.grunt.count === 1
+	ok( b.load() && b.money === a.money && b.xp === a.xp && b.xp > 1234 && b.playedSeconds === 0.75 && b.inventory.length === 1 && b.log.grunt.count === 1
 		&& b.licences[ 1 ] === a.licences[ 1 ], 'v2: save / load round trip keeps XP, played time, log and licences' );
 	ok( JSON.parse( sto.m.get( 'tidewater.save.v2' ) ).maps.island.log.grunt.count === 1 && ! sto.m.has( 'tidewater.save.v1' ), 'v2: written under its own key, log stored per map' );
 
@@ -288,8 +290,9 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	// per-map data: log and licences belong to each map; money, XP, gear travel
 	const mp = new GameState( store() );
 	mp.money = 77; mp.addXp( 900 ); mp.addFish( 'jack', 3 );
+	const mpXp = mp.xp;
 	mp.mapId = 'lake';
-	ok( Object.keys( mp.log ).length === 0 && mp.licenseTier === 1 && mp.money === 77 && mp.xp === 900, 'v2: a new map has its own empty log and basic licence; money and XP travel' );
+	ok( Object.keys( mp.log ).length === 0 && mp.licenseTier === 1 && mp.money === 77 && mp.xp === mpXp, 'v2: a new map has its own empty log and basic licence; money and XP travel' );
 	mp.mapId = 'island';
 	ok( mp.log.jack.count === 1, 'v2: back on the first map, its log is still there' );
 
@@ -319,6 +322,33 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const rs = new GameState( store() );
 	rs.addXp( 5000 ); rs.mapId = 'lake'; rs.reset();
 	ok( rs.xp === 0 && rs.mapId === 'island' && Object.keys( rs.maps ).join() === 'island' && rs.licenseTier === 1, 'v2: reset starts over' );
+
+}
+// ---- catches under the Phase 1 rules (delivery 3): class value, XP, release reasons
+{
+
+	const m = new Map();
+	const st = new GameState( { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) } );
+	const e1 = st.addFish( 'grunt', 0.8 ), c1 = st.lastCatch;
+	ok( e1 && c1.kept && c1.reason === null && c1.cls === 'common' && e1.cls === 'common' && c1.value === classValue( 'grunt', 0.8 ) && e1.value === c1.value,
+		'catch: a common grunt with the basic licence goes in the cooler at its class value' );
+	ok( c1.xp === catchXp( 'grunt', 0.8, { newSpecies: true } ) && st.xp === c1.xp, 'catch: XP with the new species bonus' );
+	st.addFish( 'grunt', 0.8 );
+	ok( st.lastCatch.xp === catchXp( 'grunt', 0.8 ), 'catch: no bonus the second time' );
+	const n = st.inventory.length;
+	ok( st.addFish( 'grunt', 0.35 ) === null && st.lastCatch.reason === 'juvenile' && st.lastCatch.xp > 0 && st.inventory.length === n, 'catch: a juvenile goes back but gives XP' );
+	ok( st.addFish( 'yellowtail', 1.2 ) === null && st.lastCatch.reason === 'license' && st.lastCatch.tier === 2 && st.log.yellowtail.count === 1, 'catch: without its licence it goes back, is logged and gives XP (D13)' );
+	st.licences = { 2: 1e9 };
+	ok( st.addFish( 'yellowtail', 1.2 ) && st.lastCatch.kept, 'catch: with the intermediate licence it is kept' );
+	FISH.grunt.protected = true;
+	ok( st.addFish( 'grunt', 0.9 ) === null && st.lastCatch.reason === 'protected', 'catch: protected species always go back' );
+	delete FISH.grunt.protected;
+	st.licences = { 3: 1e9 };
+	ok( st.addFish( 'tarpon', 40 ) === null && st.lastCatch.reason === 'full', 'catch: a full cooler is the last reason' );
+	const lv = new GameState( { getItem: () => null, setItem: () => {} } );
+	lv.xp = 599;
+	lv.addFish( 'grunt', 0.8 );
+	ok( lv.lastCatch.levelUp === 1 && lv.lastCatch.level === 2, 'catch: reports a level up' );
 
 }
 console.log( `value check ${ value }` );

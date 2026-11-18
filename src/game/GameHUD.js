@@ -1,7 +1,8 @@
 import { loc } from '../i18n.js';
-import { FISH, fishLengthCm } from './FishTable.js';
+import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { UPGRADES, nextLevel, FUEL_PRICE } from './Gear.js';
 import { FishPortrait } from './FishPortrait.js';
+import { levelFromXp, LICENSES, licenseTierOf } from './Progression.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -79,6 +80,25 @@ const CSS = /* css */`
 .gm-log { margin-top: var(--tw-3); color: var(--tw-ink-3); font-size: var(--tw-fs-sm); line-height: 1.5; }
 .gm-row .gm-cm { font-family: var(--tw-mono); color: var(--tw-ink-3); }
 .gm-row.has-cm { grid-template-columns: 1fr auto auto auto auto; }
+/* level, XP and licence (Phase 1) */
+.gm-level { display: flex; align-items: center; gap: var(--tw-2); color: var(--tw-ink-2); font-size: var(--tw-fs-md); }
+.gm-level b { font-family: var(--tw-mono); font-weight: 600; color: var(--tw-ink); }
+.gm-xp-bar { width: calc(48 * var(--tw-u)); }
+.gm-xp-bar > span { background: var(--tw-sun); }
+.gm-level.is-up b { animation: gm-bump 900ms var(--tw-ease) 2; color: var(--tw-sun); }
+.gm-lic { color: var(--tw-ink-3); font-size: var(--tw-fs-sm); white-space: nowrap; }
+.gm-lic.is-low { color: var(--tw-coral); }
+.gm-row small.cls-trophy, .gm-cls.cls-trophy { color: #f0c46a; }
+.gm-row small.cls-unique, .gm-cls.cls-unique { color: #d9a2ff; }
+.gm-prog { display: grid; grid-template-columns: auto 1fr auto; gap: var(--tw-3); align-items: center; margin: 0 0 var(--tw-3); font-size: var(--tw-fs-sm); color: var(--tw-ink-2); }
+.gm-prog b { color: var(--tw-ink); font-family: var(--tw-mono); }
+.gm-shop-head { margin: var(--tw-3) 0 0; color: var(--tw-ink-3); font-size: var(--tw-fs-xs); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+.gm-shop-row.is-active > span:first-child { color: var(--tw-aqua); }
+.gm-stat.is-class b { font-family: var(--tw-font); font-size: clamp(18px, 1.9vw, 28px); }
+.gm-stat.is-class.cls-trophy b { color: #f0c46a; }
+.gm-stat.is-class.cls-unique b { color: #d9a2ff; }
+.gm-stat.is-class.cls-juvenile b { color: rgba(244, 234, 214, 0.7); }
+.gm-catch-level { margin-top: var(--tw-2); font-family: 'Kalam', var(--tw-font); font-size: clamp(16px, 1.5vw, 22px); color: #f0c46a; }
 
 /* catch card: full screen. The world dims and blurs; the fish lies side-on in its own studio light
    (FishPortrait, a WebGPU canvas) between the name above and the numbers below */
@@ -154,6 +174,32 @@ const CSS = /* css */`
 }
 `;
 
+// names shown for licences and size classes
+export const licenseName = ( tier ) => [ loc( 'No', 'Sin' ), loc( 'Basic', 'Básica' ), loc( 'Intermediate', 'Intermedia' ), loc( 'Advanced', 'Avanzada' ) ][ tier ] ?? '';
+export const className = ( id ) => ( { juvenile: loc( 'Juvenile', 'Juvenil' ), common: loc( 'Common', 'Común' ), trophy: loc( 'Trophy', 'Trofeo' ), unique: loc( 'Unique', 'Único' ) } )[ id ] ?? '';
+const minutes = ( sec ) => `${ Math.ceil( sec / 60 ) } min`;
+
+// why a catch went back in the water (GameState.lastCatch.reason), as one short line
+export function releaseText( info, state ) {
+
+	switch ( info.reason ) {
+
+		case 'juvenile': return loc( 'Juvenile · back in the water to grow', 'Juvenil · de vuelta al agua para que crezca' );
+		case 'protected': return loc( 'Protected species · catch and release', 'Especie protegida · captura y suelta' );
+		case 'license': return loc( `Needs the ${ licenseName( info.tier ).toLowerCase() } licence · you let it go`, `Necesitas la licencia ${ licenseName( info.tier ).toLowerCase() } · lo soltaste` );
+		case 'full': {
+
+			const hold = state && state.upgrades.hold > 0;
+			return loc( `No room in the ${ hold ? 'hold' : 'cooler' } · you let it go`, `No cabe en la ${ hold ? 'bodega' : 'nevera' } · lo soltaste` );
+
+		}
+
+		default: return '';
+
+	}
+
+}
+
 const h = ( tag, cls, html ) => {
 
 	const e = document.createElement( tag );
@@ -173,7 +219,7 @@ export class GameHUD {
 		style.textContent = CSS;
 		document.head.append( style );
 
-		this.purse = h( 'div', 'gm-purse tw-glass', `<span class="gm-money">$0</span><span class="gm-cooler"><span class="gm-cooler-label">${ loc( 'Cooler', 'Nevera' ) }</span><span class="gm-cooler-bar"><span></span></span><span class="gm-cooler-kg">0 / 30 kg</span></span><span class="gm-gauge gm-fuel"><span>${ loc( 'Fuel', 'Diésel' ) }</span><span class="gm-cooler-bar gm-fuel-bar"><span></span></span><b class="gm-fuel-l">40 L</b></span><span class="gm-gauge gm-sonar"><span>${ loc( 'Sonar', 'Sonda' ) }</span><b class="gm-sonar-d">0 m</b><span class="gm-sonar-dots"></span></span>` );
+		this.purse = h( 'div', 'gm-purse tw-glass', `<span class="gm-level"><b class="gm-level-n">${ loc( 'Lv', 'Nv' ) } 1</b><span class="gm-cooler-bar gm-xp-bar"><span></span></span><span class="gm-lic"></span></span><span class="gm-money">$0</span><span class="gm-cooler"><span class="gm-cooler-label">${ loc( 'Cooler', 'Nevera' ) }</span><span class="gm-cooler-bar"><span></span></span><span class="gm-cooler-kg">0 / 30 kg</span></span><span class="gm-gauge gm-fuel"><span>${ loc( 'Fuel', 'Diésel' ) }</span><span class="gm-cooler-bar gm-fuel-bar"><span></span></span><b class="gm-fuel-l">40 L</b></span><span class="gm-gauge gm-sonar"><span>${ loc( 'Sonar', 'Sonda' ) }</span><b class="gm-sonar-d">0 m</b><span class="gm-sonar-dots"></span></span>` );
 		this.fuelEl = this.purse.querySelector( '.gm-fuel' );
 		this.fuelBar = this.purse.querySelector( '.gm-fuel-bar > span' );
 		this.fuelL = this.purse.querySelector( '.gm-fuel-l' );
@@ -181,6 +227,10 @@ export class GameHUD {
 		this.sonarD = this.purse.querySelector( '.gm-sonar-d' );
 		this.sonarDots = this.purse.querySelector( '.gm-sonar-dots' );
 		this.moneyEl = this.purse.querySelector( '.gm-money' );
+		this.levelEl = this.purse.querySelector( '.gm-level' );
+		this.levelN = this.purse.querySelector( '.gm-level-n' );
+		this.xpBar = this.purse.querySelector( '.gm-xp-bar > span' );
+		this.licEl = this.purse.querySelector( '.gm-lic' );
 		this.coolerEl = this.purse.querySelector( '.gm-cooler' );
 		this.coolerBar = this.purse.querySelector( '.gm-cooler-bar > span' );
 		this.coolerKg = this.purse.querySelector( '.gm-cooler-kg' );
@@ -243,6 +293,20 @@ export class GameHUD {
 		}
 
 		this._last.money = s.money;
+		const lv = levelFromXp( s.xp );
+		this.levelN.textContent = `${ loc( 'Lv', 'Nv' ) } ${ lv.level }`;
+		this.xpBar.style.width = `${ lv.into / lv.need * 100 }%`;
+		this.levelEl.title = `${ lv.into } / ${ lv.need } XP`;
+		if ( this._last.level !== undefined && lv.level > this._last.level ) {
+
+			this.levelEl.classList.remove( 'is-up' );
+			void this.levelEl.offsetWidth;
+			this.levelEl.classList.add( 'is-up' );
+
+		}
+
+		this._last.level = lv.level;
+		this._last.lic = null; // redraw the licence on the next frame
 		if ( this.invOpen ) this.renderInventory();
 		if ( this.standOpen ) this.vendor && this.vendor.kind === 'shop' ? this.renderShop() : this.renderStand();
 
@@ -250,6 +314,19 @@ export class GameHUD {
 
 	// per frame
 	update( { fight, casting, power, bite, aiming, fuel = null, sonar = null } ) {
+
+		// the licence and its time left (changes every second of play)
+		const s = this.game.state, tier = s.licenseTier, left = s.licenseSecondsLeft;
+		const lic = tier ? `${ licenseName( tier ) } · ${ minutes( left ) }` : loc( 'No licence', 'Sin licencia' );
+		if ( lic !== this._last.lic ) {
+
+			this._last.lic = lic;
+			this.licEl.textContent = lic;
+			this.licEl.classList.toggle( 'is-low', ! tier || left < 120 );
+			this.licEl.title = loc( 'Fishing licence of this map · counts down while you play', 'Licencia de pesca de este mapa · se descuenta mientras juegas' );
+			if ( this.standOpen && this.vendor && this.vendor.kind === 'shop' ) this.renderShop();
+
+		}
 
 		// boat instruments in the purse: fuel while aboard, the fish finder when fitted
 		this.fuelEl.classList.toggle( 'is-on', !! fuel );
@@ -299,7 +376,8 @@ export class GameHUD {
 	}
 
 	// ---- catch card
-	// info: GameState.lastCatch ({ species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept })
+	// info: GameState.lastCatch ({ species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept, cls, xp,
+	// level, levelUp, reason, tier })
 	showCatch( info, ms = 9000 ) {
 
 		const f = FISH[ info.species ];
@@ -307,7 +385,7 @@ export class GameHUD {
 		const badge = info.record ? '<span class="gm-badge is-record">' + loc( '★ New record', '★ Nuevo récord' ) + '</span>'
 			: info.newSpecies ? '<span class="gm-badge is-new">' + loc( 'New species', 'Especie nueva' ) + '</span>' : '<span class="gm-badge is-plain">' + loc( 'Catch', 'Captura' ) + '</span>';
 		let note;
-		if ( ! info.kept ) note = `<div class="gm-catch-note is-warn">${ loc( `No room in the ${ this.game.state.upgrades.hold > 0 ? 'hold' : 'cooler' } · you let it go`, `No cabe en la ${ this.game.state.upgrades.hold > 0 ? 'bodega' : 'nevera' } · lo soltaste` ) }</div>`;
+		if ( ! info.kept ) note = `<div class="gm-catch-note is-warn">${ releaseText( info, this.game.state ) }</div>`;
 		else if ( info.record ) note = `<div class="gm-catch-note">${ loc( 'Previous best', 'Mejor anterior' ) } <b>${ info.prevBestKg.toFixed( 2 ) } kg</b> · ${ info.prevBestCm } cm. ${ loc( 'Beaten by', 'Superado por' ) } ${ ( info.kg - info.prevBestKg ).toFixed( 2 ) } kg.</div>`;
 		else if ( info.newSpecies ) note = '<div class="gm-catch-note">' + loc( 'First one in your fish log.', 'El primero en tu registro de pesca.' ) + '</div>';
 		else note = `<div class="gm-catch-note">${ loc( 'Your best:', 'Tu mejor:' ) } ${ info.prevBestKg.toFixed( 2 ) } kg · ${ info.prevBestCm } cm</div>`;
@@ -333,9 +411,11 @@ export class GameHUD {
 				<div class="gm-catch-stats">
 					<div class="gm-stat"><span>${ loc( 'Length', 'Largo' ) }</span><b>${ info.cm }<small>cm</small></b><i>${ inch.toFixed( 1 ) } in</i></div>
 					<div class="gm-stat"><span>${ loc( 'Weight', 'Peso' ) }</span><b>${ info.kg < 1 ? info.kg.toFixed( 2 ) : info.kg.toFixed( 1 ) }<small>kg</small></b><i>${ lb.toFixed( 1 ) } lb</i></div>
-					<div class="gm-stat is-value"><span>${ loc( 'Value', 'Valor' ) }</span><b>$${ info.value }</b><i>${ info.kept ? loc( 'in the cooler', 'en la nevera' ) : loc( 'let go', 'soltado' ) }</i></div>
+					<div class="gm-stat is-class cls-${ info.cls }"><span>${ loc( 'Class', 'Clase' ) }</span><b>${ className( info.cls ) }</b><i>+${ info.xp } XP</i></div>
+					<div class="gm-stat is-value"><span>${ loc( 'Value', 'Valor' ) }</span><b>$${ info.value }</b><i>${ info.kept ? ( this.game.state.upgrades.hold > 0 ? loc( 'in the hold', 'en la bodega' ) : loc( 'in the cooler', 'en la nevera' ) ) : loc( 'let go', 'soltado' ) }</i></div>
 				</div>
 				${ note }
+				${ info.levelUp ? `<div class="gm-catch-level">${ loc( `Level ${ info.level }!`, `¡Nivel ${ info.level }!` ) }</div>` : '' }
 				<div class="gm-catch-foot"><kbd>${ loc( 'Click', 'Clic' ) }</kbd> ${ loc( 'or', 'o' ) } <kbd>E</kbd> ${ loc( 'to continue', 'para continuar' ) }<span class="gm-catch-timer"><span></span></span></div>
 			</div>`;
 		// restart the entrance even when a card is already up
@@ -386,16 +466,27 @@ export class GameHUD {
 	renderInventory() {
 
 		const s = this.game.state;
-		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }${ f.record ? '<small>' + loc( 'record', 'récord' ) + '</small>' : '' }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span><button class="gm-mini" data-release="${ f.id }">${ loc( 'Release', 'Soltar' ) }</button></div>` ).join( '' );
+		const tag = ( f ) => ( f.cls === 'trophy' || f.cls === 'unique' ? `<small class="cls-${ f.cls }">${ className( f.cls ).toLowerCase() }</small>` : '' );
+		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }${ tag( f ) }${ f.record ? '<small>' + loc( 'record', 'récord' ) + '</small>' : '' }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span><button class="gm-mini" data-release="${ f.id }">${ loc( 'Release', 'Soltar' ) }</button></div>` ).join( '' );
 		const logged = Object.entries( s.log ).filter( ( [ k ] ) => FISH[ k ] ).map( ( [ k, v ] ) => `${ FISH[ k ].name }: ${ v.count } ${ loc( 'caught, best', 'capturados, mejor' ) } ${ v.bestKg.toFixed( 2 ) } kg · ${ v.bestCm ?? Math.round( fishLengthCm( k, v.bestKg ) ) } cm` ).join( '<br>' );
 		this.inv.innerHTML = `
 			<h2>${ s.upgrades.hold > 0 ? loc( 'Fish hold', 'Bodega' ) : loc( 'Cooler', 'Nevera' ) }</h2>
-			<p class="gm-sub">${ s.inventory.length } ${ loc( 'fish', 'peces' ) } · ${ s.holdKg.toFixed( 1 ) } ${ loc( 'of', 'de' ) } ${ s.stats.holdKg } kg · ${ loc( 'worth', 'valor' ) } $${ s.holdValue }</p>
+			<p class="gm-sub">${ s.inventory.length } ${ s.inventory.length === 1 ? loc( 'fish', 'pez' ) : loc( 'fish', 'peces' ) } · ${ s.holdKg.toFixed( 1 ) } ${ loc( 'of', 'de' ) } ${ s.stats.holdKg } kg · ${ loc( 'worth', 'valor' ) } $${ s.holdValue }</p>
+			${ this.progressLine() }
 			<div class="gm-list">${ rows || '<div class="gm-empty">' + loc( 'Nothing yet. Cast from the pier, the beach or the boat.', 'Nada todavía. Lanza desde el muelle, la playa o el bote.' ) + '</div>' }</div>
 			${ logged ? `<div class="gm-log"><b>${ loc( 'Fish log', 'Registro de pesca' ) }</b><br>${ logged }</div>` : '' }
 			<div class="gm-foot"><span class="gm-sub">${ loc( 'Sell at the fish stand by the pier', 'Vende en el puesto de pescado junto al muelle' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Close (I)', 'Cerrar (I)' ) }</button></div>`;
 		this.inv.querySelector( '[data-close]' ).onclick = () => this.toggleInventory( false );
 		for ( const b of this.inv.querySelectorAll( '[data-release]' ) ) b.onclick = () => s.release( Number( b.dataset.release ) );
+
+	}
+
+	// level, XP and licence, one line (inventory and shop)
+	progressLine() {
+
+		const s = this.game.state, lv = levelFromXp( s.xp ), tier = s.licenseTier;
+		const lic = tier ? `${ loc( 'Licence', 'Licencia' ) } ${ licenseName( tier ).toLowerCase() } · ${ minutes( s.licenseSecondsLeft ) }` : loc( 'No licence', 'Sin licencia' );
+		return `<div class="gm-prog"><b>${ loc( 'Level', 'Nivel' ) } ${ lv.level }</b><span class="gm-cooler-bar gm-xp-bar" style="width:100%" title="${ lv.into } / ${ lv.need } XP"><span style="width:${ lv.into / lv.need * 100 }%"></span></span><span>${ lic }</span></div>`;
 
 	}
 
@@ -451,15 +542,32 @@ GameHUD.prototype.renderShop = function () {
 		return `<div class="gm-shop-row"><span>${ track.name }: ${ next ? next.label : cur.label }<small>${ loc( 'Now:', 'Actual:' ) } ${ cur.label }</small></span>${ btn }</div>`;
 
 	} ).join( '' );
+	// licences of this map (D18: cumulative, one game day of play each; buying again adds a day)
+	const active = s.licenseTier;
+	const licRows = LICENSES.filter( Boolean ).map( ( L ) => {
+
+		const names = FISH_IDS.filter( ( id ) => licenseTierOf( id ) === L.tier && ! FISH[ id ].protected ).map( ( id ) => FISH[ id ].name ).join( ', ' );
+		const own = s.licences[ L.tier ] > s.playedSeconds;
+		const block = s.licenseBlock( L.tier );
+		const status = own ? `${ loc( 'Active', 'Activa' ) } · ${ minutes( s.licences[ L.tier ] - s.playedSeconds ) }${ L.tier < active ? ' · ' + loc( 'covered by a higher one', 'cubierta por una superior' ) : '' }`
+			: block === 'level' ? `${ loc( 'From level', 'Desde el nivel' ) } ${ L.minLevel }` : '';
+		const btn = block === 'level'
+			? `<span class="gm-have">${ loc( 'Level', 'Nivel' ) } ${ L.minLevel }</span>`
+			: `<button class="gm-btn" data-lic="${ L.tier }" ${ block ? 'disabled' : '' }>${ own ? loc( '+1 day', '+1 día' ) : loc( 'Buy', 'Comprar' ) } · $${ L.price }</button>`;
+		return `<div class="gm-shop-row${ own ? ' is-active' : '' }"><span>${ loc( `${ licenseName( L.tier ) } licence`, `Licencia ${ licenseName( L.tier ).toLowerCase() }` ) }${ status ? ` · ${ status }` : '' }<small>${ L.tier > 1 ? loc( 'Adds: ', 'Suma: ' ) : '' }${ names }</small></span>${ btn }</div>`;
+
+	} ).join( '' );
 	const missing = s.stats.fuelL - s.fuelL;
 	const fuelRow = `<div class="gm-shop-row"><span>${ loc( 'Diesel', 'Diésel' ) } · $${ FUEL_PRICE.toFixed( 2 ) } / L<small>${ loc( 'Tank:', 'Tanque:' ) } ${ s.fuelL.toFixed( 0 ) } ${ loc( 'of', 'de' ) } ${ s.stats.fuelL } L</small></span>${ missing > 0.5 ? `<button class="gm-btn" data-fuel ${ s.money < FUEL_PRICE ? 'disabled' : '' }>${ loc( 'Fill', 'Llenar' ) } · $${ s.refuelCost() }</button>` : '<span class="gm-have">' + loc( 'Full', 'Lleno' ) + '</span>' }</div>`;
 	this.stand.innerHTML = `
 		<h2>${ v.name }</h2>
 		<p class="gm-sub">${ v.greeting } · ${ loc( 'You have', 'Tienes' ) } $${ s.money.toLocaleString() }</p>
-		<div class="gm-list">${ fuelRow }${ rows }</div>
+		${ this.progressLine() }
+		<div class="gm-list"><div class="gm-shop-head">${ loc( 'Licences · one game day of play (24 min)', 'Licencias · un día del juego jugado (24 min)' ) }</div>${ licRows }<div class="gm-shop-head">${ loc( 'Gear and boat', 'Equipo y bote' ) }</div>${ fuelRow }${ rows }</div>
 		<div class="gm-foot"><span class="gm-sub">${ loc( 'Upgrades take effect at once', 'Las mejoras se aplican al instante' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Leave (E)', 'Salir (E)' ) }</button></div>`;
 	this.stand.querySelector( '[data-close]' ).onclick = () => this.closeStand();
 	for ( const b of this.stand.querySelectorAll( '[data-buy]' ) ) b.onclick = () => this.game.buy( b.dataset.buy );
+	for ( const b of this.stand.querySelectorAll( '[data-lic]' ) ) b.onclick = () => this.game.buyLicense( Number( b.dataset.lic ) );
 	const f = this.stand.querySelector( '[data-fuel]' );
 	if ( f ) f.onclick = () => this.game.refuel();
 

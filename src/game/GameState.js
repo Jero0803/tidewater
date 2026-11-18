@@ -1,6 +1,7 @@
-import { FISH, fishValue, fishLengthCm } from './FishTable.js';
+import { FISH, fishLengthCm } from './FishTable.js';
 import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE } from './Gear.js';
-import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES } from './Progression.js';
+import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES,
+	sizeClass, classValue, releaseReason, licenseTierOf } from './Progression.js';
 
 // Save version 2 (docs/DISENO.md D20, D44). Version 1 saves are read from their old key and converted; the old key
 // is left untouched, so going back to an older build still finds the old game.
@@ -25,7 +26,9 @@ export class GameState {
 		this.inventory = []; // { id, species, kg, cm, value, caughtAt (game hours), record }
 		this.mapId = START_MAP;
 		this.maps = { [ START_MAP ]: newMapData() }; // map id -> { log, licences }
-		// the last addFish: { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept } (the catch card)
+		// the last addFish (the catch card): { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept,
+		// cls (size class id), xp (gained), level, levelUp (levels gained), reason (why released: 'juvenile' | 'protected'
+		// | 'license' | 'full' | null), tier (licence tier the species needs) }
 		this.lastCatch = null;
 		this.upgrades = defaultUpgrades();
 		this.fuel = null; // litres left (null = full tank)
@@ -138,8 +141,9 @@ export class GameState {
 
 	}
 
-	// store a caught fish; returns the entry, or null when the hold is full (it is logged either way).
-	// A record beats an earlier catch of the species; the first one of a species is a new species.
+	// store a caught fish; returns the entry, or null when it has to go back (juvenile, protected, no licence for it,
+	// hold full). Either way it is logged and gives XP (D13). A record beats an earlier catch of the species; the
+	// first one of a species is a new species. Values follow the size classes (Progression.classValue).
 	addFish( species, kg, timeOfDay = 12 ) {
 
 		kg = Math.round( kg * 100 ) / 100;
@@ -156,9 +160,15 @@ export class GameState {
 
 		}
 
-		const value = fishValue( species, kg );
-		const kept = this.fits( kg );
-		this.lastCatch = { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept };
+		const cls = sizeClass( species, kg ).id;
+		const value = classValue( species, kg );
+		const reason = releaseReason( species, kg, this.licenseTier ) || ( this.fits( kg ) ? null : 'full' );
+		const kept = ! reason;
+		const levelBefore = this.level;
+		const xp = catchXp( species, kg, { newSpecies } );
+		this.xp += xp;
+		const level = this.level;
+		this.lastCatch = { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept, cls, xp, level, levelUp: level - levelBefore, reason, tier: licenseTierOf( species ) };
 		if ( ! kept ) {
 
 			this.save();
@@ -167,7 +177,7 @@ export class GameState {
 
 		}
 
-		const f = { id: this._nextId ++, species, kg, cm, value, caughtAt: timeOfDay, record };
+		const f = { id: this._nextId ++, species, kg, cm, value, caughtAt: timeOfDay, record, cls };
 		this.inventory.push( f );
 		this.save();
 		this.emit();

@@ -10,7 +10,8 @@ import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
 import { CatchDisplay } from './CatchDisplay.js';
 import { UPGRADES, fuelBurn } from './Gear.js';
-import { GameHUD } from './GameHUD.js';
+import { GameHUD, releaseText, licenseName } from './GameHUD.js';
+import { LICENSES } from './Progression.js';
 import { Minimap } from './Minimap.js';
 import { Guide } from './Guide.js';
 
@@ -54,6 +55,8 @@ export class Game {
 		this._hookedSpecies = null;
 		this._pier = WORLD.pier;
 		this._tmp = new Vector3();
+		this._licTier = this.state.licenseTier; // to tell when a licence runs out
+		this._licWarned = false;
 		this.applyGear();
 		this.state.onChange( () => this.applyGear() );
 
@@ -111,6 +114,59 @@ export class Game {
 
 	}
 
+	// buy or extend a licence of this map (the shop)
+	buyLicense( tier ) {
+
+		const ok = this.state.buyLicense( tier );
+		if ( ok ) {
+
+			this._licTier = this.state.licenseTier;
+			this._licWarned = false;
+			this.toast( loc( `${ licenseName( tier ) } licence · ${ Math.ceil( this.state.licenseSecondsLeft / 60 ) } min of play`, `Licencia ${ licenseName( tier ).toLowerCase() } · ${ Math.ceil( this.state.licenseSecondsLeft / 60 ) } min de juego` ) );
+			if ( this.app.audio && this.app.audio.coin ) this.app.audio.coin();
+
+		}
+
+		return ok;
+
+	}
+
+	// played time and the licence clock (D19, D41: runs while the game runs, also with the day paused)
+	updateLicence( dt ) {
+
+		const s = this.state;
+		s.addPlayed( dt );
+		const tier = s.licenseTier, left = s.licenseSecondsLeft;
+		if ( tier < this._licTier ) {
+
+			const was = licenseName( this._licTier );
+			this.toast( tier
+				? loc( `${ was } licence expired · renew it at Marta's`, `Venció la licencia ${ was.toLowerCase() } · renuévala con Marta` )
+				: loc( 'Licence expired · fish go back until you renew it', 'Venció tu licencia · sueltas los peces hasta renovarla' ), 5200 );
+			this._licWarned = false;
+			s.emit();
+
+		} else if ( tier && left < 120 && ! this._licWarned ) {
+
+			this._licWarned = true;
+			this.toast( loc( `${ licenseName( tier ) } licence: 2 min left`, `Licencia ${ licenseName( tier ).toLowerCase() }: quedan 2 min` ), 3600 );
+
+		}
+
+		this._licTier = tier;
+
+	}
+
+	// after a catch: level up message (and what the new level opens)
+	announceLevel( info ) {
+
+		if ( ! info || ! info.levelUp ) return;
+		const opens = LICENSES.filter( ( L ) => L && L.minLevel > info.level - info.levelUp && L.minLevel <= info.level );
+		const extra = opens.length ? loc( ` · ${ licenseName( opens[ 0 ].tier ).toLowerCase() } licence for sale`, ` · ya puedes comprar la licencia ${ licenseName( opens[ 0 ].tier ).toLowerCase() }` ) : '';
+		this.toast( `${ loc( `Level ${ info.level }!`, `¡Nivel ${ info.level }!` ) }${ extra }`, 4200 );
+
+	}
+
 	refuel() {
 
 		const l = this.state.refuel();
@@ -155,6 +211,7 @@ export class Game {
 
 		}
 
+		this.updateLicence( dt );
 		const can = this.canFish;
 		if ( inp.hit( 'KeyR' ) && can && ! this.fight ) {
 
@@ -526,12 +583,13 @@ export class Game {
 			if ( this.hud ) this.landing = { species: f.species, kg: f.kg, card: info, cardT: 0 };
 			else {
 
-				if ( entry ) this.toast( `${ info.record ? loc( 'New record! ', '¡Nuevo récord! ' ) : '' }${ name } · ${ entry.kg.toFixed( 2 ) } kg · $${ entry.value }`, 3600 );
-				else this.toast( `${ name } · ${ f.kg.toFixed( 1 ) } kg · ${ loc( `no room in the ${ this.state.upgrades.hold > 0 ? 'hold' : 'cooler' }, let it go`, `no cabe en la ${ this.state.upgrades.hold > 0 ? 'bodega' : 'nevera' }, lo soltaste` ) }`, 3600 );
+				if ( entry ) this.toast( `${ info.record ? loc( 'New record! ', '¡Nuevo récord! ' ) : '' }${ name } · ${ entry.kg.toFixed( 2 ) } kg · $${ entry.value } · +${ info.xp } XP`, 3600 );
+				else this.toast( `${ name } · ${ f.kg.toFixed( 1 ) } kg · ${ releaseText( info, this.state ) } · +${ info.xp } XP`, 3600 );
 				this.landing = { species: f.species, kg: f.kg };
 
 			}
 
+			this.announceLevel( info );
 			this.rod.land();
 
 		} else if ( st === 'snapped' ) {
