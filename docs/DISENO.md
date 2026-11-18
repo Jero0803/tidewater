@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** definiendo la Fase 1. Todavía no se ha escrito código de jugabilidad nuevo.
+**Estado:** la Fase 1 está definida (D8–D44). Siguiente paso: planificar cómo programarla. Todavía no se ha escrito código de jugabilidad nuevo.
 
 ---
 
@@ -94,6 +94,10 @@ hacia arriba (mapas de nivel más alto).
 | D38 | **La pelea profunda se une a las técnicas en una sola fase** (Fase 2): freno ajustable y equipo equilibrado llegan junto con spinning, casting, fondo y curricán | Con la pelea actual el grado del aparejo casi no importa; la pelea nueva es la que le da sentido | 2026-11-18 |
 | D39 | **La Fase 1 solo implementa lo que ya existe en el código:** clases de tamaño, XP, niveles, licencias, spots y, de la tienda, el **aparejo de flotador** por grados más la bodega y el bote. Las demás técnicas llegan en la Fase 2 | La Fase 1 se puede programar y probar pronto sin depender de mecánicas nuevas | 2026-11-18 |
 | D40 | **La isla empieza con 5 spots con nombre**, equivalentes a los cinco tipos de agua que ya calcula el juego: playa de la bahía (bajos), muelle, arrecife de la bahía, centro de la bahía (bahía) y mar abierto (profundo). Entre spots se usa el más cercano. **Futuros:** bajo de arena del este, farallones y la plataforma | Conserva casi igual el equilibrio actual; el sistema de spots cuesta lo mismo con 5 que con 8 y los otros se agregan barato después | 2026-11-18 |
+| D41 | **La pausa con T no detiene el tiempo de la licencia:** la licencia cuenta tiempo jugado, no la hora del juego | Para que pausar no sea un truco | 2026-11-18 |
+| D42 | **La hora del panel de ajustes (H) queda bloqueada en el juego:** el reloj avanza solo (D16). Solo se puede mover en el modo foto | Sacar fotos al atardecer sin hacer trampa con la hora de los peces | 2026-11-18 |
+| D43 | **Mientras la isla sea el inicio (D25):** los seis grados de aparejo y de bodega se compran solo con dinero, sin nivel mínimo; las licencias intermedia y avanzada piden los niveles 4 y 7. Cuando exista la cadena, cada grado se ata a su mapa | El jugador de la isla necesita poder llegar al equipo de la isla | 2026-11-18 |
+| D44 | **Guardado versión 2:** se conservan dinero, nevera y registro; cada mejora vieja pasa al grado más parecido por su valor (sedal y caña al aparejo de flotador, nevera a la bodega equivalente); el nivel inicial se calcula con la XP que habrían dado los peces del registro. Nadie pierde nada | Compatibilidad con las partidas actuales | 2026-11-18 |
 
 ---
 
@@ -436,10 +440,9 @@ las rocas de las puntas de los cabos) y **la plataforma** (13–22 m, 300–800 
 - [x] ~~¿Acumulativas? ¿Libres? ¿Nivel mínimo?~~ Sí, la básica se regala al empezar, intermedia y avanzada con nivel (D18).
 - [x] ~~¿Reloj de pared o tiempo jugado?~~ Tiempo jugado (D19).
 - [x] ~~Duración~~ 1 día del juego jugado (D21).
-- [ ] Precio de cada licencia (se calcula con el simulador, según lo que se gana en un día del juego)
-- [ ] Nivel mínimo de la intermedia y la avanzada (se decide con la curva de niveles)
-- [ ] ¿La pausa T detiene el tiempo de la licencia? (propuesta: no; la licencia cuenta tiempo jugado aunque el
-  reloj visual esté en pausa, para que pausar no sea un truco)
+- [x] ~~Precio de cada licencia~~ Tabla por mapa (D37).
+- [x] ~~Nivel mínimo~~ Entrada + 3 y entrada + 6 de cada mapa; en la isla como inicio, niveles 4 y 7 (D43).
+- [x] ~~¿La pausa T detiene la licencia?~~ No (D41).
 
 Reparto aprobado (D14):
 
@@ -455,10 +458,9 @@ Hallazgo: el reloj viene detenido (empieza a las 16:12; la tecla T lo pone a 0.0
 y el panel de ajustes deja mover la hora a mano. Con eso una licencia por días se puede estirar (pausando) o
 gastar (adelantando), y las preferencias de hora de los peces se pueden forzar.
 - [x] ~~¿Cómo se cuenta el tiempo?~~ Licencias en tiempo real (D15); día del juego simulado (D16).
-- [ ] Duración de un día del juego en minutos reales (hoy 8 min cuando corre; propuesta: 20–30 min)
-- [ ] ¿Qué pasa con el control de hora del panel de ajustes? (propuesta: en el juego queda bloqueado y solo se
-  puede mover en el modo foto, para no forzar la hora de los peces)
-- [ ] ¿El reloj se pausa con el menú, la tienda o la tarjeta de captura? (propuesta: no se pausa, salvo con la pausa explícita T)
+- [x] ~~Duración de un día~~ 24 minutos (D22).
+- [x] ~~Control de hora del panel~~ Bloqueado en el juego, libre en el modo foto (D42).
+- [ ] (Menor, a decidir al implementar) ¿El reloj se pausa con el menú, la tienda o la tarjeta de captura? (propuesta: no se pausa, salvo con la pausa explícita T)
 
 **Viaje entre mapas (D17)**
 
@@ -528,7 +530,7 @@ todas las mejoras actuales de Marta suman $3,875. Hay que reajustar los precios 
 mejora se desbloquea en cada nivel.
 
 **Compatibilidad**
-- [ ] Partidas guardadas existentes: ¿con qué nivel empiezan? (propuesta: calcularlo desde el registro de pesca)
+- [x] ~~Partidas guardadas existentes~~ Guardado versión 2 con conversión (D44).
 
 ---
 
@@ -591,3 +593,6 @@ mejora se desbloquea en cada nivel.
 - **2026-11-18** · Decididos D39 (la Fase 1 solo implementa lo que ya existe: flotador, bodega y bote) y D40
   (cinco spots en la isla, equivalentes a los tipos de agua actuales; tres spots futuros anotados). Medidas las
   profundidades reales de la isla para ubicar los spots.
+- **2026-11-18** · Decididos D41 (la pausa no detiene la licencia), D42 (hora bloqueada salvo en el modo foto),
+  D43 (en la isla como inicio, grados por dinero y licencias en los niveles 4 y 7) y D44 (guardado versión 2 con
+  conversión). **La Fase 1 queda definida.**
