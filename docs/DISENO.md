@@ -1335,6 +1335,11 @@ Reemplaza la duración de D73 y los valores de D75 de las tablas de arriba. Scri
 0.1 · 0.14; pejerrey 0.15 · 0.8 · 1.1; capitán 0.13 · 0.5 · 0.75; trucha arcoíris 0.35 · 2.5 · 3.6; carpa 1 · 7.5 · 11; trucha café
 0.75 · 4 · 5.5. Reparto en el lago: 25 % juvenil, 55 % común, 15 % trofeo, 4 % único (antes 42 / 43 / 11 / 4).
 
+**Comprobado en FP (captura 29):** una trucha degollada común de 0.567 kg peleó **~1.2 min** (medido por el jugador del
+proyecto); la nuestra de ese peso, ~75 s. Coinciden. Antes, una común de 1.016 kg tardó ~2–2.5 min con sedal de 1.8 kg (la
+nuestra de 1 kg, 91 s con sedal de 3 kg; con sedal más fino también se alarga). En FP el dinero va a ~$250/kg en toda clase
+y la XP sube con el tamaño (20, 44, 83 XP para 0.26, 0.57 y 1.02 kg): el mismo patrón que D78.
+
 **Valores por hora** (precio × `hourMul`, XP × `xpMul`, 16 horas simuladas por especie): guapucha ×4.1 / ×2.5, carachi ×4.5 /
 ×3.3, pejerrey ×4.9 / ×3.8, capitán — / ×3.8, trucha arcoíris ×8.5 / ×7.0, carpa ×4.1 / ×3.8, trucha café ×10.3 / ×9.2. Peces por
 hora con su equipo: chicos ~30–36, trucha arcoíris ~20, trucha café ~16, carpa ~13. Los factores varían ±20 % entre corridas
@@ -1607,3 +1612,4 @@ armar las tres cañas queda para E4.
   kilos por especie. Por decidir.
 - **2026-11-18** · Decididos D84 (clases en kilos por especie en el lago, ~25 / 55 / 16 / 4 %) y D85 (la pelea crece con el
   tamaño: guapucha ~40 s, trucha de 1 kg ~1.5 min, de 3.5 kg ~4 min). Valores por hora medidos de nuevo y aplicados.
+- **2026-11-18** · Comprobado en FP: una trucha común de 0.57 kg pelea ~1.2 min; la nuestra (D85), ~75 s.
