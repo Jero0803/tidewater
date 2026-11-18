@@ -106,6 +106,9 @@ hacia arriba (mapas de nivel más alto).
 | D50 | **El lago se hace como prototipo jugable primero:** preparar mapas (M1), luego un lago jugable aunque se vea básico (terreno, agua en calma, 7 especies, 5 spots, viaje) y después se pule por capas (vegetación fría, pieles de los peces, sonidos, niebla) | Saber pronto si el proyecto funciona con más de un mapa | 2026-11-18 |
 | D51 | **El Mapa 1 se inspira en la Laguna de Tota** (Boyacá): playa de arena blanca, islas, laderas con cultivos y páramo, pueblo pesquero, trucha | Una referencia concreta para el terreno y el ambiente | 2026-11-18 |
 | D52 | **Con solo dos mapas, el lago es el inicio y la isla queda libre:** las partidas nuevas empiezan en el lago; a la isla se puede viajar desde el principio, pero sus licencias intermedia y avanzada piden los niveles de la isla. Las partidas actuales siguen en la isla. Se ajusta cuando existan los mapas 2 a 5 | Sin mapas intermedios, el nivel 51 de las bandas dejaría la isla inalcanzable | 2026-11-18 |
+| D53 | **Portada global:** una página propia desde la que se gestiona todo: partidas (continuar, crear, borrar), mapas (la cadena con abiertos, bloqueados y por llegar), progreso y registro de cada partida, y ajustes generales (idioma, calidad, sonido). Reemplaza la pantalla de inicio sobre la isla | Con varios mapas no tiene sentido cargar un mapa entero para mostrar el menú | 2026-11-18 |
+| D54 | **Desde la portada se continúa donde quedó la partida:** los mapas se ven, pero "Jugar" abre el mapa de la partida; cambiar de mapa sigue siendo viajar en el juego, desde el amarre y con costo (D20) | El viaje conserva su sentido | 2026-11-18 |
+| D55 | **La portada es una página ligera aparte, sin 3D:** abre al instante con el arte del juego de fondo; "Jugar" carga la página del juego con el mapa de la partida y "Salir al menú" vuelve. La dirección principal es la portada; el juego pasa a otra página | Rápida, desacoplada del motor, y no carga un mapa para mostrar un menú | 2026-11-18 |
 
 ---
 
@@ -696,6 +699,22 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 **A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
 
+## 7e. Plan de la portada (D53–D55)
+
+**Cómo encaja:** la portada (`index.html`, la dirección principal) no importa el motor ni WebGPU: solo el idioma,
+las partidas (`Profiles`), un catálogo ligero de mapas y las reglas de progreso para leer los guardados. El juego
+pasa a `juego.html` (lo que hoy es `index.html`, con su cargador). Las dos páginas comparten el almacenamiento del
+navegador, así que las partidas son las mismas.
+
+| # | Entrega | Contenido | Estado |
+|---|---|---|---|
+| P1 | Portada y juego separados | Portada con "Continuar" (partida activa · mapa · nivel) y Partidas (crear, borrar, elegir; lo de D49 se muda aquí); selector de idioma; el juego en `juego.html`; "Salir al menú" en el juego; la pantalla de inicio del juego queda solo con "Haz clic para explorar". Vite y GitHub Pages con las dos páginas | Pendiente |
+| P2 | Mapas y progreso | La cadena de mapas (lago → … → isla) con abierto / por llegar y dónde está la partida; progreso de la partida: nivel y XP, dinero, tiempo, licencias y especies capturadas por mapa con sus récords | Pendiente |
+| P3 | Ajustes generales | Idioma, calidad gráfica y volumen guardados desde la portada y leídos por el juego al cargar | Pendiente |
+
+**Orden propuesto:** P1 → P2 → P3, y después el lago (L3 terreno → L4 peces y spots → L2 viaje → L5 pueblo y
+arranque).
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -789,3 +808,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   Laguna de Tota) y D52 (lago como inicio, isla libre). Plan de 5 entregas (L1–L5) más pulido.
 - **2026-11-18** · **L1 hecha:** registro de mapas; la isla es el primer mapa (`src/maps/island.js`) y todo lo
   propio de ella se lee del mapa activo. Se ve y juega idéntico. 6 tests nuevos (todos pasan).
+- **2026-11-18** · Decididos D53 (portada global: partidas, mapas, progreso, ajustes), D54 (se continúa donde
+  quedó; el mapa se cambia viajando) y D55 (portada como página ligera aparte, el juego en otra página). Plan de 3
+  entregas (P1–P3) antes de seguir con el lago.
