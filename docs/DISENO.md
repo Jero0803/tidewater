@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entrega 1 de 6 hecha (reglas en `src/game/Progression.js`, todavía sin conectar al juego).
+**Estado:** programando la Fase 1. Entregas 1 y 2 de 6 hechas (reglas en `src/game/Progression.js` y guardado versión 2, todavía sin interfaz).
 
 ---
 
@@ -542,7 +542,7 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
 | 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de 24 min jugados, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
-| 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | Pendiente |
+| 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | **Hecha** (2026-11-18) |
 | 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | Pendiente |
 | 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | Pendiente |
 | 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
@@ -554,6 +554,22 @@ Con la XP de la isla (×1.0, D45), el nivel 4 llega en ~0.9 h, el 7 en ~1.8 h y 
 ~5 h de la meta, porque la curva se calibró con la XP del lago y la isla da más XP por hora. Es aceptable mientras la
 isla sea el inicio; se recalibra cuando exista el lago. Con la básica, el profundo es el spot que más XP da (se
 sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
+
+**Entrega 2, cómo quedó el guardado** (`src/game/GameState.js`):
+
+- Clave nueva `tidewater.save.v2`. Si no existe, se lee `tidewater.save.v1`, se convierte y se escribe como v2; la
+  partida v1 queda intacta (volver a una versión vieja del juego la sigue encontrando).
+- **Viaja con el jugador (D20):** dinero, XP, tiempo jugado, equipo, combustible y la nevera. **Por mapa:** registro
+  con récords y licencias (`maps.island`). Un mapa nuevo empieza con registro vacío y la básica regalada por un día.
+- **Conversión (D44):** se conservan dinero, nevera, mejoras, combustible y registro (pasa a la isla). XP inicial: el
+  mejor pez de cada especie con su peso real y el bono de especie nueva, y cada captura restante como un pez típico
+  (mitad de la clase común). Tiempo jugado desde cero y básica regalada por un día.
+- **Equipo:** se guarda igual que en v1. Pasar las mejoras viejas a grados (la otra parte de D44) se hace en la
+  entrega 6, cuando cambie el formato de la tienda.
+- El tiempo jugado se guarda cada 10 s de juego, no en cada cuadro; una pausa larga (pestaña en segundo plano)
+  cuenta como mucho 1 s.
+- Métodos nuevos, todavía sin usar en el juego: `addXp`, `level`, `licenseTier`, `licenseSecondsLeft`,
+  `licenseBlock`, `buyLicense`, `addPlayed`. 24 tests nuevos. Probado en el navegador: una partida v1 se convierte.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -620,3 +636,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · Empieza la programación de la Fase 1. **Entrega 1 hecha:** reglas en `src/game/Progression.js`,
   licencia por especie en `FishTable.js`, 31 tests nuevos (todos pasan), sección `fase1` en el simulador. Decidido
   D45 (la isla como inicio usa XP ×1.0). El juego todavía no usa estas reglas.
+- **2026-11-18** · **Entrega 2 hecha:** guardado versión 2 con datos globales y por mapa, XP, licencias y tiempo
+  jugado; conversión de partidas v1 sin perder nada (D44). La conversión del equipo a grados queda para la entrega 6.
+  24 tests nuevos (todos pasan). El juego se ve igual.

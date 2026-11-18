@@ -1,25 +1,111 @@
 import { FISH, fishValue, fishLengthCm } from './FishTable.js';
 import { defaultUpgrades, gearStats, nextLevel, UPGRADES, FUEL_PRICE } from './Gear.js';
+import { catchXp, levelFromXp, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, LICENSES, SIZE_CLASSES } from './Progression.js';
 
-const SAVE_KEY = 'tidewater.save.v1';
+// Save version 2 (docs/DISENO.md D20, D44). Version 1 saves are read from their old key and converted; the old key
+// is left untouched, so going back to an older build still finds the old game.
+const SAVE_KEY = 'tidewater.save.v2';
+const SAVE_KEY_V1 = 'tidewater.save.v1';
+export const START_MAP = 'island';
+const PLAYED_SAVE_EVERY = 10; // seconds of play between saves of the played-time counter
 
-// Everything the player owns: wallet, the fish in the cooler / hold, the fish log and the gear
-// levels. Saved to localStorage (per browser) after every change; storage can be missing or throw
-// (private windows, blocked site data), so every access is guarded and the game runs without it.
+// Everything the player owns, split as D20 says: what travels with the player (wallet, XP, played time, gear, the
+// fish in the cooler / hold) and what belongs to each map (fish log and records, licences). Saved to localStorage
+// (per browser) after every change; storage can be missing or throw (private windows, blocked site data), so every
+// access is guarded and the game runs without it.
 export class GameState {
 
 	constructor( storage = safeStorage() ) {
 
 		this.storage = storage;
 		this.money = 0;
+		this.xp = 0; // total experience (Progression.levelFromXp gives the level)
+		this.playedSeconds = 0; // time with the game running; licences count down in it (D19, D41)
+		this._playedSavedAt = 0;
 		this.inventory = []; // { id, species, kg, cm, value, caughtAt (game hours), record }
-		this.log = {}; // species -> { count, bestKg, bestCm }
+		this.mapId = START_MAP;
+		this.maps = { [ START_MAP ]: newMapData() }; // map id -> { log, licences }
 		// the last addFish: { species, kg, cm, value, newSpecies, record, prevBestKg, prevBestCm, kept } (the catch card)
 		this.lastCatch = null;
 		this.upgrades = defaultUpgrades();
 		this.fuel = null; // litres left (null = full tank)
 		this._nextId = 1;
 		this.listeners = new Set();
+
+	}
+
+	// ---- data of the current map
+	get map() {
+
+		return this.maps[ this.mapId ] || ( this.maps[ this.mapId ] = newMapData() );
+
+	}
+
+	get log() { return this.map.log; } // species -> { count, bestKg, bestCm }
+	set log( v ) { this.map.log = v; }
+	get licences() { return this.map.licences; } // tier -> expires at (played seconds)
+	set licences( v ) { this.map.licences = v; }
+
+	// ---- experience and level
+	get level() {
+
+		return levelFromXp( this.xp ).level;
+
+	}
+
+	// add experience; returns how many levels it went up (0 most of the time)
+	addXp( amount ) {
+
+		const before = this.level;
+		this.xp += Math.max( 0, Math.round( amount ) );
+		this.save();
+		this.emit();
+		return this.level - before;
+
+	}
+
+	// ---- licences of the current map
+	get licenseTier() {
+
+		return activeLicenseTier( this.licences, this.playedSeconds );
+
+	}
+
+	get licenseSecondsLeft() {
+
+		return licenseSecondsLeft( this.licences, this.playedSeconds );
+
+	}
+
+	// why a licence can't be bought now ('level' | 'money'), or null when it can
+	licenseBlock( tier ) {
+
+		const L = LICENSES[ tier ];
+		if ( ! L ) return 'unknown';
+		if ( this.level < L.minLevel ) return 'level';
+		if ( this.money < L.price ) return 'money';
+		return null;
+
+	}
+
+	// buy (or extend by a day) a licence tier of the current map; false when it can't be bought
+	buyLicense( tier ) {
+
+		if ( this.licenseBlock( tier ) ) return false;
+		this.money -= LICENSES[ tier ].price;
+		this.licences = withLicense( this.licences, tier, this.playedSeconds );
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
+	// ---- played time: called every frame with the frame time; saved every few seconds, not every frame
+	addPlayed( dt ) {
+
+		if ( ! ( dt > 0 ) ) return;
+		this.playedSeconds += Math.min( dt, 1 ); // a long stall (tab in the background) is not play
+		if ( this.playedSeconds - this._playedSavedAt >= PLAYED_SAVE_EVERY ) this.save();
 
 	}
 
@@ -188,19 +274,32 @@ export class GameState {
 
 	toJSON() {
 
-		return { v: 1, money: this.money, inventory: this.inventory, log: this.log, upgrades: this.upgrades, fuel: this.fuel, nextId: this._nextId };
+		return {
+			v: 2,
+			// travels with the player (D20)
+			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, upgrades: this.upgrades, fuel: this.fuel,
+			inventory: this.inventory, nextId: this._nextId,
+			// per map
+			map: this.mapId, maps: this.maps,
+		};
 
 	}
 
 	fromJSON( d ) {
 
-		if ( ! d || d.v !== 1 ) return false;
-		this.money = Number.isFinite( d.money ) ? d.money : 0;
+		if ( d && d.v === 1 ) d = convertV1( d );
+		if ( ! d || d.v !== 2 ) return false;
+		this.money = finite( d.money );
+		this.xp = Math.max( 0, finite( d.xp ) );
+		this.playedSeconds = Math.max( 0, finite( d.playedSeconds ) );
+		this._playedSavedAt = this.playedSeconds;
 		this.inventory = Array.isArray( d.inventory ) ? d.inventory.filter( ( f ) => f && FISH[ f.species ] && Number.isFinite( f.kg ) ) : [];
 		// saves from before lengths were recorded
 		for ( const f of this.inventory ) if ( ! Number.isFinite( f.cm ) ) f.cm = Math.round( fishLengthCm( f.species, f.kg ) );
-		this.log = d.log && typeof d.log === 'object' ? d.log : {};
-		for ( const [ k, v ] of Object.entries( this.log ) ) if ( FISH[ k ] && v && v.bestKg > 0 && ! Number.isFinite( v.bestCm ) ) v.bestCm = Math.round( fishLengthCm( k, v.bestKg ) );
+		this.maps = {};
+		for ( const [ id, m ] of Object.entries( d.maps && typeof d.maps === 'object' ? d.maps : {} ) ) this.maps[ id ] = cleanMapData( m );
+		this.mapId = typeof d.map === 'string' ? d.map : START_MAP;
+		this.map; // make sure the current map has its data
 		this.upgrades = { ...defaultUpgrades(), ...( d.upgrades || {} ) };
 		this.fuel = Number.isFinite( d.fuel ) ? d.fuel : null;
 		this._nextId = Math.max( d.nextId | 0, ...this.inventory.map( ( f ) => f.id + 1 ), 1 );
@@ -211,6 +310,7 @@ export class GameState {
 	save() {
 
 		if ( ! this.storage ) return;
+		this._playedSavedAt = this.playedSeconds;
 		try {
 
 			this.storage.setItem( SAVE_KEY, JSON.stringify( this.toJSON() ) );
@@ -219,13 +319,18 @@ export class GameState {
 
 	}
 
+	// load the version 2 save; without one, convert a version 1 save (and write it as version 2)
 	load() {
 
 		if ( ! this.storage ) return false;
 		try {
 
 			const raw = this.storage.getItem( SAVE_KEY );
-			return raw ? this.fromJSON( JSON.parse( raw ) ) : false;
+			if ( raw ) return this.fromJSON( JSON.parse( raw ) );
+			const old = this.storage.getItem( SAVE_KEY_V1 );
+			if ( ! old || ! this.fromJSON( JSON.parse( old ) ) ) return false;
+			this.save();
+			return true;
 
 		} catch ( e ) {
 
@@ -238,14 +343,71 @@ export class GameState {
 	reset() {
 
 		this.money = 0;
+		this.xp = 0;
+		this.playedSeconds = 0;
 		this.inventory = [];
-		this.log = {};
+		this.mapId = START_MAP;
+		this.maps = { [ START_MAP ]: newMapData() };
 		this.upgrades = defaultUpgrades();
 		this.fuel = null;
 		this.save();
 		this.emit();
 
 	}
+
+}
+
+const finite = ( x ) => ( Number.isFinite( x ) ? x : 0 );
+
+// a map the player has not fished yet: empty log and the free basic licence for the first day (D18)
+function newMapData() {
+
+	return { log: {}, licences: starterLicences() };
+
+}
+
+function cleanMapData( m ) {
+
+	const log = m && m.log && typeof m.log === 'object' ? m.log : {};
+	for ( const [ k, v ] of Object.entries( log ) ) if ( FISH[ k ] && v && v.bestKg > 0 && ! Number.isFinite( v.bestCm ) ) v.bestCm = Math.round( fishLengthCm( k, v.bestKg ) );
+	const licences = {};
+	for ( const [ tier, until ] of Object.entries( m && m.licences && typeof m.licences === 'object' ? m.licences : {} ) ) if ( LICENSES[ tier ] && Number.isFinite( until ) ) licences[ tier ] = until;
+	return { log, licences };
+
+}
+
+// XP the fish in an old log would have given (D44): the best of each species with its real weight and the bonus of
+// a new species, every other catch as a typical one (the middle of the common class).
+export function xpFromLog( log ) {
+
+	const i = SIZE_CLASSES.findIndex( ( c ) => c.id === 'common' );
+	const tMid = ( SIZE_CLASSES[ i - 1 ].upTo + SIZE_CLASSES[ i ].upTo ) / 2;
+	let xp = 0;
+	for ( const [ species, e ] of Object.entries( log || {} ) ) {
+
+		if ( ! FISH[ species ] || ! e || ! ( e.count > 0 ) ) continue;
+		const [ lo, hi ] = FISH[ species ].kg;
+		const typical = lo + tMid * ( hi - lo );
+		xp += catchXp( species, e.bestKg > 0 ? e.bestKg : typical, { newSpecies: true } );
+		xp += ( e.count - 1 ) * catchXp( species, typical );
+
+	}
+
+	return xp;
+
+}
+
+// version 1 -> 2 (D44): money, cooler, gear and log are kept as they are; the log goes to the island; the starting XP
+// is what the logged fish would have given; the basic licence is given for the first day. (The gear changes format
+// with the new shop, Phase 1 delivery 6, and is converted then.)
+function convertV1( d ) {
+
+	const log = d.log && typeof d.log === 'object' ? d.log : {};
+	return {
+		v: 2, money: d.money, xp: xpFromLog( log ), playedSeconds: 0, upgrades: d.upgrades, fuel: d.fuel,
+		inventory: d.inventory, nextId: d.nextId,
+		map: START_MAP, maps: { [ START_MAP ]: { log, licences: starterLicences() } },
+	};
 
 }
 
