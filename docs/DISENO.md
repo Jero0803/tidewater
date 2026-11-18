@@ -64,9 +64,13 @@ Más adelante, **varios escenarios o mapas** que se desbloquean con la progresi�
 | D12 | **Las licencias duran días del juego** | Gasto recurrente que mantiene viva la economía | 2026-11-17 |
 | D13 | **Sin licencia: hay que soltar el pez, pero da XP y cuenta en el registro** | Sin castigo, pero motiva comprar la licencia | 2026-11-17 |
 | D14 | **Reparto de especies aprobado** (tabla en la sección 7): básica = 7 especies de orilla y muelle, intermedia = 6 de arrecife y bahía, avanzada = 5 de profundo más el sábalo | Ordena por spot, valor y dificultad | 2026-11-17 |
-| D15 | **Las licencias duran tiempo real**, no horas del juego | Independiente del reloj del juego y de la velocidad del tiempo | 2026-11-17 |
+| D15 | ~~Las licencias duran tiempo real~~ Precisada por D19 y D21 | | 2026-11-17 |
 | D16 | **El día del juego es simulado:** el reloj avanza solo mientras se juega (alba, día, ocaso, noche) | El ciclo del día importa para qué pica | 2026-11-17 |
 | D17 | **Se podrá viajar entre mapas** y se diseña desde la Fase 1 (qué se guarda por mapa y qué viaja con el jugador) | Evita rehacer el guardado cuando lleguen los mapas | 2026-11-17 |
+| D18 | **Licencias acumulativas** (la intermedia incluye la básica; la avanzada, las dos). **La básica se regala al empezar.** **Intermedia y avanzada piden nivel mínimo** | Progresión ordenada y sin barrera al inicio | 2026-11-17 |
+| D19 | **El tiempo de las licencias es tiempo jugado:** solo corre con el juego abierto | Quien juega poco no pierde sus licencias por no entrar | 2026-11-17 |
+| D20 | **Viaje entre mapas aprobado** como se propuso: desde el amarre del bote (E), destinos por nivel, con costo; viajan dinero, nivel, XP y equipo; licencias, registro, récords y vendedores son de cada mapa; los peces de la nevera se venden o sueltan antes de viajar | Separa datos globales y por mapa desde el principio | 2026-11-17 |
+| D21 | **Una licencia dura 1 día del juego jugado** (lo que dure un día simulado mientras se juega) | Se renueva seguido: gasto recurrente sin sentirse corto | 2026-11-17 |
 
 ---
 
@@ -169,12 +173,13 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
 - [x] ~~¿Duración?~~ Días del juego (D12).
 - [x] ~~¿Sin licencia?~~ Soltar, con XP (D13).
 - [x] ~~Reparto de especies~~ Aprobado (D14, tabla abajo).
-- [ ] ¿Las licencias son acumulativas? (propuesta: sí, la intermedia incluye la básica y la avanzada incluye las dos)
-- [ ] ¿Qué especies son libres? (propuesta: ninguna; la básica es barata y se regala al empezar)
-- [ ] ¿La licencia también pide nivel mínimo? (propuesta: intermedia y avanzada sí)
-- [ ] Tiempo real (D15): ¿reloj de pared (vence aunque no juegues) o tiempo jugado (solo corre con el juego abierto)?
-  (propuesta: tiempo jugado; con reloj de pared, quien juega un rato cada semana pierde casi todas sus licencias)
-- [ ] Precio y duración de cada una (se calcula con el simulador)
+- [x] ~~¿Acumulativas? ¿Libres? ¿Nivel mínimo?~~ Sí, la básica se regala al empezar, intermedia y avanzada con nivel (D18).
+- [x] ~~¿Reloj de pared o tiempo jugado?~~ Tiempo jugado (D19).
+- [x] ~~Duración~~ 1 día del juego jugado (D21).
+- [ ] Precio de cada licencia (se calcula con el simulador, según lo que se gana en un día del juego)
+- [ ] Nivel mínimo de la intermedia y la avanzada (se decide con la curva de niveles)
+- [ ] ¿La pausa T detiene el tiempo de la licencia? (propuesta: no; la licencia cuenta tiempo jugado aunque el
+  reloj visual esté en pausa, para que pausar no sea un truco)
 
 Reparto aprobado (D14):
 
@@ -197,9 +202,9 @@ gastar (adelantando), y las preferencias de hora de los peces se pueden forzar.
 
 **Viaje entre mapas (D17)**
 
-Propuesta inicial, para discutir:
+Aprobado (D20):
 
-| Tema | Propuesta |
+| Tema | Decisión |
 |---|---|
 | Cómo se viaja | Desde el amarre del bote, con E se abre un mapa de viaje con los destinos desbloqueados |
 | Qué lo desbloquea | La XP (D8): cada mapa pide un nivel mínimo |
@@ -209,11 +214,7 @@ Propuesta inicial, para discutir:
 | Peces en la nevera | Hay que venderlos o soltarlos antes de viajar (o se pierden al viajar) |
 | Técnico | Cambiar de mapa recarga la página (D6); el guardado se organiza en datos globales + datos por mapa |
 
-- [ ] ¿Se viaja desde el bote, desde un muelle o desde un menú?
-- [ ] ¿El viaje cuesta? ¿Cuánto?
-- [ ] ¿Las licencias son por mapa o globales?
-- [ ] ¿Qué pasa con los peces en la nevera al viajar?
-- [ ] ¿El equipo y las mejoras del bote son globales?
+- [ ] Costo de cada viaje (se decide al diseñar el mapa 2)
 
 **Clases de tamaño**
 - [ ] Umbrales de cada clase por especie (propuesta: por percentil del rango de peso actual)
@@ -253,3 +254,5 @@ Propuesta inicial, para discutir:
   panel, lo que hay que resolver para que las licencias por días funcionen.
 - **2026-11-17** · Decididos D14 (reparto aprobado), D15 (licencias en tiempo real), D16 (día del juego simulado)
   y D17 (viajar entre mapas, diseñado desde la Fase 1). Agregada la propuesta de viaje entre mapas.
+- **2026-11-17** · Decididos D18 (acumulativas, básica regalada, nivel mínimo), D19 (tiempo jugado), D20 (viaje
+  aprobado) y D21 (licencia de 1 día del juego jugado). Licencias cerradas salvo precios y niveles.
