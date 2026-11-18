@@ -234,27 +234,53 @@ a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
 | **XP para pasar del nivel N al N+1** | 600 × 1.03^(N − 1): nivel 10 ≈ 6,100 XP acumulados; nivel 50 ≈ 65,100; nivel 60 ≈ 94,400 |
 | **Resultado estimado** | ~5 horas de juego por mapa (lago: ~6,100 XP a ~1,200 XP/h; isla: ~30,000 XP a ~5,500 XP/h) y ~30 horas hasta la isla. Mejorar el equipo dentro de cada mapa lo acorta |
 
-### Tienda calculada desde las bandas (propuesta, 2026-11-17; **a recalcular por técnicas, D36**)
+### Tienda por técnicas, calculada desde las bandas (propuesta, 2026-11-18)
 
-Script: `node --no-warnings tools/balance/tienda-propuesta.mjs`. El equipo viaja entre mapas (D20), así que la
-tienda es **una progresión de equipo para toda la cadena**: cada mapa trae un nuevo nivel de cada mejora.
+Script: `node --no-warnings tools/balance/tienda-propuesta.mjs`. Reemplaza la versión del 2026-11-17 (una sola
+caña que subía de nivel), que quedó obsoleta con D33–D36.
 
-**Regla:** todo escala ×1.25 por mapa, como la XP (D32). Lo que se gana en una banda (~5 h × $/h del mapa; lago
-~$600/h medido) se reparte: 40 % equipo, 10 % bote, 20 % licencias, 5 % combustible, 25 % margen.
+**Regla:** todo escala ×1.25 por mapa (D32). Lo ganado en una banda (~5 h; lago ~$600/h medido) se reparte:
+40 % equipo (70 % aparejos, 30 % bodega), 10 % bote, 20 % licencias, 5 % combustible, 25 % margen.
+Precio de un aparejo en el mapa k = **precio estándar del mapa k × factor de la técnica**, para que cada técnica
+siempre suba de precio de un mapa al siguiente.
 
-| Mapa | Niveles | Ganado en la banda | Sedal | Bodega | Caña | Carrete | Bote |
+**El "grado" de un aparejo es el número del mapa:** todos los aparejos de grado 3 se compran en el río, aunque la
+técnica haya aparecido antes o después. Una técnica que aparece tarde no nace más débil que las demás.
+
+| Técnica | Aparece en | Para | Factor de precio | Sedal y lance respecto a la base |
+|---|---|---|---|---|
+| Flotador | Lago de montaña (grado inicial gratis) | Carpa, pejerrey, peces pequeños | ×0.7 | Sedal ×0.8 |
+| Spinning | Lago de montaña | Trucha, barracuda, macabí | ×1.0 | Lance ×1.15 |
+| Fondo | Lago de montaña | Capitán, bagres, peces de arrecife | ×0.9 | Sedal ×1.1, lance ×1.2 |
+| Casting | Lago cálido | Lobina, pavón, payara, sábalo | ×1.2 | Sedal ×1.3, lance ×1.1 |
+| Curricán | La isla | Atún, dorado (arrastre desde el bote) | ×1.5 | Sedal ×1.6, sin lance |
+
+| Mapa | Flotador | Spinning | Fondo | Casting | Curricán | Bodega | Bote |
 |---|---|---|---|---|---|---|---|
-| Lago de montaña | 1–10 | ~$3,000 | 10 kg · $300 (nv 3) | 45 kg · $400 (nv 3) | 25 m · $250 (nv 6) | 1.3 m/s · $250 (nv 6) | — |
-| Lago cálido | 11–20 | ~$3,750 | 13 kg · $400 | 60 kg · $550 | 29 m · $300 | 1.5 m/s · $300 | — |
-| Río tropical | 21–30 | ~$4,700 | 18 kg · $450 | 80 kg · $650 | 33 m · $400 | 1.7 m/s · $400 | Tanque 60 L $200 · motor ×1.1 $300 · sonda $250 |
-| Ciénaga y manglar | 31–40 | ~$5,900 | 26 kg · $600 | 110 kg · $800 | 38 m · $450 | 1.9 m/s · $450 | Tanque 80 L $250 · luces $250 |
-| Laguna costera | 41–50 | ~$7,300 | 36 kg · $750 | 140 kg · $1,000 | 43 m · $600 | 2.1 m/s · $600 | Tanque 110 L $300 · motor ×1.2 $450 |
-| La isla | 51–60 | ~$9,200 | 50 kg · $900 | 180 kg · $1,500 | 48 m · $750 | 2.3 m/s · $750 | Tanque 150 L $350 · motor ×1.3 $550 |
+| Lago de montaña (1–10) | $150 (nv 3) | $200 (nv 2) | $200 (nv 6) | — | — | 45 kg $350 (nv 4) | — |
+| Lago cálido (11–20) | $200 | $250 | $250 | $300 (nv 14) | — | 60 kg $450 | — |
+| Río tropical (21–30) | $250 | $350 | $300 | $400 | — | 80 kg $550 | Tanque 60 L $200 · motor ×1.1 $300 · sonda $250 |
+| Ciénaga y manglar (31–40) | $300 | $400 | $350 | $500 | — | 110 kg $700 | Tanque 80 L $250 · luces $250 |
+| Laguna costera (41–50) | $350 | $500 | $450 | $600 | — | 140 kg $900 | Tanque 110 L $300 · motor ×1.2 $450 |
+| La isla (51–60) | $450 | $650 | $600 | $750 | $950 (nv 55) | 180 kg $1,000 | Tanque 150 L $350 · motor ×1.3 $550 |
 
-En cada mapa, sedal y bodega se desbloquean en el nivel de entrada + 2; caña y carrete en el de entrada + 5.
-Equipo inicial: sedal 7 kg, nevera 30 kg, caña 22 m, carrete 1.1 m/s (igual que hoy). Total hasta la isla: ~$16,700.
+En cada mapa: spinning en el nivel de entrada + 1, flotador + 2, bodega y casting + 3, curricán + 4, fondo + 5.
+Las estadísticas de cada grado (sedal, lance, recogida) están en el script; son provisionales hasta la Fase 2.
 
-**Licencias por mapa** (por día del juego; básica 5 %, intermedia 15 %, avanzada 25 % de lo que se gana en un día):
+**Comprobación de bandas:**
+
+| Mapa | Ganado en la banda | Costo de todo su equipo | % de lo ganado | Licencias (20 %) | Queda libre |
+|---|---|---|---|---|---|
+| Lago de montaña | $3,000 | $900 | 30 % | $600 | $1,350 |
+| Lago cálido | $3,750 | $1,450 | 39 % | $750 | $1,363 |
+| Río tropical | $4,688 | $2,600 | 55 % | $938 | $916 |
+| Ciénaga y manglar | $5,859 | $2,750 | 47 % | $1,172 | $1,645 |
+| Laguna costera | $7,324 | $3,550 | 48 % | $1,465 | $1,943 |
+| La isla | $9,155 | $5,300 | 58 % | $1,831 | $1,566 |
+
+Todo el equipo hasta la isla: ~$16,550.
+
+**Licencias por mapa** (por día del juego; básica 5 %, intermedia 15 %, avanzada 25 % de un día):
 
 | Mapa | Básica | Intermedia (nivel) | Avanzada (nivel) |
 |---|---|---|---|
@@ -266,20 +292,18 @@ Equipo inicial: sedal 7 kg, nevera 30 kg, caña 22 m, carrete 1.1 m/s (igual que
 | La isla | $35 | $100 (54) | $200 (57) |
 
 **Hallazgos:**
-- **El sedal casi no importa con la pelea actual:** los peces del lago salen al 100 % con cualquier sedal. En la
-  isla solo cambia algo con el atún y el dorado (80 % y 64 % con el inicial) y, sobre todo, con el sábalo (1 % con
-  7 kg, 52 % con 18 kg, 100 % con 50 kg). El sedal solo tendrá peso real con la Fase 3 (pelea profunda) o con peces
-  grandes en los mapas del medio (payara, róbalo, palometa).
-- **La bodega es la mejora que más cambia el dinero** (es el límite real, ver auditoría): por eso se lleva la
-  mayor parte del presupuesto.
-- **La licencia avanzada del lago no se paga sola:** solo agrega la trucha café (+$50 por día medido) y costaría
-  $60. Hay que hacer la trucha café más común o más valiosa, o bajar esa licencia.
-- **La isla queda con licencias más baratas** que la propuesta anterior medida solo en la isla ($35 / $100 / $200
-  frente a $20 / $100 / $300): la avanzada se abarata y la básica sube.
-- **Guardado:** hoy la isla tiene 3–4 niveles por mejora; con 7 niveles por mejora cambia el significado de cada
-  número guardado. Habrá que subir la versión del guardado y convertir los niveles viejos por su valor
-  (por ejemplo, el sedal de 26 kg pasa al nivel de 26 kg).
-- **Mientras la isla sea el inicio (D25)** hay que decidir cómo se reparten estos niveles en sus niveles 1–10.
+- **Todo cabe en las bandas:** el equipo de cada mapa cuesta entre el 30 % y el 58 % de lo que se gana en él, y
+  siempre queda dinero libre ($900–1,950 por mapa). El río y la isla son los más caros porque traen mejoras del bote.
+- **Con la pelea actual el sedal sigue sin importar:** con su técnica, la carpa, la trucha café, la barracuda, el
+  atún, el dorado y el pargo salen al 100 % con cualquier grado. Solo el sábalo depende del grado (50 % con casting
+  de grado 2, 100 % con grado 6). La Fase 3 (pelea profunda) es la que hará que el grado importe.
+- **El inicio del lago es lento:** con la licencia básica se ganan ~$55–140 por hora. El camino natural es subir
+  al nivel 4 (~1.5 h), comprar la intermedia ($35), pescar carpa con flotador y después comprar el spinning ($200)
+  para la trucha. Hay que vigilar que la primera hora no aburra.
+- **La licencia avanzada del lago no se paga sola** (sigue pendiente: solo agrega la trucha café).
+- **Guardado:** el formato de mejoras cambia por completo (aparejos por técnica); habrá que subir la versión del
+  guardado y convertir el equipo actual (por ejemplo, la caña y el sedal actuales pasan al aparejo de flotador
+  del grado más parecido).
 
 ### Técnica por especie (propuesta, 2026-11-18)
 
@@ -543,3 +567,6 @@ mejora se desbloquea en cada nivel.
   mucho menos), D35 (flotador, spinning, casting, fondo, curricán) y D36 (aparejo completo por niveles por técnica).
   Propuesta de técnica por especie para el lago y la isla. La tienda queda por recalcular por técnicas; la Fase 2
   pasa a ser "técnicas, carnadas y consecuencias".
+- **2026-11-18** · Recalculada la tienda por técnicas: aparejos de flotador, spinning, fondo, casting y curricán por
+  grado (= número del mapa), bodega y bote globales. El equipo de cada mapa cuesta el 30–58 % de lo ganado en él.
+  Pendientes: la licencia avanzada del lago y la lentitud de la primera hora.
