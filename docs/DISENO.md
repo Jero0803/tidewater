@@ -90,6 +90,8 @@ hacia arriba (mapas de nivel más alto).
 | D34 | **Con la técnica equivocada el pez pica mucho menos:** con la principal pica normal, con una secundaria menos, con una incompatible casi nunca (propuesta de pesos: 1 / 0.4 / 0.05, por medir) | Realista y deja margen para experimentar | 2026-11-18 |
 | D35 | **Técnicas del diseño: flotador, spinning, casting, fondo y curricán.** La mosca queda como opcional futura | Cubren todas las especies de la cadena sin un catálogo enorme | 2026-11-18 |
 | D36 | **Por ahora, cada técnica es un aparejo completo (caña + carrete + sedal) que sube de nivel** ("Aparejo de spinning nivel 3"). La bodega y el bote siguen siendo globales. Más adelante se evaluará separar piezas (caña, carrete, sedal, gramos del señuelo) | Pocas compras y fácil de entender para empezar; se puede refinar después | 2026-11-18 |
+| D37 | **Tienda por técnicas aprobada:** aparejos de flotador, spinning, fondo, casting y curricán por grado (grado = número del mapa), bodega y bote globales; precio = precio estándar del mapa × factor de la técnica; licencias por mapa (5 / 15 / 25 % de lo ganado en un día) | El equipo de cada mapa cuesta el 30–58 % de lo ganado en él y siempre sobra dinero | 2026-11-18 |
+| D38 | **La pelea profunda se une a las técnicas en una sola fase** (Fase 2): freno ajustable y equipo equilibrado llegan junto con spinning, casting, fondo y curricán | Con la pelea actual el grado del aparejo casi no importa; la pelea nueva es la que le da sentido | 2026-11-18 |
 
 ---
 
@@ -163,8 +165,8 @@ la progresión y después se construyen hacia abajo los mapas de inicio, empezan
 | 5 | **M4. Lago cálido o represa** (mapa 2) | Agua dulce quieta (el océano sin viento ni oleaje, rodeado de tierra; por verificar); juncos y cipreses; lobina, mojarras, crappie, bagre | Alto | Medio | Pendiente |
 | 6 | **M5. Río tropical** (mapa 3) | Agua con corriente (tecnología nueva); bosque de galería y sabana; pavón, payara, bagre rayado | Muy alto | Alto | Pendiente |
 | 7 | **M6. Lago de montaña** (mapa 1, inicio) | Agua fría y clara; vegetación fría nueva (pinos, eucaliptos, páramo); trucha, carpa, capitán | Alto | Medio | Pendiente |
-| — | Fase 2. Técnicas, carnadas y consecuencias | Técnicas (D33–D35): spinning y casting, fondo y curricán, cada una con su aparejo por niveles (D36); carnadas y señuelos que se gastan; desgaste y reparación. **El spinning hace falta antes del lago de montaña** (su pez estrella es la trucha) | Alto | Medio | Pendiente; spinning antes de M6 |
-| — | Fase 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | Alto | Medio | Pendiente, se puede intercalar |
+| — | Fase 2. Técnicas, pelea y consecuencias | Técnicas (D33–D35): spinning y casting, fondo y curricán, cada una con su aparejo por grados (D36, D37); **pelea profunda** (D38): freno ajustable con la rueda del mouse y equipo equilibrado, para que el grado del aparejo importe; carnadas y señuelos que se gastan; desgaste y reparación. **El spinning hace falta antes del lago de montaña** (su pez estrella es la trucha) | Muy alto | Medio-alto (cambia el corazón del juego) | Pendiente; spinning antes de M6 |
+| — | ~~Fase 3. Pelea profunda~~ | Unida a la Fase 2 (D38) | | | |
 | — | Fase 4. Objetivos | Encargos de los vendedores; torneo de los 10 más pesados | Medio | Bajo | Pendiente, se puede intercalar |
 | — | Mapas por encima de la isla | Mar abierto, otras islas o atolones de nivel más alto (D24) | Alto | Bajo | Futuro |
 
@@ -234,7 +236,7 @@ a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
 | **XP para pasar del nivel N al N+1** | 600 × 1.03^(N − 1): nivel 10 ≈ 6,100 XP acumulados; nivel 50 ≈ 65,100; nivel 60 ≈ 94,400 |
 | **Resultado estimado** | ~5 horas de juego por mapa (lago: ~6,100 XP a ~1,200 XP/h; isla: ~30,000 XP a ~5,500 XP/h) y ~30 horas hasta la isla. Mejorar el equipo dentro de cada mapa lo acorta |
 
-### Tienda por técnicas, calculada desde las bandas (propuesta, 2026-11-18)
+### Tienda por técnicas, calculada desde las bandas (aprobada, D37, 2026-11-18)
 
 Script: `node --no-warnings tools/balance/tienda-propuesta.mjs`. Reemplaza la versión del 2026-11-17 (una sola
 caña que subía de nivel), que quedó obsoleta con D33–D36.
@@ -570,3 +572,5 @@ mejora se desbloquea en cada nivel.
 - **2026-11-18** · Recalculada la tienda por técnicas: aparejos de flotador, spinning, fondo, casting y curricán por
   grado (= número del mapa), bodega y bote globales. El equipo de cada mapa cuesta el 30–58 % de lo ganado en él.
   Pendientes: la licencia avanzada del lago y la lentitud de la primera hora.
+- **2026-11-18** · Decididos D37 (tienda por técnicas aprobada) y D38 (pelea profunda unida a las técnicas en la
+  Fase 2). Hoja de ruta actualizada.
