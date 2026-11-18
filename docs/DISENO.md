@@ -192,6 +192,27 @@ Los nombres comunes varían por país; las listas son un punto de partida, no de
 - La laguna costera es agua salada, quieta y poco profunda: probablemente **el mapa más fácil de construir**
   después de la isla, porque reutiliza el océano casi tal cual.
 
+### Investigación ampliada: trucha, lagos de Colombia, Florida y mojarras (2026-11-17)
+
+Pedido del dueño del proyecto: no limitarse a las islas; incluir trucha, agua dulce, mojarras, Florida y los lagos de Colombia.
+
+| Región y bioma | Características | Especies | Notas |
+|---|---|---|---|
+| **Lagos y embalses andinos** (Colombia: Laguna de Tota, Neusa, Tominé, Sisga, Guavio) | Agua fría de montaña, altiplano | Trucha arcoíris, carpa común, capitán de la sabana (nativo) | La trucha se introdujo hacia 1938–1939 y es parte de la identidad de Tota (hay una fiesta y un concurso nacional de pesca). Es considerada invasora: compite con el capitán por la comida. En Tominé la captura la dominan trucha, carpa y capitán |
+| **Lagos y canales de Florida** | Lagos cálidos, canales, Everglades | Lobina negra (la más popular de Florida, está en casi toda el agua dulce), mojarra de agallas azules (bluegill) y otras mojarras de río, crappie negro, tucunaré mariposa (en los canales del sureste), catán o pejelagarto | El tucunaré se introdujo en los años 80 para controlar una tilapia invasora; supera los 11 kg |
+| **Ciénagas y embalses cálidos de Colombia** (Ayapel, Lorica, Zapatosa, Urrá) | Humedales y represas de tierra caliente | Mojarra amarilla (*Caquetaia kraussii*, cíclido nativo), mojarra roja y tilapia (cultivo), bocachico, cachama | La mojarra amarilla es nativa de Colombia y Venezuela y muy consumida |
+| **Ríos de los Llanos** (Orinoquía: Meta, Vichada, Puerto Gaitán) | Grandes ríos tropicales | Pavón o tucunaré (récord en Colombia ~11 kg), payara (~17.7 kg), bagre rayado, arawana, cachama, sardinata | Una de las regiones más ricas para la pesca deportiva de río. Hay propuestas de veda para cachama y bagres |
+
+**Lo que cambia para el diseño:**
+- El ambiente deja de ser solo de islas: es una **cadena del Gran Caribe y las Américas tropicales**, de los Andes
+  fríos al mar.
+- La **trucha en un lago de montaña** es un inicio clásico del género: agua quieta y clara, peces medianos, fácil.
+- La **lobina** y las **mojarras** son el corazón de un lago cálido (estilo Florida o represa caribeña).
+- Los **ríos de los Llanos** (pavón, payara, bagre) son un mapa de río mucho más emocionante que la quebrada de isla.
+- **Costo de arte:** el lago andino necesita vegetación fría nueva (pinos, eucaliptos, páramo); Florida y los
+  Llanos necesitan plantas nuevas parciales (cipreses, juncos, sabana). La laguna costera y el manglar reutilizan
+  más de lo que ya hay.
+
 ### Mapas: lo que sabemos (2026-11-17)
 
 - **A favor:** el relieve es procedural (código, no imágenes pesadas); las posiciones clave están en
@@ -362,3 +383,5 @@ mejora se desbloquea en cada nivel.
   de ruta; niveles de licencias pasan a ser relativos a la banda de cada mapa.
 - **2026-11-17** · Investigados los biomas acuáticos del Caribe de la montaña al mar, con sus especies reales
   (sección 6). Pendiente decidir cuántos mapas van por debajo de la isla.
+- **2026-11-17** · Ampliada la investigación: trucha y lagos andinos de Colombia, lagos y canales de Florida,
+  ciénagas y mojarras de Colombia, ríos de los Llanos. Propuesta de cadena de cinco mapas por debajo de la isla.
