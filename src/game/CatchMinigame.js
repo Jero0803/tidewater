@@ -35,9 +35,12 @@ import { FISH } from './FishTable.js';
 //   what the drag holds against its setting (1 = the spool slips)
 export const DRAG_STEPS = 10;
 const TAU = Math.PI * 2;
-export const STAMINA = { min: 180, k: 4, size: 0.35 }; // D73: seconds of full pressure to tire a fish (with tackle)
+// D73, D85: seconds of full pressure to tire a fish (with tackle): min + k × species stamina^sp × kg^size. Fitted with
+// the fight simulator: a guapucha ~40 s, a 1 kg trout ~1.5 min, a 3.5 kg trout ~4 min, a 10 kg carp ~4.5 min
+export const STAMINA = { min: 95, k: 170, size: 0.5, sp: 0 };
 export const fishForce = ( f, kg ) => Math.max( 0.05, kg * ( 0.25 + 0.6 * f.fight ) + 0.05 ); // kg of pull (with tackle)
-export const fishStamina = ( f, kg ) => STAMINA.min + STAMINA.k * f.stamina * Math.pow( Math.max( kg / f.kg[ 1 ], 0.05 ), STAMINA.size );
+// grows with the fish's real weight (D85)
+export const fishStamina = ( f, kg ) => STAMINA.min + STAMINA.k * Math.pow( f.stamina, STAMINA.sp ) * Math.pow( Math.max( kg, 0.001 ), STAMINA.size );
 
 // the default fighting style of a species (FishTable.js may override any of these in `style`)
 function styleOf( f ) {

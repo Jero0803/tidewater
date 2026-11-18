@@ -76,17 +76,27 @@ for ( const k in STYLES ) if ( FISH[ k ] ) FISH[ k ].style = STYLES[ k ];
 
 // Value per hour (docs/DISENO.md D75, D78; measured with tools/balance/equipo-lago.mjs): hourMul scales the price per
 // kg and xpMul the XP of each fish so an hour of fishing yields what it did before. The lake has the new rhythm (not
-// every bite hooks, fights of a minute or more: 4 to 5 times fewer fish an hour); the island keeps its rhythm and only
+// every bite hooks, fights that grow with the fish, D85; size classes by kg, D84: 4 to 8 times fewer fish an hour); the island keeps its rhythm and only
 // gets back what the flatter size-class prices (trophy ×1.1, unique ×1.2) took. [ hourMul, xpMul ]
 const PER_HOUR = {
-	guapucha: [ 5.9, 4.8 ], carachi: [ 6.1, 5.4 ], pejerrey: [ 5.0, 3.8 ], capitan: [ 1, 3.6 ],
-	rainbowTrout: [ 6.4, 4.7 ], carp: [ 2.5, 2.2 ], brownTrout: [ 4.8, 3.9 ],
+	guapucha: [ 4.1, 2.5 ], carachi: [ 4.5, 3.3 ], pejerrey: [ 4.9, 3.8 ], capitan: [ 1, 3.8 ],
+	rainbowTrout: [ 8.5, 7.0 ], carp: [ 4.1, 3.8 ], brownTrout: [ 10.3, 9.2 ],
 	silverside: [ 1.26, 1 ], mullet: [ 1.28, 1 ], needlefish: [ 1.28, 1 ], sergeant: [ 1.26, 1 ], grunt: [ 1.26, 1 ],
 	chromis: [ 1.26, 1 ], tang: [ 1.26, 1 ], yellowtail: [ 1.28, 1 ], wrasse: [ 1.3, 1 ], parrot: [ 1.28, 1 ],
 	angel: [ 1.27, 1 ], jack: [ 1.3, 1 ], barracuda: [ 1.3, 1 ], redSnapper: [ 1.28, 1 ], grouper: [ 1.27, 1 ],
 	tuna: [ 1.28, 1 ], mahi: [ 1.28, 1 ], tarpon: [ 1.27, 1 ],
 };
 for ( const id in FISH ) [ FISH[ id ].hourMul, FISH[ id ].xpMul ] = PER_HOUR[ id ] || [ 1, 1 ];
+
+// Size classes in kg (D84; as in Fishing Planet, each species has its own weights): [ juvenile below, common below,
+// trophy below ] — unique above. Species without an entry use the share of their weight range (Progression.SIZE_CLASSES).
+// Chosen so ~25 % of the catch is juvenile, ~55 % common, ~16 % trophy and ~4 % unique with rollWeight's spread: a 1 kg
+// trout is common and sells (a trout lake of FP: joven 0.26, común 0.62–1.02 kg), trophies and uniques stay rare.
+const CLASSES_KG = {
+	guapucha: [ 0.006, 0.014, 0.018 ], carachi: [ 0.03, 0.1, 0.14 ], pejerrey: [ 0.15, 0.8, 1.1 ], capitan: [ 0.13, 0.5, 0.75 ],
+	rainbowTrout: [ 0.35, 2.5, 3.6 ], carp: [ 1, 7.5, 11 ], brownTrout: [ 0.75, 4, 5.5 ],
+};
+for ( const id in CLASSES_KG ) if ( FISH[ id ] ) FISH[ id ].classesKg = CLASSES_KG[ id ];
 
 export const FISH_IDS = Object.keys( FISH );
 

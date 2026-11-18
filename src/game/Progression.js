@@ -16,6 +16,9 @@ export const SIZE_CLASSES = [
 
 export function sizeClass( species, kg ) {
 
+	// species with their own weights per class (FishTable CLASSES_KG, D84)
+	const c = FISH[ species ].classesKg;
+	if ( c ) return SIZE_CLASSES[ c.findIndex( ( max ) => kg < max ) < 0 ? 3 : c.findIndex( ( max ) => kg < max ) ];
 	const [ lo, hi ] = FISH[ species ].kg;
 	const t = Math.min( 1, Math.max( 0, ( kg - lo ) / Math.max( hi - lo, 1e-6 ) ) );
 	return SIZE_CLASSES.find( ( c ) => t < c.upTo ) || SIZE_CLASSES[ SIZE_CLASSES.length - 1 ];

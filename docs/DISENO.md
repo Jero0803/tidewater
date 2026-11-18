@@ -136,6 +136,8 @@ hacia arriba (mapas de nivel más alto).
 | D80 | **Licencias por varios días, como en Fishing Planet:** se compran por 1 día, 3 días o 1 semana de juego (tiempo jugado, D19), con descuento (3 días ×2.8, semana ×6.3 el precio de un día). La tarjeta muestra qué especies deja guardar y cuáles hay que soltar. Sin licencia ilimitada | Menos visitas al vendedor; el gasto por hora casi no cambia | 2026-11-18 |
 | D81 | **Tienda en rejilla, como en Fishing Planet** (completa D65): tarjetas con imagen, nivel, cantidad del paquete, nombre, precio y Comprar; filtros a la izquierda (técnica, potencia o peso, tipo de cebo o señuelo, "para qué pez", en venta, nuevos); orden por nivel; panel del artículo con imagen grande, **para qué especies sirve**, con qué piezas es compatible, sus números comparados con lo equipado y una descripción | Lo vio el jugador del proyecto en la tienda de FP | 2026-11-18 |
 | D82 | **La licencia básica del mapa de inicio (el lago) es gratis y sin vencimiento**, como en Fishing Planet. Las demás licencias del lago y todas las de los otros mapas se siguen pagando por días (D80) | El inicio del lago era lento ($55–140/h) y además se cobraba la básica desde el segundo día |  2026-11-18 |
+| D84 | **Clases de tamaño en kilos por especie en el lago** (como en Fishing Planet): cada especie tiene sus kilos de juvenil, común, trofeo y único, elegidos para que ~25 % de lo que se pesca sea juvenil, ~55 % común, ~16 % trofeo y ~4 % único (trucha arcoíris: juvenil hasta 0.35 kg, común hasta 2.5, trofeo hasta 3.6). Una trucha de 1 kg es común y se vende. La isla sigue con el porcentaje del rango. Los juveniles se siguen soltando | En FP una trucha de 0.62 kg es común; aquí era juvenil hasta 0.77 kg y se soltaba con $0 | 2026-11-18 |
+| D85 | **La pelea crece con el tamaño del pez (cambia D73):** aguante = 95 s + 170 × peso^0.5 (kg reales). Con el equipo correcto y buen manejo: guapucha ~40 s, trucha de 0.3 kg ~65 s, de 1 kg ~1.5 min, de 2 kg ~2 min, de 3.5 kg ~4 min; carpa de 10 kg ~4.5 min. Los valores por hora (D75) se miden de nuevo: precio × 4.1–10.3 y XP × 2.5–9.2 según la especie | Medido en FP: una trucha joven sale en 30–50 s y una común de 1 kg en ~2–2.5 min; la diferencia de tamaño se tiene que sentir | 2026-11-18 |
 
 ---
 
@@ -1310,11 +1312,33 @@ carrete 1500, trenzado 0.12 mm de 1.8 kg, cucharilla estrecha de 7 g.
   Las dos pesaron lo mismo: FP parece usar pocos pesos por clase; nosotros sorteamos el peso en un rango.
 - **Clases en kilos por especie en FP:** trucha degollada joven 0.26–0.29 kg, común 0.62 kg, trofeo 1.34 kg; la degollada de
   dorso verde es trofeo con 0.47 kg. **Nuestras clases son un porcentaje del rango:** la trucha arcoíris es juvenil hasta
-  0.77 kg y la trucha café hasta 1.33 kg (se sueltan con $0). **Propuesta D84 (por decidir):** clases en kilos por especie
+  0.77 kg y la trucha café hasta 1.33 kg (se sueltan con $0). **D84 (aprobada, con otros kilos):** clases en kilos por especie
   donde el porcentaje no sirve (trucha arcoíris: juvenil hasta 0.3 kg, común 0.3–1.2, trofeo 1.2–2.5, único más de 2.5);
   se vuelven a medir los valores por hora.
 - **Comparación:** nuestra pelea mínima es de 1 minuto para todo pez (D73, pedido del jugador del proyecto); FP saca una
   trucha joven en menos. Queda a decisión del jugador del proyecto si los juveniles pelean menos de 1 minuto.
+
+### Pelea según el tamaño y clases en kilos (D84, D85, medido, 2026-11-18)
+
+Reemplaza la duración de D73 y los valores de D75 de las tablas de arriba. Script: `tools/balance/equipo-lago.mjs`.
+
+**Duración** con el equipo correcto y buen manejo (aguante = 95 s + 170 × peso^0.5):
+
+| Pez | Antes (D73) | Ahora (D85) |
+|---|---|---|
+| Guapucha | 64 s | 40 s |
+| Trucha arcoíris 0.3 / 1 / 2 / 3.5 kg | 65 / 67 / ~90 / ~150 s | 65 / 91 / 121 / ~235 s |
+| Trucha café 1.5 / 5 kg | ~70 / ~200 s | ~105 / ~295 s |
+| Carpa 2 / 6 / 10 kg | ~70 / — / 95 s | ~115 / ~220 / ~265 s |
+
+**Clases en kilos** (juvenil por debajo de · común · trofeo · único por encima): guapucha 0.006 · 0.014 · 0.018; carachi 0.03 ·
+0.1 · 0.14; pejerrey 0.15 · 0.8 · 1.1; capitán 0.13 · 0.5 · 0.75; trucha arcoíris 0.35 · 2.5 · 3.6; carpa 1 · 7.5 · 11; trucha café
+0.75 · 4 · 5.5. Reparto en el lago: 25 % juvenil, 55 % común, 15 % trofeo, 4 % único (antes 42 / 43 / 11 / 4).
+
+**Valores por hora** (precio × `hourMul`, XP × `xpMul`, 16 horas simuladas por especie): guapucha ×4.1 / ×2.5, carachi ×4.5 /
+×3.3, pejerrey ×4.9 / ×3.8, capitán — / ×3.8, trucha arcoíris ×8.5 / ×7.0, carpa ×4.1 / ×3.8, trucha café ×10.3 / ×9.2. Peces por
+hora con su equipo: chicos ~30–36, trucha arcoíris ~20, trucha café ~16, carpa ~13. Los factores varían ±20 % entre corridas
+(un pez grande pesa mucho en una hora); se afinan jugando.
 
 ### Lo que cambia en las decisiones
 
@@ -1581,3 +1605,5 @@ armar las tres cañas queda para E4.
   ~30–45 s; el corte de sedal quita metros; la clase joven se vende allá.
 - **2026-11-18** · Segunda trucha medida en FP (~35–50 s; ~4 min entre capturas). Propuesta D84: clases de tamaño en
   kilos por especie. Por decidir.
+- **2026-11-18** · Decididos D84 (clases en kilos por especie en el lago, ~25 / 55 / 16 / 4 %) y D85 (la pelea crece con el
+  tamaño: guapucha ~40 s, trucha de 1 kg ~1.5 min, de 3.5 kg ~4 min). Valores por hora medidos de nuevo y aplicados.

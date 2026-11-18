@@ -228,10 +228,17 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	// class frequencies with the game's own weight distribution: ~42 / 43 / 11 / 4 %
 	const cnt = {};
 	let n = 0;
-	for ( const id of FISH_IDS ) for ( let i = 0; i < 1500; i ++ ) { const c = sizeClass( id, rollWeight( id, rng ) ).id; cnt[ c ] = ( cnt[ c ] || 0 ) + 1; n ++; }
+	for ( const id of FISH_IDS.filter( ( k ) => ! FISH[ k ].classesKg ) ) for ( let i = 0; i < 1500; i ++ ) { const c = sizeClass( id, rollWeight( id, rng ) ).id; cnt[ c ] = ( cnt[ c ] || 0 ) + 1; n ++; }
 	const pct = ( c ) => cnt[ c ] / n * 100;
 	ok( Math.abs( pct( 'juvenile' ) - 42 ) < 3 && Math.abs( pct( 'common' ) - 43 ) < 3 && Math.abs( pct( 'trophy' ) - 11 ) < 2 && Math.abs( pct( 'unique' ) - 4 ) < 1.5,
 		`class frequencies ${ SIZE_CLASSES.map( ( c ) => `${ c.id } ${ pct( c.id ).toFixed( 1 ) }%` ).join( ', ' ) }` );
+	// the lake species have their own kg per class (D84): fewer juveniles, trophies and uniques still rare
+	const lk = {};
+	let ln = 0;
+	for ( const id of FISH_IDS.filter( ( k ) => FISH[ k ].classesKg ) ) for ( let i = 0; i < 1500; i ++ ) { const c = sizeClass( id, rollWeight( id, rng ) ).id; lk[ c ] = ( lk[ c ] || 0 ) + 1; ln ++; }
+	const lp = ( c ) => lk[ c ] / ln * 100;
+	ok( Math.abs( lp( 'juvenile' ) - 25 ) < 5 && Math.abs( lp( 'common' ) - 54 ) < 5 && Math.abs( lp( 'trophy' ) - 16 ) < 4 && lp( 'unique' ) < 7, `class: lake species by kg (D84): ${ [ 'juvenile', 'common', 'trophy', 'unique' ].map( ( c ) => `${ c } ${ lp( c ).toFixed( 1 ) }%` ).join( ', ' ) }` );
+	ok( sizeClass( 'rainbowTrout', 1.016 ).id === 'common' && sizeClass( 'rainbowTrout', 0.26 ).id === 'juvenile' && sizeClass( 'rainbowTrout', 3.8 ).id === 'unique', 'class: a 1 kg rainbow trout is common, a 0.26 kg one juvenile (D84)' );
 
 	// value: price × kg × class multiplier, juveniles worth nothing
 	ok( classValue( 'grunt', 0.35 ) === 0, 'value: juveniles are worth $0' );
@@ -630,11 +637,11 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const trout = { rod: 'spinL', reel: 'r2500', line: 'f18', bait: 'spin2' };
 	const carpMH = { rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 2, sinker: 60, bait: 'corn' };
 
-	// D73: at least a minute with the right rig
+	// D73, D85: the fight grows with the fish (a juvenile under a minute, a typical trout over a minute, a big one minutes)
 	const times = [ 0.3, 1, 2 ].map( ( kg ) => fightWith( 'rainbowTrout', kg, trout ) );
-	ok( times.every( ( g ) => g.state === 'caught' && g.time >= 60 ), `fight: a trout on its rod is landed and takes at least a minute (${ times.map( ( g ) => Math.round( g.time ) + ' s' ).join( ', ' ) })` );
+	ok( times.every( ( g ) => g.state === 'caught' ) && times[ 1 ].time >= 70 && times[ 2 ].time > times[ 1 ].time && times[ 1 ].time > times[ 0 ].time, `fight: a trout on its rod is landed, longer the bigger it is (${ times.map( ( g ) => Math.round( g.time ) + ' s' ).join( ', ' ) })` );
 	const tiny = fightWith( 'guapucha', 0.008, STARTER_RIG );
-	ok( tiny.state === 'caught' && tiny.time >= 60, 'fight: even a guapucha on the starter rod takes a minute and does not tear out' );
+	ok( tiny.state === 'caught' && tiny.time >= 25 && tiny.time < 60, `fight: a guapucha on the starter rod is quick and does not tear out (${ Math.round( tiny.time ) } s)` );
 
 	// the reel's drag can't pass its maximum
 	const g = new CatchMinigame( { species: 'carp', kg: 5, lineKg: 20, reelSpeed: 1.3, tackle: fightTackle( 'carp', carpMH ), rng: r } );

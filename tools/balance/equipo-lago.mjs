@@ -156,8 +156,10 @@ const goodSpot = { a: 1 };
 const OLD_MULT = { juvenile: 0, common: 1, trophy: 1.5, unique: 3 };
 const NEW_MULT = Object.fromEntries( SIZE_CLASSES.map( ( c ) => [ c.id, c.mult ] ) );
 const basePrice = ( id ) => FISH[ id ].price; // hourMul is a separate multiplier (FishTable PER_HOUR), not in price
-const money = ( id, kg, mult ) => FISH[ id ].protected ? 0 : basePrice( id ) * kg * mult[ sizeClass( id, kg ).id ];
-const xpOf = ( id, kg ) => sizeClass( id, kg ).xp * difficulty( id ) + XP_PER_KG * kg; // sin hourMul ni especie nueva
+// antes: clases por porcentaje del rango (P1); ahora: las del juego (en kilos para el lago, D84)
+const oldClass = ( id, kg ) => { const [ lo, hi ] = FISH[ id ].kg, t = ( kg - lo ) / Math.max( hi - lo, 1e-6 ); return SIZE_CLASSES.find( ( c ) => t < c.upTo ) || SIZE_CLASSES[ 3 ]; };
+const money = ( id, kg, mult, cls = sizeClass ) => FISH[ id ].protected ? 0 : basePrice( id ) * kg * mult[ cls( id, kg ).id ];
+const xpOf = ( id, kg, cls = sizeClass ) => cls( id, kg ).xp * difficulty( id ) + XP_PER_KG * kg; // sin xpMul ni especie nueva
 const fightOld = ( id, kg ) => {
 
 	const g = new CatchMinigame( { species: id, kg, lineKg: 7, reelSpeed: 1.1, distance: 18, rng } );
@@ -170,7 +172,7 @@ const fightOld = ( id, kg ) => {
 console.log( '\n## 5. Ritmo y valores por hora: antes (P1) y ahora (espera ×' + RHYTHM.waitMul + ', robo ' + pct( RHYTHM.steal ) + ', enganche ' + pct( RHYTHM.hookFirst ) + ' / ' + pct( RHYTHM.hookLate ) + ', pelea D73, clases D78)\n' );
 console.log( '| Pez (con su equipo) | Antes: peces/h | Antes: $/h | Antes: XP/h | Ahora: peces/h | Picadas que enganchan | Factor $ | Factor XP | hourMul en el juego |' );
 console.log( '|---|---|---|---|---|---|---|---|---|' );
-const H = 3600 * arg( 'horas', 6 );
+const H = 3600 * arg( 'horas', 12 );
 const RIGHT5 = { guapucha: 'Flotador UL (inicial)', carachi: 'Flotador UL (inicial)', pejerrey: 'Flotador UL (inicial)', capitan: 'Flotador L lombriz', rainbowTrout: 'Spinning L trucha', carp: 'Fondo M carpa', brownTrout: 'Spinning ML trucha café' };
 export const FACTORS = {};
 for ( const [ id, kitName ] of Object.entries( RIGHT5 ) ) {
@@ -182,7 +184,7 @@ for ( const [ id, kitName ] of Object.entries( RIGHT5 ) ) {
 		t += CAST + biteDelay( goodSpot, 12, rng ) + NIBBLES;
 		const kg = rollWeight( id, rng ), r = fightOld( id, kg );
 		t += r.t;
-		if ( r.ok ) { n0 ++; v0 += money( id, kg, OLD_MULT ); x0 += xpOf( id, kg ); t += CARD; }
+		if ( r.ok ) { n0 ++; v0 += money( id, kg, OLD_MULT, oldClass ); x0 += xpOf( id, kg, oldClass ); t += CARD; }
 
 	}
 
