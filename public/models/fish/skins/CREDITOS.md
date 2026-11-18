@@ -16,3 +16,4 @@ Se recortaron, se enderezaron y se pasaron al marco de la piel del juego con `to
 | Especie | Archivo | Fuente | Autor | Licencia |
 |---|---|---|---|---|
 | Trucha arcoíris | ../rainbowTrout.glb (reducido: texturas en WebP, sin la trucha joven) | [Rainbow Trout - Redband](https://sketchfab.com/3d-models/rainbow-trout-redband-442ab10476d0486e8eb689941bc4ad6e) | eb78 | CC-BY 4.0 |
+| Carpa común | ../carp.glb (reducido: sin el caracol que traía de adorno, textura en WebP) | [CC0 Carp, Cyprinus carpio, Animation](https://sketchfab.com/3d-models/cc0-carp-cyprinus-carpio-animation-c79dcd2ce7074bac9ce3cb0c11eccb6b) | ffish.asia / floraZia.com | CC0 (dominio público) |

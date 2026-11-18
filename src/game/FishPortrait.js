@@ -206,7 +206,13 @@ fn fragment( in: FSIn ) -> vec4f {
 		const g = this.glb[ id ] = { model: null, holder: null };
 		try {
 
-			const model = await SkinnedModel.create( await loadGLB( FISH_GLB_BASE + spec.file ) );
+			// fish skin: wet and only a little metallic (the downloaded maps often mark the whole fish as metal, which
+			// turns thin, bluish fins almost black under the studio light)
+			const model = await SkinnedModel.create( await loadGLB( FISH_GLB_BASE + spec.file ), {
+				materials: ( info ) => ( { surface: 's.metalness = min( s.metalness, 0.3 ); s.roughness = max( s.roughness, 0.25 );' +
+					// scans with their light baked into the photo (KHR_materials_unlit): some light of their own
+					( info.gltfMaterial.extensions && info.gltfMaterial.extensions.KHR_materials_unlit ? ' s.emissive += s.albedo * 0.3;' : '' ) } ),
+			} );
 			if ( spec.clip ) model.play( spec.clip, { fade: 0.01 } );
 			model.update( 0 );
 			// bind-pose bounds in the model's frame (mesh node transform applied to the vertices)

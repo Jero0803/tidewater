@@ -848,7 +848,7 @@ Blender.
 | M1 | Prototipo con piel ilustrada: trucha café y carpa (ilustraciones del USFWS), anatomía ajustada a cada ilustración | **Hecha** (2026-11-18) |
 | M2 | Si M1 convence: ilustraciones para las demás especies del lago (trucha arcoíris, pejerrey; guapucha, capitán y carachi si hay fuente), luego las de la isla | Pendiente |
 | M3 | Prueba de modelo 3D: la trucha arcoíris "Rainbow Trout - Redband" (eb78, Sketchfab, CC-BY) en la tarjeta de captura, reducida de 22 MB a 3,4 MB (`tools/fish/glb_slim.py`); se apaga con `?fishglb=0` para comparar. Comparación en `docs/comparacion-trucha.png` | **Hecha** (2026-11-18): aprobada, ver D61 |
-| M4 | Modelo 3D completo en la tarjeta de captura y en la mano: transparencia de las aletas, nado con la onda del motor para modelos sin animación, miniaturas | Pendiente |
+| M4 | Modelo 3D en la tarjeta de captura: aletas con su color (el brillo metálico limitado), escaneos con luz propia, carpa (escaneo CC0 de ffish.asia, 4,7 MB) además de la trucha (2,1 MB); `glb_slim.py` deja solo el pez que se dibuja. **Pasa a la M5:** el nado con la onda del motor para modelos sin animación (todavía no hay ninguno) | **Hecha** (2026-11-18) |
 | M5 | Modelos 3D en el agua: los peces que nadan usan el modelo (una malla compartida por especie, con la onda del motor; el esqueleto solo en la tarjeta) | Pendiente |
 | M6 | Modelos para el resto del lago (lista de candidatos abajo) | Pendiente |
 | M7 | Modelos para la isla | Pendiente |
@@ -859,7 +859,7 @@ Blender.
 |---|---|---|
 | Trucha arcoíris | Rainbow Trout - Redband (eb78 / E.A.Cornell) | En uso |
 | Trucha café | No hay libre. Opción: Bull Trout (E.A.Cornell, mismo estilo, 3 animaciones) pintada con la ilustración de la trucha café | La piel ilustrada se proyecta igual sobre un modelo 3D |
-| Carpa | Carp Fish (huykhoi2407, 7 mil caras, animada) o Common Carp (Nullifiedit, 19 mil caras) | Comparar las dos |
+| Carpa | CC0 Carp, Cyprinus carpio, Animation (ffish.asia, escaneo con esqueleto y nado) | En uso; falta simplificar la malla (76 mil triángulos) |
 | Pejerrey | Brook Silverside (MTSU Ichthyology, escaneo, 69 mil caras) | Misma familia (Atherinopsidae); hay que simplificarlo |
 | Capitán | Sin modelo parecido (los bagres libres son de otra forma) | Sigue con la piel ilustrada |
 | Guapucha, carachi | Sin modelo | Siguen con la piel ilustrada |
@@ -985,3 +985,5 @@ Blender.
   M3: prueba del modelo 3D de la trucha arcoíris en la tarjeta de captura, para comparar con la ilustración.
 - **2026-11-18** · Decidido D61: los peces pasan a modelos 3D como camino principal; la piel ilustrada queda de
   respaldo para las especies sin modelo libre. Plan M4 a M7 y candidatos del lago en 7f.
+- **2026-11-18** · **M4 hecha:** la trucha arcoíris y la carpa (escaneo CC0 de ffish.asia) se ven en 3D en la tarjeta
+  de captura. `glb_slim.py` ahora quita del archivo lo que no se dibuja (la trucha joven, un caracol de adorno).
