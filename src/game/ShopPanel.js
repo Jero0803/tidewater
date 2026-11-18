@@ -78,6 +78,7 @@ const CSS = /* css */`
 .sh-up { color: var(--tw-aqua); } .sh-down { color: var(--tw-coral); }
 .sh-note { font-size: var(--tw-fs-sm); color: var(--tw-ink-2); margin: 0 0 var(--tw-2); }
 .sh-note b { color: var(--tw-ink-3); font-weight: 600; display: block; font-size: var(--tw-fs-xs); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+.gm-btn.is-armed, .gm-mini.is-armed { background: var(--tw-coral); color: #160a0c; }
 .sh-actions { display: flex; flex-wrap: wrap; gap: var(--tw-2); margin-top: var(--tw-3); }
 .sh-rigs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--tw-3); margin-bottom: var(--tw-4); }
 .sh-rig { text-align: left; padding: var(--tw-3); border-radius: var(--tw-r-md); background: var(--tw-fill); border: 1px solid var(--tw-line); color: var(--tw-ink); font: 500 var(--tw-fs-sm) var(--tw-font); cursor: pointer; }
@@ -231,6 +232,26 @@ function rigSummary( s, slot ) {
 
 }
 
+// a sell button sells on the second click: the first one turns it into "Sure? Click again" for a few seconds (as in
+// Fishing Planet: "this can't be undone")
+export function confirmSell( b, run ) {
+
+	if ( b.dataset.armed ) { run(); return; }
+	b.dataset.armed = '1';
+	const text = b.textContent;
+	b.textContent = loc( 'Sure? Click again to sell', '¿Seguro? Clic otra vez para vender' );
+	b.classList.add( 'is-armed' );
+	setTimeout( () => {
+
+		if ( ! b.isConnected ) return;
+		b.removeAttribute( 'data-armed' );
+		b.textContent = text;
+		b.classList.remove( 'is-armed' );
+
+	}, 3000 );
+
+}
+
 export function renderTackleShop( hud ) {
 
 	ensureStyle();
@@ -308,7 +329,7 @@ export function renderTackleShop( hud ) {
 	for ( const b of $$( '[data-buy]' ) ) b.onclick = () => { const [ k, id ] = parse( b.dataset.buy ); if ( s.buyPiece( k, id ) ) say( `${ loc( 'Bought', 'Compraste' ) }: ${ pieceName( k, id ) }` ); redraw(); };
 	for ( const b of $$( '[data-buyequip]' ) ) b.onclick = () => { const [ k, id ] = parse( b.dataset.buyequip ); if ( s.buyPiece( k, id, { equip: true } ) ) say( `${ pieceName( k, id ) } · ${ loc( 'on rod', 'en la caña' ) } ${ s.tackle.active + 1 }` ); redraw(); };
 	for ( const b of $$( '[data-equip]' ) ) b.onclick = () => { const [ k, id ] = parse( b.dataset.equip ); if ( s.equipPiece( k, id ) ) say( `${ pieceName( k, id ) } · ${ loc( 'on rod', 'en la caña' ) } ${ s.tackle.active + 1 }` ); redraw(); };
-	for ( const b of $$( '[data-sell]' ) ) b.onclick = () => { const [ k, id ] = parse( b.dataset.sell ); if ( s.sellPiece( k, id ) ) say( `${ loc( 'Sold', 'Vendiste' ) }: ${ pieceName( k, id ) } · ${ money( sellPrice( k, id ) ) }` ); redraw(); };
+	for ( const b of $$( '[data-sell]' ) ) b.onclick = () => confirmSell( b, () => { const [ k, id ] = parse( b.dataset.sell ); if ( s.sellPiece( k, id ) ) say( `${ loc( 'Sold', 'Vendiste' ) }: ${ pieceName( k, id ) } · ${ money( sellPrice( k, id ) ) }` ); redraw(); } );
 	for ( const b of $$( '[data-pack]' ) ) b.onclick = () => { if ( s.buyPack( b.dataset.pack ) ) say( loc( 'Pack bought and assembled', 'Paquete comprado y armado' ) ); redraw(); };
 	for ( const b of $$( '[data-up]' ) ) b.onclick = () => { game.buy( b.dataset.up ); redraw(); };
 	for ( const b of $$( '[data-lic]' ) ) b.onclick = () => { const [ tier, days ] = b.dataset.lic.split( ':' ).map( Number ); game.buyLicense( tier, days ); redraw(); };

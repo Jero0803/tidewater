@@ -1623,3 +1623,5 @@ armar las tres cañas queda para E4.
   si a la nueva le falta algo); la caña activa con su cebo y cuántos quedan arriba a la derecha (en rojo si no está lista);
   pestaña Equipo en el inventario (I) con las tres cañas armables desde la mochila, la caña activa y la mochila con vender
   al 50 % (`EquipPanel.js`). El paquete de carpa lleva plomo de 20 g. 8 tests nuevos.
+- **2026-11-18** · Vender equipo pide confirmar (el primer clic pregunta "¿Seguro?", el segundo vende), como en Fishing
+  Planet. Anotado: allá la reventa paga ~20 % (una caña de 1,800 se vende por 352); nosotros, 50 % (D68). Por decidir si se baja.

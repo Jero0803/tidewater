@@ -1,7 +1,7 @@
 import { loc } from '../i18n.js';
 import { RODS, isLure, rigStats } from './Tackle.js';
 import { TABLES, DURABLE, KINDS, count, free, inUse, canSell, sellPrice, rigIssues, rigCastable, RIG_SLOTS } from './TackleBag.js';
-import { pieceName, ensureStyle as ensureShopStyle } from './ShopPanel.js';
+import { pieceName, ensureStyle as ensureShopStyle, confirmSell } from './ShopPanel.js';
 
 // The gear tab of the inventory (docs/DISENO.md 7h, E4, D65): the three assembled rods side by side, each slot a list
 // of what the bag holds for it, the active rod, and the bag with what is left of everything (sell spare rods, reels and
@@ -144,7 +144,7 @@ export function bindEquipment( root, s, redraw ) {
 
 	};
 	for ( const b of root.querySelectorAll( '[data-active]' ) ) b.onclick = () => { s.setActiveRig( Number( b.dataset.active ) ); redraw(); };
-	for ( const b of root.querySelectorAll( '[data-sell]' ) ) b.onclick = () => { const [ k, id ] = b.dataset.sell.split( ':' ); s.sellPiece( k, id ); redraw(); };
+	for ( const b of root.querySelectorAll( '[data-sell]' ) ) b.onclick = () => confirmSell( b, () => { const [ k, id ] = b.dataset.sell.split( ':' ); s.sellPiece( k, id ); redraw(); } );
 
 }
 
