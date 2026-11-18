@@ -715,9 +715,16 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   especies y los spots del lago llegan en L4: mientras tanto se pesca como en la isla.
 - 7 tests nuevos. Probado en el navegador: carga sin errores, 180 fps, vistas desde el aire y desde el agua.
 
-**Pendientes del prototipo (para el pulido):** vegetación tropical (árboles de la isla) en vez de pinos, eucaliptos y
-frailejones; el agua todavía tiene el color turquesa del Caribe; laderas lisas y muy empinadas al fondo; sonidos de
-mar (rompiente, gaviotas) en la orilla; peces del arrecife nadando.
+**Pulido visual, primera pasada (2026-11-18, con la foto de referencia):**
+- **Agua de Tota:** absorbe más el azul que el Caribe (`water.absorption` / `water.scattering` del mapa): los bajos de
+  arena frente a la playa se ven verde claro y el agua profunda azul oscuro, como en la foto.
+- **Cielo de páramo:** más nubes (72 %) y más bruma (`sky` del mapa).
+- **Cerros redondeados:** lomas suaves y anchas en vez de picos de serrucho, más altas hacia el borde; la
+  cordillera del borde empieza cerca del límite del mapa para no levantar una pared desde la orilla sur.
+- **El río nace en una quebrada** antes del borde del mapa (antes su valle dejaba ver el mar infinito de más allá).
+
+**Pendientes del pulido:** pinos, eucaliptos y frailejones (hoy son los árboles de la isla); sonidos de mar
+(rompiente, gaviotas) en la orilla; peces del arrecife nadando; laderas algo lisas.
 
 **Referencia visual para el pulido (foto de la Playa Blanca de Tota, compartida el 2026-11-18):** agua azul
 petróleo oscura (no turquesa); una franja verde clara muy marcada sobre los bajos de arena frente a la playa;
@@ -875,3 +882,5 @@ arranque).
   playa blanca, dos islas, río, bahía de lodo, centro profundo y montañas; agua en calma, sin rompiente ni ballena.
 - **2026-11-18** · Anotada la referencia visual de la Playa Blanca de Tota para el pulido del lago (agua oscura,
   franja verde de los bajos, cerros redondeados, pinos y eucaliptos, cielo nublado).
+- **2026-11-18** · Pulido visual del lago (primera pasada): agua de Tota con la franja verde de los bajos, cielo
+  nublado de páramo, cerros redondeados, río que nace en una quebrada.

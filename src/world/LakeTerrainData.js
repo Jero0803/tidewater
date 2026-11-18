@@ -28,8 +28,9 @@ const smax = ( a, b, k ) => - smin( - a, - b, k );
 const beachZoneAt = ( x, z ) => ( 1 - smoothstep( 130, 215, Math.abs( x - 20 ) ) ) * ( 1 - smoothstep( 70, 170, z + 40 ) ) * smoothstep( - 280, - 140, z );
 const SHORE_Z = - 42;
 
-// the river that feeds the western arm: from the edge of the domain down to the arm's tip
-const RIVER = [ [ - 1100, 210 ], [ - 980, 230 ], [ - 900, 262 ], [ - 820, 270 ] ];
+// the river that feeds the western arm: out of a gorge in the western mountains (it never reaches the edge of the
+// domain: the water plane beyond it would show through the valley as an open sea) down to the arm's tip
+const RIVER = [ [ - 930, 225 ], [ - 890, 245 ], [ - 850, 262 ], [ - 800, 270 ] ];
 
 function riverDistance( x, z ) {
 
@@ -57,9 +58,9 @@ export class LakeTerrainData extends TerrainData {
 		const bz = beachZoneAt( x, z );
 		const w = 1 - bz;
 		const wx = x + n.fbm( x / 260, z / 260, 3 ) * 55 * w, wz = z + n.fbm( x / 260 + 4.7, z / 260 - 2.9, 3 ) * 55 * w;
-		let e = ell( wx, wz, 40, 388, 620, 430 ); // main body (north edge at z ≈ -42 by the pier)
+		let e = ell( wx, wz, 40, 368, 620, 410 ); // main body (north edge at z ≈ -42 by the pier)
 		e = smin( e, ell( wx, wz, - 560, 262, 270, 130 ), 70 ); // western arm (river mouth)
-		e = smin( e, ell( wx, wz, 560, 150, 230, 175 ), 70 ); // eastern muddy bay
+		e = smin( e, ell( wx, wz, 540, 150, 195, 160 ), 70 ); // eastern muddy bay
 		e = smax( e, - ell( wx, wz, - 170, 540, 125, 85 ), 30 ); // the big island
 		e = smax( e, - ell( wx, wz, 310, 650, 72, 52 ), 20 ); // the small island
 		const d = - e;
@@ -110,21 +111,23 @@ export class LakeTerrainData extends TerrainData {
 		} else {
 
 			const e = - d;
-			// mountains: a rim of hills, then ridged peaks toward the edge of the domain
-			const ridge = n.ridged( x / 520, z / 520, 4 );
-			const hills = 30 * ( 1 - Math.exp( - e / 70 ) ) + smoothstep( 40, 520, e ) * ( 110 + 170 * ridge ) + n2.fbm( x / 120, z / 120, 4 ) * 10 * smoothstep( 6, 50, e );
+			// rounded Andean hills (the reference photo: broad, low, layered), higher toward the edge of the domain
+			const roll = 0.5 + 0.5 * n.fbm( x / 460, z / 460, 4 );
+			// separate rounded hills (smooth lumps of the noise) on top of the broad rise
+			const knolls = smoothstep( - 0.05, 0.55, n2.fbm( x / 280 + 3.1, z / 280 - 1.7, 3 ) ) * smoothstep( 60, 420, e );
+			const hills = 34 * ( 1 - Math.exp( - e / 90 ) ) + smoothstep( 40, 650, e ) * ( 40 + 110 * roll ) + knolls * 90 + n2.fbm( x / 160, z / 160, 3 ) * 9 * smoothstep( 6, 50, e );
 			// by the village: the beach (white sand), the village terrace, the hills behind
 			const village = Math.min( e * 0.035, 2.1 ) + smoothstep( 60, 170, e ) * 4 + smoothstep( 170, 520, e ) * 70 + n2.fbm( x / 90, z / 90, 3 ) * 3 * smoothstep( 120, 220, e );
 			h = lerp( hills, village, bz );
 			// a mountain wall along the edge of the domain hides the world beyond it (the ocean plane goes on forever)
 			const edge = 1024 - Math.max( Math.abs( x ), Math.abs( z ) );
-			h += ( 1 - smoothstep( 0, 420, edge ) ) * ( 170 + 90 * ridge ) * smoothstep( 0, 80, e );
+			h += ( 1 - smoothstep( 0, 320, edge ) ) * ( 95 + 110 * roll + 50 * knolls ) * smoothstep( 0, 120, e );
 			h = Math.max( h, 0.2 + e * 0.025 ); // the shore always rises out of the water
 
 		}
 
-		// the river: a valley and a channel below the water level
-		const c = riverDistance( x, z );
+		// the river: a valley and a channel below the water level, closing into a gorge at its source
+		const c = riverDistance( x, z ) + Math.max( 0, - 900 - x ) * 6;
 		if ( c < 220 ) {
 
 			const valley = smoothstep( 12, 200, c );

@@ -197,6 +197,8 @@ export class App {
 			this.fft.updateSpectrumUniforms();
 			this.shore.amplitude.value = W.surf;
 			G.windSpeed.value = W.wind;
+			if ( W.absorption ) G.waterAbsorption.value.set( ...W.absorption );
+			if ( W.scattering ) G.waterScattering.value.set( ...W.scattering );
 
 		}
 		this.caustics = qs.has( 'noCaustics' ) ? null : new Caustics( renderer, this.fft );
@@ -352,6 +354,10 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 			depthTexture: this.sceneRenderer.sceneRT.depthTexture, underwater: this.underwater, atmosphere: this.atmosphere,
 			sky: this.sky, clouds: this.clouds, terrain: this.terrainGPU, csm: this.csm,
 		} );
+		// the map's sky (the lake: a cloudier páramo sky); the panel starts from these values
+		const S = this.map.sky;
+		if ( S && S.clouds !== undefined && this.clouds && this.clouds.coverage ) this.clouds.coverage.value = S.clouds;
+		if ( S && S.haze !== undefined && this.haze ) this.haze.density.value = S.haze;
 		this.post = new PostFX( renderer, { sceneRenderer: this.sceneRenderer, camera, underwater: this.underwater, clouds: this.clouds, sunDir: this.atmosphere.sunDir, haze: this.haze } );
 		G.exposure.value = this.settings.exposure;
 		if ( qs.has( 'scale' ) ) this.settings.renderScale = Number( qs.get( 'scale' ) ) || 1;

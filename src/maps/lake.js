@@ -42,6 +42,11 @@ export const LAKE = {
 
 	features: { reef: false, surf: false, seabirds: true, whale: false, palms: false },
 
-	// calm fresh water: light breeze, short fetch, no swell and no surf
-	water: { wind: 2.5, fetch: 6, swell: 0, chop: 0.55, surf: 0 },
+	// calm fresh water: light breeze, short fetch, no swell and no surf. Colour (per metre, RGB): Tota's water takes
+	// more of the blue than the Caribbean (dissolved organic matter), so the sandy shallows turn pale green and the
+	// deep water dark (the reference photo, docs/DISENO.md 7d)
+	water: { wind: 2.5, fetch: 6, swell: 0, chop: 0.55, surf: 0, absorption: [ 0.55, 0.11, 0.3 ], scattering: [ 0.0035, 0.0075, 0.0055 ] },
+
+	// a páramo sky: more cloud, a little more haze
+	sky: { clouds: 0.72, haze: 2.0 },
 };
