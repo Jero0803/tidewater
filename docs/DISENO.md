@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entregas 1, 2 y 3 de 6 hechas: las reglas de progresión ya funcionan en el juego (clases, XP, niveles, licencias).
+**Estado:** programando la Fase 1. Entregas 1 a 4 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias) y reloj de 24 minutos.
 
 ---
 
@@ -99,6 +99,7 @@ hacia arriba (mapas de nivel más alto).
 | D43 | **Mientras la isla sea el inicio (D25):** los seis grados de aparejo y de bodega se compran solo con dinero, sin nivel mínimo; las licencias intermedia y avanzada piden los niveles 4 y 7. Cuando exista la cadena, cada grado se ata a su mapa | El jugador de la isla necesita poder llegar al equipo de la isla | 2026-11-18 |
 | D44 | **Guardado versión 2:** se conservan dinero, nevera y registro; cada mejora vieja pasa al grado más parecido por su valor (sedal y caña al aparejo de flotador, nevera a la bodega equivalente); el nivel inicial se calcula con la XP que habrían dado los peces del registro. Nadie pierde nada | Compatibilidad con las partidas actuales | 2026-11-18 |
 | D45 | **Mientras la isla sea el mapa de inicio, su multiplicador de XP es ×1.0** (el del primer mapa de la cadena). Cuando haya mapas por debajo, pasa a ×3.05 | Coherente con D25: el multiplicador depende de la posición del mapa en la cadena | 2026-11-18 |
+| D46 | **El reloj no se detiene con la tienda, el inventario ni la tarjeta de captura;** solo la pausa T lo detiene (y la licencia sigue corriendo, D41). En el modo foto la hora se puede mover, pero al salir vuelve a la del juego, que siguió corriendo por debajo | Simple y sin trucos con la hora de los peces | 2026-11-18 |
 
 ---
 
@@ -461,7 +462,7 @@ gastar (adelantando), y las preferencias de hora de los peces se pueden forzar.
 - [x] ~~¿Cómo se cuenta el tiempo?~~ Licencias en tiempo real (D15); día del juego simulado (D16).
 - [x] ~~Duración de un día~~ 24 minutos (D22).
 - [x] ~~Control de hora del panel~~ Bloqueado en el juego, libre en el modo foto (D42).
-- [ ] (Menor, a decidir al implementar) ¿El reloj se pausa con el menú, la tienda o la tarjeta de captura? (propuesta: no se pausa, salvo con la pausa explícita T)
+- [x] ~~¿El reloj se pausa con el menú, la tienda o la tarjeta de captura?~~ No; solo con la pausa T (D46).
 
 **Viaje entre mapas (D17)**
 
@@ -544,7 +545,7 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 | 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de 24 min jugados, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
 | 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | **Hecha** (2026-11-18) |
 | 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | **Hecha** (2026-11-18) |
-| 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | Pendiente |
+| 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | **Hecha** (2026-11-18) |
 | 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
 | 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
 
@@ -587,6 +588,19 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - La guía de bienvenida menciona las licencias.
 - Probado en el navegador: compra de licencia, tarjeta de juvenil, pez sin licencia con subida de nivel,
   vencimiento de licencias, inventario. 9 tests nuevos de capturas.
+
+**Entrega 4, cómo quedó el reloj:**
+
+- El día avanza solo desde el arranque: 1 hora del juego por minuto real (`CLOCK_HOURS_PER_SECOND` en
+  `Progression.js`). T lo pausa y lo reanuda a esa velocidad; las licencias siguen corriendo (D41).
+- **Reloj en el HUD**, arriba a la izquierda junto al modo: hora y parte del día (alba 5–8, día 8–17, ocaso 17–20,
+  noche), "en pausa" en rojo.
+- **Panel de ajustes (H), Cielo → Sol:** hora, "Avanzar el tiempo" y velocidad bloqueados, con la nota "Reloj:
+  libre en modo foto (P)". En el modo foto se liberan; al salir, la hora vuelve a la del juego más el tiempo pasado
+  (D46). El azimut del sol sigue libre (no afecta a los peces).
+- La hora se guarda con la partida (campo `hour` del guardado v2, agregado sin cambiar de versión) y el día sigue
+  donde quedó al volver. Con `?bench` el reloj sigue detenido para las capturas de referencia.
+- 5 tests nuevos. Probado en el navegador: velocidad, bloqueo, modo foto, pausa con T, hora guardada.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -659,3 +673,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · **Entrega 3 hecha:** las reglas de la Fase 1 ya funcionan en el juego: valor por clase, XP en
   cada captura, motivo al soltar, nivel y licencia en el HUD, licencias a la venta con Marta, avisos de
   vencimiento. 9 tests nuevos (todos pasan).
+- **2026-11-18** · **Entrega 4 hecha:** reloj de 24 minutos que avanza solo, reloj en el HUD, hora del panel
+  bloqueada salvo en el modo foto, hora guardada con la partida. Decidido D46 (el reloj solo se detiene con T).
+  5 tests nuevos (todos pasan).

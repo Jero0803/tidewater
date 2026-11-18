@@ -80,6 +80,19 @@ export function levelFromXp( xp ) {
 // so pausing the clock (T) does not stop it.
 export const DAY_SECONDS = 24 * 60;
 export const LICENSE_SECONDS = DAY_SECONDS;
+// the game clock (D16, D22): one game day in DAY_SECONDS of play, so one game hour per real minute
+export const CLOCK_HOURS_PER_SECOND = 24 / DAY_SECONDS;
+
+// part of the day for the clock in the HUD (matches where Bites.activity peaks: dawn ~6:30, dusk ~18:30)
+export function dayPhase( hour ) {
+
+	const h = ( ( hour % 24 ) + 24 ) % 24;
+	if ( h >= 5 && h < 8 ) return 'dawn';
+	if ( h >= 8 && h < 17 ) return 'day';
+	if ( h >= 17 && h < 20 ) return 'dusk';
+	return 'night';
+
+}
 
 // prices and minimum levels while the island is the starting map (D37 island prices, D43 levels 4 and 7)
 export const LICENSES = [

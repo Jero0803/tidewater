@@ -157,7 +157,8 @@ export class AppUI {
 		// ---------------------------------------------------------------- Sky
 		const sky = ui.addTab( 'sky', loc( 'Sky', 'Cielo' ), 'sky' );
 		const sun = sky.addFolder( loc( 'Sun', 'Sol' ), { icon: 'clock' } );
-		sun.addTimeOfDay( { object: app.settings, key: 'timeOfDay' } );
+		const clockInfo = sun.addInfo( { label: loc( 'Clock', 'Reloj' ), get: () => loc( 'free in photo mode (P)', 'libre en modo foto (P)' ), tooltip: loc( 'The day runs by itself, one game hour per real minute; T pauses it. The hour can only be moved in photo mode, and it goes back when you leave it.', 'El día avanza solo, una hora del juego por minuto real; T lo pausa. La hora solo se mueve en el modo foto, y vuelve a la del juego al salir.' ) } );
+		const timeCtl = sun.addTimeOfDay( { object: app.settings, key: 'timeOfDay' } );
 		sun.addSlider( { label: loc( 'Sun azimuth', 'Azimut del sol' ), object: app.settings, key: 'sunAzimuth', min: - 180, max: 180, step: 1, format: ( v ) => `${ Math.round( v ) }°`, tooltip: loc( 'Turns the sun\'s path around the island (0 = the real path: rises in the east, sets in the west).', 'Gira la trayectoria del sol alrededor de la isla (0 = la real: sale por el este y se pone por el oeste).' ) } );
 		let speed = null;
 		sun.addToggle( { label: loc( 'Advance time', 'Avanzar el tiempo' ), object: s, key: 'advance', onChange: ( v ) => {
@@ -167,6 +168,25 @@ export class AppUI {
 
 		} } );
 		speed = sun.addSlider( { label: loc( 'Time speed', 'Velocidad del tiempo' ), object: s, key: 'timeSpeed', min: 0.002, max: 1, log: true, unit: 'h/s', onChange: ( v ) => { if ( s.advance ) app.settings.timeSpeed = v; } } ).setVisible( s.advance );
+		// D42: the hour, the toggle and the speed are locked while playing and free in photo mode
+		const advanceCtl = sun.controls().find( ( c ) => c.key === 'advance' );
+		const lockClock = ( locked ) => {
+
+			for ( const c of [ timeCtl, advanceCtl, speed ] ) if ( c ) c.setEnabled( ! locked );
+			clockInfo.setVisible( locked );
+			speed.setVisible( s.advance );
+			sun.refresh();
+
+		};
+		lockClock( true );
+		const prevPhoto = ui.onPhotoMode;
+		ui.onPhotoMode = ( on ) => {
+
+			if ( prevPhoto ) prevPhoto( on );
+			app.photoClock( on );
+			lockClock( ! on );
+
+		};
 		const atmo = sky.addFolder( loc( 'Atmosphere', 'Atmósfera' ), { icon: 'cloud' } );
 		if ( app.clouds ) atmo.addSlider( { label: loc( 'Cloud cover', 'Nubosidad' ), object: s, key: 'clouds', min: 0, max: 1, step: 0.01, format: ( v ) => `${ Math.round( v * 100 ) }%`, onChange: ( v ) => { app.clouds.coverage.value = v; } } );
 		if ( app.clouds && app.clouds.cirrus ) atmo.addSlider( { label: loc( 'Cirrus', 'Cirros' ), object: s, key: 'cirrus', min: 0, max: 1, step: 0.01, format: ( v ) => `${ Math.round( v * 100 ) }%`, onChange: ( v ) => { app.clouds.cirrus.value = v; } } );

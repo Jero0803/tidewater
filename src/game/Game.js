@@ -32,6 +32,8 @@ export class Game {
 		this.app = app;
 		this.state = new GameState();
 		this.state.load();
+		// the game clock carries on from the saved hour (D16)
+		if ( this.state.hour !== null && ! ( app.qs && app.qs.has( 'bench' ) ) ) app.settings.timeOfDay = this.state.hour;
 		this.rod = new FishingRod( { scene: app.scene, camera: app.camera, query: app.query, terrain: app.terrainData, audio: app.audio } );
 		this.rod.onLand = ( where ) => this.onBobberLanded( where );
 		this.stand = new FishStand( { scene: app.scene, terrain: app.terrainData, colliders: app.colliders } );
@@ -135,6 +137,8 @@ export class Game {
 	updateLicence( dt ) {
 
 		const s = this.state;
+		// the clock is saved with the played time; not in photo mode, where the panel can move the hour (D42)
+		if ( ! this.photo ) s.hour = this.app.settings.timeOfDay;
 		s.addPlayed( dt );
 		const tier = s.licenseTier, left = s.licenseSecondsLeft;
 		if ( tier < this._licTier ) {
@@ -185,6 +189,13 @@ export class Game {
 
 		if ( this.hud ) this.hud.toast( text, ms );
 		else console.log( '[game]', text );
+
+	}
+
+	get photo() {
+
+		const app = this.app;
+		return !! ( app.ui && app.ui.ui && app.ui.ui.photoMode );
 
 	}
 

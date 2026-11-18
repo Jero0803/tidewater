@@ -23,6 +23,7 @@ export class GameState {
 		this.xp = 0; // total experience (Progression.levelFromXp gives the level)
 		this.playedSeconds = 0; // time with the game running; licences count down in it (D19, D41)
 		this._playedSavedAt = 0;
+		this.hour = null; // game clock (0..24) when last saved; null = the world's default
 		this.inventory = []; // { id, species, kg, cm, value, caughtAt (game hours), record }
 		this.mapId = START_MAP;
 		this.maps = { [ START_MAP ]: newMapData() }; // map id -> { log, licences }
@@ -287,7 +288,7 @@ export class GameState {
 		return {
 			v: 2,
 			// travels with the player (D20)
-			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, upgrades: this.upgrades, fuel: this.fuel,
+			money: this.money, xp: this.xp, playedSeconds: this.playedSeconds, hour: this.hour, upgrades: this.upgrades, fuel: this.fuel,
 			inventory: this.inventory, nextId: this._nextId,
 			// per map
 			map: this.mapId, maps: this.maps,
@@ -303,6 +304,7 @@ export class GameState {
 		this.xp = Math.max( 0, finite( d.xp ) );
 		this.playedSeconds = Math.max( 0, finite( d.playedSeconds ) );
 		this._playedSavedAt = this.playedSeconds;
+		this.hour = Number.isFinite( d.hour ) ? ( ( d.hour % 24 ) + 24 ) % 24 : null;
 		this.inventory = Array.isArray( d.inventory ) ? d.inventory.filter( ( f ) => f && FISH[ f.species ] && Number.isFinite( f.kg ) ) : [];
 		// saves from before lengths were recorded
 		for ( const f of this.inventory ) if ( ! Number.isFinite( f.cm ) ) f.cm = Math.round( fishLengthCm( f.species, f.kg ) );
@@ -355,6 +357,7 @@ export class GameState {
 		this.money = 0;
 		this.xp = 0;
 		this.playedSeconds = 0;
+		this.hour = null;
 		this.inventory = [];
 		this.mapId = START_MAP;
 		this.maps = { [ START_MAP ]: newMapData() };

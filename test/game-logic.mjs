@@ -5,7 +5,7 @@ import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { gearStats, defaultUpgrades, UPGRADES } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
-	LICENSES, LICENSE_SECONDS, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
+	LICENSES, LICENSE_SECONDS, CLOCK_HOURS_PER_SECOND, dayPhase, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
 
 let fails = 0;
 const ok = ( c, msg ) => {
@@ -349,6 +349,22 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	lv.xp = 599;
 	lv.addFish( 'grunt', 0.8 );
 	ok( lv.lastCatch.levelUp === 1 && lv.lastCatch.level === 2, 'catch: reports a level up' );
+
+}
+// ---- game clock (delivery 4: D16, D22, D42)
+{
+
+	ok( Math.abs( CLOCK_HOURS_PER_SECOND * LICENSE_SECONDS - 24 ) < 1e-9 && Math.abs( CLOCK_HOURS_PER_SECOND * 60 - 1 ) < 1e-9, 'clock: one game hour per real minute, a day = a licence' );
+	ok( dayPhase( 6.5 ) === 'dawn' && dayPhase( 12 ) === 'day' && dayPhase( 18.5 ) === 'dusk' && dayPhase( 23 ) === 'night' && dayPhase( 2 ) === 'night' && dayPhase( 26 ) === 'night', 'clock: parts of the day' );
+	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) };
+	const a = new GameState( sto );
+	ok( a.hour === null, 'clock: a new game has no saved hour (the world default is used)' );
+	a.hour = 21.25; a.save();
+	const b = new GameState( sto );
+	ok( b.load() && b.hour === 21.25, 'clock: the hour is saved and loaded' );
+	m.set( 'tidewater.save.v2', JSON.stringify( { ...JSON.parse( m.get( 'tidewater.save.v2' ) ), hour: 25.5 } ) );
+	const c = new GameState( sto );
+	ok( c.load() && c.hour === 1.5, 'clock: a saved hour is wrapped to 0..24' );
 
 }
 console.log( `value check ${ value }` );

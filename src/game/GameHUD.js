@@ -2,7 +2,7 @@ import { loc } from '../i18n.js';
 import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { UPGRADES, nextLevel, FUEL_PRICE } from './Gear.js';
 import { FishPortrait } from './FishPortrait.js';
-import { levelFromXp, LICENSES, licenseTierOf } from './Progression.js';
+import { levelFromXp, LICENSES, licenseTierOf, dayPhase } from './Progression.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -98,6 +98,10 @@ const CSS = /* css */`
 .gm-stat.is-class.cls-trophy b { color: #f0c46a; }
 .gm-stat.is-class.cls-unique b { color: #d9a2ff; }
 .gm-stat.is-class.cls-juvenile b { color: rgba(244, 234, 214, 0.7); }
+.gm-clock { gap: var(--tw-2); font-variant-numeric: tabular-nums; }
+.gm-clock b { font-family: var(--tw-mono); font-weight: 600; color: var(--tw-ink); }
+.gm-clock .gm-phase { color: var(--tw-ink-3); }
+.gm-clock.is-paused b { color: var(--tw-coral); }
 .gm-catch-level { margin-top: var(--tw-2); font-family: 'Kalam', var(--tw-font); font-size: clamp(16px, 1.5vw, 22px); color: #f0c46a; }
 
 /* catch card: full screen. The world dims and blurs; the fish lies side-on in its own studio light
@@ -231,6 +235,12 @@ export class GameHUD {
 		this.levelN = this.purse.querySelector( '.gm-level-n' );
 		this.xpBar = this.purse.querySelector( '.gm-xp-bar > span' );
 		this.licEl = this.purse.querySelector( '.gm-lic' );
+		// the game clock, next to the mode chip (top left): hour, part of the day, paused
+		this.clockEl = h( 'div', 'tw-mode gm-clock', `<b>16:12</b><span class="gm-phase"></span>` );
+		this.clockEl.title = loc( 'Game clock · one game hour per real minute · T pauses it', 'Reloj del juego · una hora del juego por minuto real · T lo pausa' );
+		this.clockTime = this.clockEl.querySelector( 'b' );
+		this.clockPhase = this.clockEl.querySelector( '.gm-phase' );
+		if ( ui.modeEl ) ui.modeEl.after( this.clockEl );
 		this.coolerEl = this.purse.querySelector( '.gm-cooler' );
 		this.coolerBar = this.purse.querySelector( '.gm-cooler-bar > span' );
 		this.coolerKg = this.purse.querySelector( '.gm-cooler-kg' );
@@ -314,6 +324,21 @@ export class GameHUD {
 
 	// per frame
 	update( { fight, casting, power, bite, aiming, fuel = null, sonar = null } ) {
+
+		// the game clock
+		const set = this.game.app.settings, hr = ( ( set.timeOfDay % 24 ) + 24 ) % 24;
+		const clock = `${ String( Math.floor( hr ) ).padStart( 2, '0' ) }:${ String( Math.floor( ( hr % 1 ) * 60 ) ).padStart( 2, '0' ) }`;
+		const paused = set.timeSpeed === 0;
+		if ( clock !== this._last.clock || paused !== this._last.paused ) {
+
+			this._last.clock = clock;
+			this._last.paused = paused;
+			this.clockTime.textContent = clock;
+			const phase = { dawn: loc( 'dawn', 'alba' ), day: loc( 'day', 'día' ), dusk: loc( 'dusk', 'ocaso' ), night: loc( 'night', 'noche' ) }[ dayPhase( hr ) ];
+			this.clockPhase.textContent = paused ? `${ phase } · ${ loc( 'paused', 'en pausa' ) }` : phase;
+			this.clockEl.classList.toggle( 'is-paused', paused );
+
+		}
 
 		// the licence and its time left (changes every second of play)
 		const s = this.game.state, tier = s.licenseTier, left = s.licenseSecondsLeft;

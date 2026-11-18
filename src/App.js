@@ -58,6 +58,7 @@ import { AirHaze } from './post/AirHaze.js';
 import { FlyCamera } from './player/FlyCamera.js';
 import { Player } from './player/Player.js';
 import { Game } from './game/Game.js';
+import { CLOCK_HOURS_PER_SECOND } from './game/Progression.js';
 import { STAND } from './game/FishStand.js';
 import { CHANDLERY } from './game/Chandlery.js';
 import { BoatController } from './player/BoatController.js';
@@ -76,11 +77,12 @@ export class App {
 		this.settings = {
 			timeOfDay: 16.2,
 			sunAzimuth: 0, // degrees: turns the sun's daily path about the vertical
-			timeSpeed: 0, // hours per real second
+			timeSpeed: CLOCK_HOURS_PER_SECOND, // hours per real second: the game clock runs by itself (D16, D22)
 			exposure: 0.55,
 			renderScale: 1, // internal resolution (the temporal upscaler reconstructs the output), Performance tab
 		};
 		this.qs = new URLSearchParams( location.search );
+		if ( this.qs.has( 'bench' ) ) this.settings.timeSpeed = 0; // reference shots set their own hour
 
 	}
 
@@ -477,10 +479,12 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 	}
 
-	// T: let the day run (about 8 minutes per day) or stop it
+	// T: pause the day or let it run again at the game clock (one game hour per real minute, D22). Licences keep
+	// counting played time while it is paused (D41). In photo mode the panel's own speed is kept.
 	toggleTime() {
 
 		const s = this.settings;
+		const photo = !! ( this.ui && this.ui.ui && this.ui.ui.photoMode );
 		if ( s.timeSpeed !== 0 ) {
 
 			this._timeSpeed = s.timeSpeed;
@@ -488,15 +492,40 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 		} else {
 
-			s.timeSpeed = this._timeSpeed || 0.05;
+			s.timeSpeed = photo ? this._timeSpeed || CLOCK_HOURS_PER_SECOND : CLOCK_HOURS_PER_SECOND;
 
 		}
 
 		if ( this.ui ) {
 
 			this.ui.s.advance = s.timeSpeed !== 0;
+			if ( s.timeSpeed ) this.ui.s.timeSpeed = s.timeSpeed;
 			this.ui.ui.refresh();
 			this.ui.ui.toast( s.timeSpeed !== 0 ? loc( 'Time running', 'Tiempo en marcha' ) : loc( 'Time paused', 'Tiempo en pausa' ) );
+
+		}
+
+	}
+
+	// Photo mode frees the panel's hour (D42); leaving it puts the game clock back where it was, so the hour of the
+	// fish can't be changed from the panel.
+	photoClock( on ) {
+
+		const s = this.settings;
+		if ( on ) this._clockSaved = { time: s.timeOfDay, speed: s.timeSpeed, at: performance.now() };
+		else if ( this._clockSaved ) {
+
+			// the game clock kept running underneath the photo session
+			const c = this._clockSaved;
+			s.timeOfDay = ( c.time + ( performance.now() - c.at ) / 1000 * c.speed ) % 24;
+			s.timeSpeed = c.speed;
+			this._clockSaved = null;
+			if ( this.ui ) {
+
+				this.ui.s.advance = s.timeSpeed !== 0;
+				if ( s.timeSpeed ) this.ui.s.timeSpeed = s.timeSpeed;
+
+			}
 
 		}
 
