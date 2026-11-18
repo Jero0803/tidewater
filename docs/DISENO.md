@@ -33,8 +33,9 @@ Pasar de un juego relajado de ~30 minutos a uno con **progresión de varias hora
 Fishing Planet** (niveles, clases de tamaño, licencias, equipo que importa, objetivos), sin perder lo que el
 juego hace bien: es bonito, se entiende rápido y no castiga de más.
 
-Más adelante, **varios escenarios o mapas** que se desbloquean con la progresión, en una cadena caribeña de la
-montaña al mar: represa, río, manglar y la isla (D23). Mapas y niveles no tienen fin: **la isla es el punto de
+Más adelante, **varios escenarios o mapas** que se desbloquean con la progresión, en una cadena del Gran Caribe y
+las Américas tropicales, de los Andes fríos al mar: lago de montaña, lago cálido, río tropical, ciénaga y manglar,
+laguna costera y la isla (D27), en lugares inspirados en sitios reales pero ficticios (D28). Mapas y niveles no tienen fin: **la isla es el punto de
 referencia** (D24). Hoy es el mapa más alto; desde ella se diseña hacia abajo (mapas de inicio) y, en el futuro,
 hacia arriba (mapas de nivel más alto).
 
@@ -75,10 +76,13 @@ hacia arriba (mapas de nivel más alto).
 | D20 | **Viaje entre mapas aprobado** como se propuso: desde el amarre del bote (E), destinos por nivel, con costo; viajan dinero, nivel, XP y equipo; licencias, registro, récords y vendedores son de cada mapa; los peces de la nevera se venden o sueltan antes de viajar | Separa datos globales y por mapa desde el principio | 2026-11-17 |
 | D21 | **Una licencia dura 1 día del juego jugado** (lo que dure un día simulado mientras se juega) | Se renueva seguido: gasto recurrente sin sentirse corto | 2026-11-17 |
 | D22 | **Un día del juego dura 24 minutos reales** (1 hora del juego = 1 minuto real). Por tanto una licencia dura 24 minutos de juego | Fácil de entender; se vive el ciclo completo del día | 2026-11-17 |
-| D23 | **Cadena de mapas de la montaña al mar, en ambiente caribeño:** represa o lago (inicio) → río o quebrada → manglar o estuario → la isla actual | Como en el género: se empieza en aguas tranquilas y el mar es la meta. El ambiente caribeño reutiliza vegetación y sonidos | 2026-11-17 |
+| D23 | ~~Cadena represa → río → manglar → isla~~ Reemplazada por D27. **Cadena de mapas de la montaña al mar, en ambiente caribeño:** represa o lago (inicio) → río o quebrada → manglar o estuario → la isla actual | Como en el género: se empieza en aguas tranquilas y el mar es la meta. El ambiente caribeño reutiliza vegetación y sonidos | 2026-11-17 |
 | D24 | **La isla es el punto de referencia** de todo el diseño. Por ahora es el mapa más alto: los números (peces, precios, XP, licencias) se calibran en ella y se escalan **hacia abajo** para los mapas de inicio y, cuando se agreguen, **hacia arriba** para mapas de nivel más alto | Mapas y niveles son infinitos; hace falta un ancla fija desde la que medir | 2026-11-17 |
-| D25 | **Hasta que exista la represa, la isla sigue siendo donde se empieza**, con su progresión interna de licencias. Cuando la represa esté lista pasa a ser el inicio, la isla se desbloquea por nivel y las partidas que ya estén en la isla se quedan ahí sin perder nada | El juego siempre es jugable mientras se construye la cadena | 2026-11-17 |
-| D26 | **Orden de construcción ≠ orden del juego:** se construye primero la represa (la que más reutiliza: agua quieta), luego el manglar, y el río al final o como opcional (el agua que corre es tecnología nueva) | Empezar por lo de menor riesgo | 2026-11-17 |
+| D25 | **Hasta que exista un mapa de nivel más bajo, la isla sigue siendo donde se empieza** (redactado antes de D27, que cambió la represa por la cadena de cinco), con su progresión interna de licencias. Cuando la represa esté lista pasa a ser el inicio, la isla se desbloquea por nivel y las partidas que ya estén en la isla se quedan ahí sin perder nada | El juego siempre es jugable mientras se construye la cadena | 2026-11-17 |
+| D26 | ~~Represa primero~~ Reemplazada por D29. **Orden de construcción ≠ orden del juego:** se construye primero la represa (la que más reutiliza: agua quieta), luego el manglar, y el río al final o como opcional (el agua que corre es tecnología nueva) | Empezar por lo de menor riesgo | 2026-11-17 |
+| D27 | **Cinco mapas por debajo de la isla**, ordenados por dificultad y tamaño de los peces: 1) lago de montaña (trucha), 2) lago cálido o represa (lobina, mojarras), 3) río tropical (pavón, payara), 4) ciénaga y manglar (róbalo, sábalo joven), 5) laguna costera y bajos (macabí, palometa), 6) la isla. Por encima, mar abierto (7+). La quebrada de isla (dajao, guabina) queda como rincón del río o mapa opcional | Investigación de biomas: cada mapa es un bioma distinto con agua, peces y forma de pescar propias | 2026-11-17 |
+| D28 | **Lugares inspirados, no reales:** cada mapa se basa en sitios reales (Andes colombianos, Florida, Llanos, ciénagas, flats del Caribe) pero con nombre y geografía propios | Libertad de diseño; nadie compara con el lugar real | 2026-11-17 |
+| D29 | **Orden de construcción por reutilización:** laguna costera → ciénaga y manglar → lago cálido → río tropical → lago de montaña. Mientras tanto se empieza por el mapa existente de nivel más bajo | Lo que más reutiliza (agua salada quieta) va primero; el lago de montaña pide más arte nuevo (vegetación fría) y el río, tecnología nueva (agua que corre) | 2026-11-17 |
 
 ---
 
@@ -140,30 +144,34 @@ lo que importa son las ideas.
 
 ## 6. Hoja de ruta
 
-Orden de trabajo (reordenado el 2026-11-17 según D23–D26). La isla es el ancla: primero se define en ella la
-progresión y después se construyen hacia abajo los mapas de inicio.
+Orden de trabajo (reordenado el 2026-11-17 según D24, D27–D29). La isla es el ancla: primero se define en ella
+la progresión y después se construyen hacia abajo los mapas de inicio, empezando por los que más reutilizan.
 
 | Orden | Etapa | Contenido | Esfuerzo | Riesgo | Estado |
 |---|---|---|---|---|---|
 | 1 | **Fase 1. Progresión (en la isla)** | Clases de tamaño; nivel y XP; licencias por pez; spots con su lista de peces; desbloqueos por nivel; tienda rediseñada. Calibrada en la isla como mapa de referencia, con la escala pensada para mapas por debajo y por encima | Medio | Bajo-medio (no toca la pelea) | **Definiendo** |
 | 2 | **M1. Preparar mapas** | Convertir la isla en el primer mapa de un registro (forma, distribución, especies, vendedores y licencias por mapa); guardado global + por mapa; viaje entre mapas (D20). Debe verse idéntico | Medio | Medio | Pendiente |
-| 3 | **M2. Represa o lago** | Primer mapa de inicio: agua quieta (el océano sin viento ni oleaje, rodeado de tierra; por verificar), peces de agua dulce. Al terminar pasa a ser el inicio del juego (D25) | Alto | Medio | Pendiente |
-| 4 | **M3. Manglar o estuario** | Agua quieta y salobre; mangles nuevos; peces de estuario | Alto | Medio | Pendiente |
-| 5 | **M4. Río o quebrada** | Agua con corriente (tecnología nueva); puede quedar como opcional | Muy alto | Alto | Pendiente |
+| 3 | **M2. Laguna costera y bajos** (mapa 5 del juego) | Agua salada, quieta y poco profunda; praderas de hierba marina y arena; macabí, palometa, sábalo. Reutiliza el océano casi tal cual | Medio-alto | Bajo | Pendiente |
+| 4 | **M3. Ciénaga y manglar** (mapa 4) | Agua salobre y quieta; mangles nuevos; róbalo, sábalo joven, pargo de manglar, pejelagarto | Alto | Medio | Pendiente |
+| 5 | **M4. Lago cálido o represa** (mapa 2) | Agua dulce quieta (el océano sin viento ni oleaje, rodeado de tierra; por verificar); juncos y cipreses; lobina, mojarras, crappie, bagre | Alto | Medio | Pendiente |
+| 6 | **M5. Río tropical** (mapa 3) | Agua con corriente (tecnología nueva); bosque de galería y sabana; pavón, payara, bagre rayado | Muy alto | Alto | Pendiente |
+| 7 | **M6. Lago de montaña** (mapa 1, inicio) | Agua fría y clara; vegetación fría nueva (pinos, eucaliptos, páramo); trucha, carpa, capitán | Alto | Medio | Pendiente |
 | — | Fase 2. Consecuencias | Carnadas que se gastan y preferencias por especie; desgaste y reparación | Medio | Medio | Pendiente, se puede intercalar |
 | — | Fase 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | Alto | Medio | Pendiente, se puede intercalar |
 | — | Fase 4. Objetivos | Encargos de los vendedores; torneo de los 10 más pesados | Medio | Bajo | Pendiente, se puede intercalar |
 | — | Mapas por encima de la isla | Mar abierto, otras islas o atolones de nivel más alto (D24) | Alto | Bajo | Futuro |
 
-### Cadena de mapas (D23, D24)
+### Cadena de mapas (D24, D27, D28)
 
-| Orden en el juego | Mapa | Agua | Peces de ejemplo (por definir) | Banda de niveles (propuesta, por medir) |
-|---|---|---|---|---|
-| 1 | Represa o lago | Quieta, dulce | Tilapia, guapote, lobina negra, bagre, carpa | 1–10 |
-| 2 | Río o quebrada | Con corriente, dulce | Dajao, guabina, lisa de río | 10–20 |
-| 3 | Manglar o estuario | Quieta, salobre | Róbalo, pargo de manglar, mojarra, sábalo joven | 20–30 |
-| 4 | **La isla (referencia)** | Mar | Las 18 especies actuales | 30–40 |
-| 5+ | Mapas futuros de nivel más alto | Mar abierto y otros | Por definir | 40+ |
+| Orden en el juego | Mapa (nombre por definir) | Inspiración | Agua | Peces estrella (por definir) | Banda de niveles (propuesta, por medir) |
+|---|---|---|---|---|---|
+| 1 | Lago de montaña (inicio) | Lagos andinos de Colombia | Dulce, fría, quieta | Trucha arcoíris, carpa, capitán | 1–10 |
+| 2 | Lago cálido o represa | Lagos de Florida, presas del Caribe, embalses de Colombia | Dulce, cálida, quieta | Lobina negra, mojarras (bluegill, mojarra amarilla), crappie, bagre, tilapia | 10–20 |
+| 3 | Río tropical | Ríos de los Llanos | Dulce, con corriente | Pavón, payara, bagre rayado, cachama, arawana | 20–30 |
+| 4 | Ciénaga y manglar | Ciénagas de Colombia, Everglades, manglar caribeño | Salobre, quieta | Róbalo, sábalo joven, pargo de manglar, mojarra, pejelagarto | 30–40 |
+| 5 | Laguna costera y bajos | Flats del Caribe | Salada, somera, clara | Macabí, palometa, sábalo, róbalo | 40–50 |
+| 6 | **La isla (referencia)** | La isla actual | Mar | Las 18 especies actuales | 50–60 |
+| 7+ | Mar abierto y otros | Pesca de altura del Caribe | Mar abierto | Marlín, peto, pez vela | 60+ |
 
 Cada mapa tiene sus propias licencias básica, intermedia y avanzada (D11, D20), con niveles mínimos dentro de su banda.
 
@@ -332,11 +340,11 @@ con equipo inicial) y mejorar el equipo da más XP (~2,200 XP/h con equipo medio
 | Siguiente mapa | **Nivel de entrada + 10** | |
 
 Desde D24 los niveles de las licencias son **relativos a la banda del mapa**. Mientras la isla sea el inicio
-(D25), su nivel de entrada es 1 (intermedia 4, avanzada 7). Cuando exista la cadena completa, la isla entra en
-el nivel 30 (intermedia 33, avanzada 36, siguiente mapa 40).
+(D25), su nivel de entrada es 1 (intermedia 4, avanzada 7). Cuando exista la cadena completa (D27), la isla entra
+en el nivel 50 (intermedia 53, avanzada 56, siguiente mapa 60).
 
 - [ ] **Curva por banda o global.** Con una curva global 100 × (N − 1)², cada banda de 10 niveles pide más XP
-  que la anterior (niveles 1→10: 8,100 XP; 30→40: 68,000 XP). Como los peces de cada mapa son más grandes, también
+  que la anterior (niveles 1→10: 8,100 XP; 50→60: 108,000 XP). Como los peces de cada mapa son más grandes, también
   dan más XP por kilo; hay que medir que el tiempo por banda quede razonable. Alternativa: curva por banda,
   calibrada para que cada mapa dure lo mismo.
 
@@ -385,3 +393,6 @@ mejora se desbloquea en cada nivel.
   (sección 6). Pendiente decidir cuántos mapas van por debajo de la isla.
 - **2026-11-17** · Ampliada la investigación: trucha y lagos andinos de Colombia, lagos y canales de Florida,
   ciénagas y mojarras de Colombia, ríos de los Llanos. Propuesta de cadena de cinco mapas por debajo de la isla.
+- **2026-11-17** · Decididos D27 (cinco mapas por debajo de la isla), D28 (lugares inspirados, no reales) y D29
+  (orden de construcción: laguna costera, manglar, lago cálido, río, lago de montaña). La isla pasa a la banda
+  50–60. Hoja de ruta y cadena de mapas actualizadas.
