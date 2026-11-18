@@ -230,6 +230,53 @@ a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
 | **XP para pasar del nivel N al N+1** | 600 × 1.03^(N − 1): nivel 10 ≈ 6,100 XP acumulados; nivel 50 ≈ 65,100; nivel 60 ≈ 94,400 |
 | **Resultado estimado** | ~5 horas de juego por mapa (lago: ~6,100 XP a ~1,200 XP/h; isla: ~30,000 XP a ~5,500 XP/h) y ~30 horas hasta la isla. Mejorar el equipo dentro de cada mapa lo acorta |
 
+### Tienda calculada desde las bandas (propuesta, 2026-11-17)
+
+Script: `node --no-warnings tools/balance/tienda-propuesta.mjs`. El equipo viaja entre mapas (D20), así que la
+tienda es **una progresión de equipo para toda la cadena**: cada mapa trae un nuevo nivel de cada mejora.
+
+**Regla:** todo escala ×1.25 por mapa, como la XP (D32). Lo que se gana en una banda (~5 h × $/h del mapa; lago
+~$600/h medido) se reparte: 40 % equipo, 10 % bote, 20 % licencias, 5 % combustible, 25 % margen.
+
+| Mapa | Niveles | Ganado en la banda | Sedal | Bodega | Caña | Carrete | Bote |
+|---|---|---|---|---|---|---|---|
+| Lago de montaña | 1–10 | ~$3,000 | 10 kg · $300 (nv 3) | 45 kg · $400 (nv 3) | 25 m · $250 (nv 6) | 1.3 m/s · $250 (nv 6) | — |
+| Lago cálido | 11–20 | ~$3,750 | 13 kg · $400 | 60 kg · $550 | 29 m · $300 | 1.5 m/s · $300 | — |
+| Río tropical | 21–30 | ~$4,700 | 18 kg · $450 | 80 kg · $650 | 33 m · $400 | 1.7 m/s · $400 | Tanque 60 L $200 · motor ×1.1 $300 · sonda $250 |
+| Ciénaga y manglar | 31–40 | ~$5,900 | 26 kg · $600 | 110 kg · $800 | 38 m · $450 | 1.9 m/s · $450 | Tanque 80 L $250 · luces $250 |
+| Laguna costera | 41–50 | ~$7,300 | 36 kg · $750 | 140 kg · $1,000 | 43 m · $600 | 2.1 m/s · $600 | Tanque 110 L $300 · motor ×1.2 $450 |
+| La isla | 51–60 | ~$9,200 | 50 kg · $900 | 180 kg · $1,500 | 48 m · $750 | 2.3 m/s · $750 | Tanque 150 L $350 · motor ×1.3 $550 |
+
+En cada mapa, sedal y bodega se desbloquean en el nivel de entrada + 2; caña y carrete en el de entrada + 5.
+Equipo inicial: sedal 7 kg, nevera 30 kg, caña 22 m, carrete 1.1 m/s (igual que hoy). Total hasta la isla: ~$16,700.
+
+**Licencias por mapa** (por día del juego; básica 5 %, intermedia 15 %, avanzada 25 % de lo que se gana en un día):
+
+| Mapa | Básica | Intermedia (nivel) | Avanzada (nivel) |
+|---|---|---|---|
+| Lago de montaña | Regalada el primer día; luego $10 | $35 (4) | $60 (7) |
+| Lago cálido | $15 | $45 (14) | $75 (17) |
+| Río tropical | $20 | $55 (24) | $95 (27) |
+| Ciénaga y manglar | $25 | $70 (34) | $100 (37) |
+| Laguna costera | $30 | $90 (44) | $150 (47) |
+| La isla | $35 | $100 (54) | $200 (57) |
+
+**Hallazgos:**
+- **El sedal casi no importa con la pelea actual:** los peces del lago salen al 100 % con cualquier sedal. En la
+  isla solo cambia algo con el atún y el dorado (80 % y 64 % con el inicial) y, sobre todo, con el sábalo (1 % con
+  7 kg, 52 % con 18 kg, 100 % con 50 kg). El sedal solo tendrá peso real con la Fase 3 (pelea profunda) o con peces
+  grandes en los mapas del medio (payara, róbalo, palometa).
+- **La bodega es la mejora que más cambia el dinero** (es el límite real, ver auditoría): por eso se lleva la
+  mayor parte del presupuesto.
+- **La licencia avanzada del lago no se paga sola:** solo agrega la trucha café (+$50 por día medido) y costaría
+  $60. Hay que hacer la trucha café más común o más valiosa, o bajar esa licencia.
+- **La isla queda con licencias más baratas** que la propuesta anterior medida solo en la isla ($35 / $100 / $200
+  frente a $20 / $100 / $300): la avanzada se abarata y la básica sube.
+- **Guardado:** hoy la isla tiene 3–4 niveles por mejora; con 7 niveles por mejora cambia el significado de cada
+  número guardado. Habrá que subir la versión del guardado y convertir los niveles viejos por su valor
+  (por ejemplo, el sedal de 26 kg pasa al nivel de 26 kg).
+- **Mientras la isla sea el inicio (D25)** hay que decidir cómo se reparten estos niveles en sus niveles 1–10.
+
 ### Investigación: biomas acuáticos del Caribe, de la montaña al mar (2026-11-17)
 
 Fuentes: estudios científicos (USGS, GCFI, revistas de pesca y ecología), DRNA de Puerto Rico, prensa dominicana.
@@ -453,3 +500,6 @@ mejora se desbloquea en cada nivel.
   bandas: multiplicador de XP ×1.25 por mapa y curva 600 × 1.03^(N − 1) por nivel (~5 horas por mapa).
 - **2026-11-17** · Decididos D30 (lago de montaña aprobado), D31 (especies protegidas) y D32 (modelo de bandas:
   ×1.25 de XP por mapa, curva 600 × 1.03^(N − 1), ~5 h por mapa). Resuelta la pregunta de la curva.
+- **2026-11-17** · Calculada la tienda desde las bandas (`tools/balance/tienda-propuesta.mjs`): 4 mejoras con un
+  nivel por mapa más mejoras del bote; licencias por mapa. Hallazgos: el sedal casi no importa hasta la Fase 3,
+  la licencia avanzada del lago no se paga sola, el guardado necesitará conversión.
