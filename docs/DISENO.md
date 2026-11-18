@@ -719,6 +719,11 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 frailejones; el agua todavía tiene el color turquesa del Caribe; laderas lisas y muy empinadas al fondo; sonidos de
 mar (rompiente, gaviotas) en la orilla; peces del arrecife nadando.
 
+**Referencia visual para el pulido (foto de la Playa Blanca de Tota, compartida el 2026-11-18):** agua azul
+petróleo oscura (no turquesa); una franja verde clara muy marcada sobre los bajos de arena frente a la playa;
+cerros redondeados y bajos con capas de montañas al fondo (no picos empinados); pinos y eucaliptos en la orilla;
+cielo nublado de páramo; muelles de madera con lanchas de colores. (La foto no se guarda en el repositorio.)
+
 **A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
 
@@ -868,3 +873,5 @@ arranque).
   dinero, tiempo, licencia, equipo y registro de especies con récords) en la portada.
 - **2026-11-18** · **L3 hecha (prototipo):** el lago existe y se puede recorrer (`juego.html?map=lake`): cuenca con
   playa blanca, dos islas, río, bahía de lodo, centro profundo y montañas; agua en calma, sin rompiente ni ballena.
+- **2026-11-18** · Anotada la referencia visual de la Playa Blanca de Tota para el pulido del lago (agua oscura,
+  franja verde de los bajos, cerros redondeados, pinos y eucaliptos, cielo nublado).
