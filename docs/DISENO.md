@@ -709,7 +709,7 @@ navegador, así que las partidas son las mismas.
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
 | P1 | Portada y juego separados | Portada con "Continuar" (partida activa · mapa · nivel) y Partidas (crear, borrar, elegir; lo de D49 se muda aquí); selector de idioma; el juego en `juego.html`; "Salir al menú" en el juego; la pantalla de inicio del juego queda solo con "Haz clic para explorar". Vite y GitHub Pages con las dos páginas | **Hecha** (2026-11-18) |
-| P2 | Mapas y progreso | La cadena de mapas (lago → … → isla) con abierto / por llegar y dónde está la partida; progreso de la partida: nivel y XP, dinero, tiempo, licencias y especies capturadas por mapa con sus récords | Pendiente |
+| P2 | Mapas y progreso | La cadena de mapas (lago → … → isla) con abierto / por llegar y dónde está la partida; progreso de la partida: nivel y XP, dinero, tiempo, licencias y especies capturadas por mapa con sus récords | **Hecha** (2026-11-18) |
 | P3 | Ajustes generales | Idioma, calidad gráfica y volumen guardados desde la portada y leídos por el juego al cargar | Pendiente |
 
 **Entrega P1, cómo quedó:**
@@ -728,6 +728,17 @@ navegador, así que las partidas son las mismas.
 - Vite compila las dos páginas para GitHub Pages.
 - Probado en el navegador: portada en escritorio y teléfono, Jugar → juego con la partida, Menú → portada, crear y
   borrar desde la portada, compilación.
+
+**Entrega P2, cómo quedó:** el panel derecho de la portada tiene tres pestañas (se recuerda la última):
+- **Partidas:** lo de P1.
+- **Mapas:** los 6 mapas de la cadena en orden, con inspiración, banda de niveles y estado (abierto, en
+  construcción, planeado); el mapa de la partida elegida resaltado ("tu partida está aquí") y cuántas especies lleva
+  en cada mapa que ha pescado.
+- **Progreso** de la partida elegida: nivel con barra de XP, dinero, tiempo jugado, licencia activa del mapa con su
+  tiempo restante, equipo (grado del aparejo, bodega, sonda, luces) y el registro por mapa: cada especie con sus
+  capturas y su récord (kg · cm), o "sin capturar".
+- La lista de especies de cada mapa pasó al catálogo ligero (`src/maps/catalog.js`); la isla la toma de ahí.
+- Las dos páginas tienen ícono de pestaña.
 
 **Orden propuesto:** P1 → P2 → P3, y después el lago (L3 terreno → L4 peces y spots → L2 viaje → L5 pueblo y
 arranque).
@@ -830,3 +841,5 @@ arranque).
   entregas (P1–P3) antes de seguir con el lago.
 - **2026-11-18** · **P1 hecha:** portada propia (`index.html`) con fondo de pesca sacado del juego, Continuar y
   Partidas; el juego pasa a `juego.html` con "Menú" / "Salir al menú".
+- **2026-11-18** · **P2 hecha:** pestañas Mapas (la cadena con su estado y dónde está la partida) y Progreso (nivel,
+  dinero, tiempo, licencia, equipo y registro de especies con récords) en la portada.

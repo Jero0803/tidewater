@@ -1,6 +1,6 @@
 import * as THREE from '../engine/index.js';
 import { loc } from '../i18n.js';
-import { mapName } from './catalog.js';
+import { mapName, catalogEntry } from './catalog.js';
 
 // The island (the tropical map, highest of the chain, D25 / D29; the starting map until the lake exists, D45).
 // Everything that is particular to this map lives here; the rest of the game reads it through the registry
@@ -55,9 +55,8 @@ export const ISLAND = {
 		chandlery: { x: 85.5, z: - 60.5, yaw: - 1.9 },
 	},
 
-	// the species that bite here (keys of FishTable.FISH)
-	species: [ 'silverside', 'mullet', 'needlefish', 'sergeant', 'grunt', 'chromis', 'tang', 'yellowtail', 'wrasse', 'parrot',
-		'angel', 'jack', 'barracuda', 'redSnapper', 'grouper', 'tuna', 'mahi', 'tarpon' ],
+	// the species that bite here (keys of FishTable.FISH; listed in the catalog so the landing page knows them too)
+	species: catalogEntry( 'island' ).species,
 
 	// named spots (D9, D40): each is one of the water types Bites.habitatAt computes; label = where the name sits on
 	// the minimap (world x, z)
