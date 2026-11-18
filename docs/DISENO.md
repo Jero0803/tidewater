@@ -132,6 +132,9 @@ hacia arriba (mapas de nivel más alto).
 | D76 | **Los trofeos del mar pelean de 5 a 15 minutos**, como en Fishing Planet (un pez espada único de 448 kg tardó ~12.5 min y no era el récord del jugador, de 530 kg). Se calibra con la isla y los mapas de mar; en el lago los más grandes quedan en 2.5–3.5 min (D73) | Lo vio el jugador del proyecto en su propia pelea | 2026-11-18 |
 | D77 | **Avanzar el tiempo**, como en Fishing Planet: una ventana para saltar solo hacia adelante a una hora del mismo día o del siguiente, con la curva de actividad de los peces; 10 min de juego entre usos; no durante una pelea ni con el sedal en el agua; la licencia no corre con el salto; la nevera se queda. Cambia D42 (la hora se puede adelantar con esta ventana) | Con el día de 120 min, esperar el amanecer para la trucha toma casi una hora real | 2026-11-18 |
 | D78 | **El dinero va casi por peso y la clase se premia en XP**, como en Fishing Planet: trofeo ×1.1 y único ×1.2 en dinero (antes ×1.5 y ×3); la XP de la clase no cambia. En la isla, el precio por kg de cada especie sube ×1.26–1.30 para que la hora rinda lo mismo | En FP un único da ×1.1 de dinero por kg y ×2.9 de XP por kg | 2026-11-18 |
+| D79 | **Pez carnada:** la guapucha y el carachi que se pescan se pueden guardar como carnada viva (cubo aparte, sin ocupar la nevera); son cebo preferido de la trucha café y de la trucha arcoíris grande, y también se compran. En la isla, el pejerrey cabezón y la lisa | Como en Fishing Planet, los peces grandes comen peces; los chicos sirven para algo más que la XP | 2026-11-18 |
+| D80 | **Licencias por varios días, como en Fishing Planet:** se compran por 1 día, 3 días o 1 semana de juego (tiempo jugado, D19), con descuento (3 días ×2.8, semana ×6.3 el precio de un día). La tarjeta muestra qué especies deja guardar y cuáles hay que soltar. Sin licencia ilimitada | Menos visitas al vendedor; el gasto por hora casi no cambia | 2026-11-18 |
+| D81 | **Tienda en rejilla, como en Fishing Planet** (completa D65): tarjetas con imagen, nivel, cantidad del paquete, nombre, precio y Comprar; filtros a la izquierda (técnica, potencia o peso, tipo de cebo o señuelo, "para qué pez", en venta, nuevos); orden por nivel; panel del artículo con imagen grande, **para qué especies sirve**, con qué piezas es compatible, sus números comparados con lo equipado y una descripción | Lo vio el jugador del proyecto en la tienda de FP | 2026-11-18 |
 
 ---
 
@@ -1056,6 +1059,10 @@ diseño de filas y categorías, con precio y "comprar" en vez de "vender".
 | Siguiente pez (séptima captura) | Sacado el pez espada a las 15:48:45, **el siguiente picó a las 15:53: unos 4 min entre un pez y el siguiente** (tarjeta, volver a armar, curricán y espera). La bodega pasó de 971 a 1,419 kg (el pez espada de 448 kg). Otra pelea larga, con 78 m fuera y el carrete en naranja | Referencia de ritmo para el mar (D74, D76): unos 4 min hasta la siguiente picada más 10 o más min de pelea, o sea **pocos peces grandes por hora**. En el lago (D74) un pez cada 2 a 2.5 min |
 | Segundo pez espada (octava captura) | **Pez espada común de 199 kg, ~7 min de pelea** (picó a las 15:53, sacado a las 15:59:48). $74,320 y 20,813 XP. Comparado con el único de 448 kg ($182,942 y 136,391 XP): **el dinero va casi en proporción al peso** ($373/kg el común, $408/kg el único: ×1.1) y **la XP premia mucho la clase** (104 XP/kg el común, 304 XP/kg el único: ×2.9 por kg, ×6.5 en total). El estado del equipo bajó otros 2 puntos por pieza | **Por decidir:** nuestro juego hace lo contrario en dinero (el único vale ×3 por kg, el trofeo ×1.5; `Progression.js` SIZE_CLASSES). Se podría acercar a FP: dinero casi por peso (único ×1.2) y la clase premiada sobre todo en XP. Se revisa con los valores por hora de E2 (D75) |
 | Avanzar el tiempo (novena captura) | Ventana para saltar a otra hora: se elige la hora con flechas (23:00) y muestra **el clima a esa hora y la actividad de los peces** en tres tramos (noche 5, día 6, noche 6) con curvas de color; botones **Avanzar el tiempo**, **Día siguiente** y Cancelar. Tiene **espera entre usos** ("Se podrá tener acceso dentro de 07:58"). Aviso: al pasar al día siguiente **se venden todos los peces** de la nevera | **Propuesta D77** (abajo) |
+| Guía: los cebos (décima captura) | Ficha del marlín negro: clases con casilla, **incluida "Joven"** (joven, común, trofeo, único); descripción real de la especie; **"Cebos preferidos"** (cebos naturales: peces carnada como mújol, pez volador, sardina, anchoa, jurel, y calamar) y **"Señuelos preferidos"** (plugs, pulpos y faldas de curricán, cadena de calamares) por separado, en grupos de 2 o 3 por renglón. Solo muestra los preferidos | **Sí:** la guía separa cebos y señuelos preferidos, en grupos, y suma la casilla de la clase juvenil. Solo se muestran los preferidos; los aceptables los descubre el jugador. **Propuesta D79:** pez carnada (abajo) |
+| Globo (captura 11) | Elegir destino en un globo terráqueo con un marcador por lugar (con el clima de ahora). Panel: lugar y **nivel que pide**, actividad de los peces de hoy y **pronóstico de los próximos días** (temperatura e ícono por día), especies pescadas, licencia, **gastos de viaje** con selector de días de estadía | **Parcial:** nuestro viaje es en bote desde el amarre (D57). El panel del destino suma nivel que pide, especies pescadas y la curva de actividad (D71). Sin clima ni días de estadía por ahora |
+| Tienda: cebos (captura 12) | **Rejilla de tarjetas** (imagen, nivel que pide, cantidad del paquete "x50", nombre, precio, botón Comprar). **Filtros a la izquierda:** en venta, nuevos; peso (ligero a extra pesado); tipo (cebos comunes, insectos y gusanos, frescos, pellets, de mar, de curricán). Buscador y **orden "nivel más bajo primero"**. **Panel derecho del artículo:** imagen grande, **"Pez:" para qué especies sirve**, peso, botón **"Compatible: equipos"** y descripción | **Sí, D81** |
+| Tienda: licencias (capturas 13 y 14) | Menú de licencias por región (Norteamérica, Europa, Sudamérica, África, Asia). Tarjeta por licencia (básica, avanzada) con **precio por duración: 1 día, 3 días, semana, mes** (más días, más barato el día: 3 días ×2.84, semana ×6.3, mes ×24) y nivel que pide. Panel: arte de la licencia, **reglas** (pesca nocturna, pesca en barco: permitida o no) y qué peces hay que soltar o se pueden guardar | **Sí, D80** (sin la ilimitada, que es de pago real) |
 | Perfil (sexta captura) | Resultado: XP total, lo que falta para el siguiente nivel, peces capturados por clase (común 1,954, trofeo 377, único 65). **Récord por especie** con su modelo 3D, lugar, fecha, peso, largo y **el cebo con que se pescó** (el pez espada récord pesó 530 kg; el de 448 kg de la pelea no fue el más grande). **Retos** con insignia por niveles (I, II, III): pescar cierto número de peces con aparejos de flotador, con señuelos, con anzuelos sin rebaba | **Sí:** el registro de la portada (ya tiene récords) suma el cebo del récord, la fecha y el conteo por clase. Los retos van con las misiones (Fase 4) y premian usar cada técnica |
 | Centro | Brújula arriba; la caña en primera persona con las manos en el carrete y los portacañas del bote | La brújula y la caña ya existen. Las manos y los portacañas quedan para A1 |
 
@@ -1220,6 +1227,17 @@ atrás ni libremente fuera del modo foto, pero se puede adelantar con esta venta
 ×6.4 / ×4.7, carpa ×2.5 / ×2.2, trucha café ×4.8 / ×3.9. La isla: ×1.26–1.30 en dinero (solo compensa D78), XP ×1.
 `npm run balance` sigue midiendo la isla con la pelea P1; el lago se mide con `equipo-lago.mjs`.
 
+**D79 · Pez carnada (aprobada).** En Fishing Planet los peces grandes comen peces: los cebos preferidos del
+marlín son peces carnada. En el lago la trucha café es cazadora y come peces chicos. Propuesta: **la guapucha y el carachi
+que pescas se pueden guardar como carnada viva** (en un cubo, sin nevera) y son cebo preferido de la trucha café y de la
+trucha arcoíris grande; también se compran en la tienda. Así los peces chicos sirven para algo más que la XP, como en
+el mar (sardina, pez volador). En la isla el pejerrey cabezón y la lisa harían ese papel.
+
+**Cómo tomamos de Fishing Planet (2026-11-18):** el jugador del proyecto pidió seguir al mejor del género. Se toman
+**mecánicas, reglas y forma de organizar las pantallas** (qué información va dónde); los **nombres, marcas, arte,
+textos y aspecto visual son nuestros** (el estilo de Tidewater, sus colores y tipografía; artículos y marcas inventados,
+sin parecerse a los reales ni a los de FP).
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1235,7 +1253,7 @@ atrás ni libremente fuera del modo foto, pero se puede adelantar con esta venta
 |---|---|---|
 | E1 | Datos y reglas, sin cambiar el juego: `src/game/Tackle.js` (catálogo del lago, preferencias por especie, caña armada, problemas de armado, multiplicador de picada) y el enganche de D74 en `Bites.js`; `equipo-lago.mjs` lee de ahí; 28 tests | **Hecha** (2026-11-18) |
 | E2 | Pelea con equipo en el lago (`map.tackle`): fuerza realista, aguante de D73, freno tope del carrete, desgarre según la rigidez, caña rota; tres barras de carga por segmentos, metros fuera / capacidad, dial del freno; espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %; `hourMul` y `xpMul` por especie (D75) y clases de D78. Provisional hasta E3: cada grado del aparejo de flotador equivale a una caña del catálogo (`GRADE_RIGS`), el multiplicador de picada por cebo está apagado y la caña rota no se pierde. La isla sigue con la pelea P1 | **Hecha** (2026-11-18) |
-| E3 | Tienda nueva por pestañas con filtro por pez, fichas, paquetes por especie, comprar y equipar, vender al 50 %; guardado versión 4 | Pendiente |
+| E3 | Tienda nueva en rejilla (D81) con filtros, panel del artículo, paquetes por especie, comprar y equipar, vender al 50 %; licencias por varios días (D80); pez carnada (D79); el multiplicador de picada por cebo se enciende; guardado versión 4 | Pendiente |
 | E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
 | E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa | Pendiente |
 | E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) | Pendiente |
@@ -1420,3 +1438,8 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   tres barras de carga, metros fuera / capacidad y el dial del freno; no toda picada engancha; valores por hora por
   especie. Provisional hasta E3: cada grado del aparejo equivale a una caña del catálogo y la picada por cebo está
   apagada. La isla sigue igual (solo compensa D78). Probado en el navegador; 12 tests nuevos.
+- **2026-11-18** · Anotada en 7h la guía de Fishing Planet (cebos y señuelos preferidos por separado, clase juvenil) y
+  propuesta D79 (los peces chicos del lago como carnada viva). Por decidir.
+- **2026-11-18** · Decididos D79 (pez carnada), D80 (licencias por varios días) y D81 (tienda en rejilla con filtros y
+  panel del artículo), con las capturas del globo, la tienda de cebos y las licencias de Fishing Planet. Anotado
+  cómo se toma de FP: mecánicas y organización, con nombres, arte y aspecto propios.
