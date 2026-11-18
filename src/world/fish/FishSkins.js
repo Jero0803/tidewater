@@ -33,6 +33,12 @@ export const SKIN_ART = {
 export const FISH_GLB = {
 	rainbowTrout: { file: 'rainbowTrout.glb', clip: 'Casual_Swim', nose: '-z', credit: 'Rainbow Trout - Redband, eb78 (Sketchfab, CC-BY)' },
 	carp: { file: 'carp.glb', clip: 'Animation', nose: '-x', credit: 'CC0 Carp, Cyprinus carpio, Animation, ffish.asia / floraZia.com (Sketchfab, CC0)' },
+	// stand-ins (no free model of the exact species): a close-looking fish, the card still names the game's species
+	brownTrout: { file: 'brownTrout.glb', clip: 'Animation', nose: '-x', credit: 'CC0 Yamame Masu Salmon, ffish.asia / floraZia.com (Sketchfab, CC0)' },
+	pejerrey: { file: 'pejerrey.glb', nose: '-x', credit: 'CC0 Flathead Mullet, Mugil cephalus, ffish.asia / floraZia.com (Sketchfab, CC0)' },
+	capitan: { file: 'capitan.glb', clip: 'Animation', nose: '-x', credit: 'CC0 Japanese Common Loach, ffish.asia / floraZia.com (Sketchfab, CC0)' },
+	guapucha: { file: 'guapucha.glb', clip: 'Animation', nose: '-x', credit: 'CC0 Amur Minnow, ffish.asia / floraZia.com (Sketchfab, CC0)' },
+	carachi: { file: 'carachi.glb', clip: 'Animation', nose: '-x', credit: 'CC0 Rice Fish, Oryzias latipes, ffish.asia / floraZia.com (Sketchfab, CC0)' },
 };
 export const fishGlbOn = () => ! ( typeof location !== 'undefined' && new URLSearchParams( location.search ).get( 'fishglb' ) === '0' );
 export const FISH_GLB_BASE = ( ( typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/fish/';

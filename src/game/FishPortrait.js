@@ -4,9 +4,8 @@ import { FishProps } from '../world/fish/FishProps.js';
 import { ACES_WGSL } from '../post/PostFX.js';
 import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { Group } from '../engine/index.js';
-import { loadGLB } from '../engine/loaders/GLTF.js';
-import { SkinnedModel } from '../engine/render/Skinning.js';
-import { FISH_GLB, FISH_GLB_BASE, fishGlbOn } from '../world/fish/FishSkins.js';
+import { FISH_GLB, fishGlbOn } from '../world/fish/FishSkins.js';
+import { loadFishModel } from '../world/fish/FishModel.js';
 
 // Studio portraits of the catchable fish: the real game models (world/fish, through FishProps) in a
 // neutral photo studio, side-on and horizontal (nose left, as in a field guide).
@@ -199,52 +198,16 @@ fn fragment( in: FSIn ) -> vec4f {
 
 	}
 
-	// ---- 3D models (GLB): normalized to the fish model frame (nose +z, back +y, total length 1)
+	// ---- 3D models (GLB, world/fish/FishModel.js): normalized to the fish model frame
 	async _loadGlb( id ) {
 
-		const spec = FISH_GLB[ id ];
 		const g = this.glb[ id ] = { model: null, holder: null };
 		try {
 
-			// fish skin: wet and only a little metallic (the downloaded maps often mark the whole fish as metal, which
-			// turns thin, bluish fins almost black under the studio light)
-			const model = await SkinnedModel.create( await loadGLB( FISH_GLB_BASE + spec.file ), {
-				materials: ( info ) => ( { surface: 's.metalness = min( s.metalness, 0.3 ); s.roughness = max( s.roughness, 0.25 );' +
-					// scans with their light baked into the photo (KHR_materials_unlit): some light of their own
-					( info.gltfMaterial.extensions && info.gltfMaterial.extensions.KHR_materials_unlit ? ' s.emissive += s.albedo * 0.3;' : '' ) } ),
-			} );
-			if ( spec.clip ) model.play( spec.clip, { fade: 0.01 } );
-			model.update( 0 );
-			// bind-pose bounds in the model's frame (mesh node transform applied to the vertices)
-			const gl = model.gltf;
-			const mi = gl.nodes.findIndex( ( n ) => n.mesh !== undefined && n.skin !== undefined );
-			const W = new Matrix4().fromArray( model.world, mi * 16 );
-			const pos = model.meshes[ 0 ].geometry.attributes.position.array;
-			const lo = [ Infinity, Infinity, Infinity ], hi = [ - Infinity, - Infinity, - Infinity ];
-			for ( let i = 0; i < pos.length; i += 3 ) {
-
-				_p.set( pos[ i ], pos[ i + 1 ], pos[ i + 2 ] ).applyMatrix4( W );
-				lo[ 0 ] = Math.min( lo[ 0 ], _p.x ); lo[ 1 ] = Math.min( lo[ 1 ], _p.y ); lo[ 2 ] = Math.min( lo[ 2 ], _p.z );
-				hi[ 0 ] = Math.max( hi[ 0 ], _p.x ); hi[ 1 ] = Math.max( hi[ 1 ], _p.y ); hi[ 2 ] = Math.max( hi[ 2 ], _p.z );
-
-			}
-
-			const axis = spec.nose[ 1 ], sign = spec.nose[ 0 ] === '-' ? - 1 : 1;
-			const k = { x: 0, y: 1, z: 2 }[ axis ];
-			const len = hi[ k ] - lo[ k ];
-			// rotate the nose onto +z (about y), centre, scale to length 1
-			const fix = new Matrix4();
-			if ( axis === 'z' && sign < 0 ) fix.makeRotationY( Math.PI );
-			else if ( axis === 'x' ) fix.makeRotationY( sign > 0 ? - Math.PI / 2 : Math.PI / 2 );
-			const c = new Vector3( ( lo[ 0 ] + hi[ 0 ] ) / 2, ( lo[ 1 ] + hi[ 1 ] ) / 2, ( lo[ 2 ] + hi[ 2 ] ) / 2 );
-			fix.multiply( new Matrix4().makeScale( 1 / len, 1 / len, 1 / len ) ).multiply( new Matrix4().makeTranslation( - c.x, - c.y, - c.z ) );
-			const inner = new Group();
-			inner.matrixAutoUpdate = false;
-			inner.matrix.copy( fix );
-			inner.add( model.group );
+			const model = await loadFishModel( id );
 			const holder = new Group();
 			holder.matrixAutoUpdate = false;
-			holder.add( inner );
+			holder.add( model.group );
 			this.scene.add( holder );
 			g.model = model;
 			g.holder = holder;

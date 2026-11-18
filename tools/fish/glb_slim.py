@@ -43,6 +43,21 @@ if DROP and j.get('animations'):
     j['animations'] = [a for a in j['animations'] if not any(w in a.get('name', '') for w in DROP)]
     print('animations kept:', [a.get('name') for a in j['animations']])
 
+# old specular-glossiness materials (some scans): the diffuse map becomes the base colour, not metallic
+for m in j['materials']:
+    sg = (m.get('extensions') or {}).pop('KHR_materials_pbrSpecularGlossiness', None)
+    if sg:
+        pbr = m.setdefault('pbrMetallicRoughness', {})
+        if 'diffuseTexture' in sg: pbr['baseColorTexture'] = sg['diffuseTexture']
+        if 'diffuseFactor' in sg: pbr['baseColorFactor'] = sg['diffuseFactor']
+        pbr['metallicFactor'] = 0.0
+        pbr['roughnessFactor'] = round(1.0 - sg.get('glossinessFactor', 0.5), 3)
+        if not m['extensions']: m.pop('extensions')
+for key in ('extensionsUsed', 'extensionsRequired'):
+    if key in j:
+        j[key] = [e for e in j[key] if e != 'KHR_materials_pbrSpecularGlossiness']
+        if not j[key]: j.pop(key)
+
 # materials -> textures -> images
 mats = sorted({p['material'] for m in j['meshes'] for p in m['primitives'] if 'material' in p})
 mat_map = {old: new for new, old in enumerate(mats)}

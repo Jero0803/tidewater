@@ -853,16 +853,21 @@ Blender.
 | M6 | Modelos para el resto del lago (lista de candidatos abajo) | Pendiente |
 | M7 | Modelos para la isla | Pendiente |
 
-**Candidatos para el lago (Sketchfab, descargables, CC-BY):**
+**Modelos del lago (todos en 3D en la tarjeta de captura):** sin modelo libre de la especie exacta se usa un
+**doble** parecido; la tarjeta sigue mostrando el nombre y el nombre científico de la especie del juego.
 
-| Especie | Modelo | Notas |
+| Especie | Modelo | Tamaño |
 |---|---|---|
-| Trucha arcoíris | Rainbow Trout - Redband (eb78 / E.A.Cornell) | En uso |
-| Trucha café | No hay libre. Opción: Bull Trout (E.A.Cornell, mismo estilo, 3 animaciones) pintada con la ilustración de la trucha café | La piel ilustrada se proyecta igual sobre un modelo 3D |
-| Carpa | CC0 Carp, Cyprinus carpio, Animation (ffish.asia, escaneo con esqueleto y nado) | En uso; falta simplificar la malla (76 mil triángulos) |
-| Pejerrey | Brook Silverside (MTSU Ichthyology, escaneo, 69 mil caras) | Misma familia (Atherinopsidae); hay que simplificarlo |
-| Capitán | Sin modelo parecido (los bagres libres son de otra forma) | Sigue con la piel ilustrada |
-| Guapucha, carachi | Sin modelo | Siguen con la piel ilustrada |
+| Trucha arcoíris | Rainbow Trout - Redband (eb78, CC-BY), animado | 2,1 MB |
+| Trucha café | Doble: yamame (ffish.asia, CC0), escaneo animado | 2,4 MB |
+| Carpa | Carp (ffish.asia, CC0), escaneo animado | 4,7 MB |
+| Pejerrey | Doble: lisa, *Mugil cephalus* (ffish.asia, CC0), escaneo fijo; plateado y con dos dorsales | 6,2 MB |
+| Capitán | Doble: locha japonesa (ffish.asia, CC0), escaneo animado | 2,2 MB |
+| Guapucha | Doble: Amur minnow (ffish.asia, CC0), escaneo animado | 2,6 MB |
+| Carachi | Doble: medaka (ffish.asia, CC0), escaneo animado | 1,7 MB |
+
+Se descartó el Brook Silverside (MTSU): es un ejemplar de museo conservado, café y con las aletas maltratadas.
+**Pendiente:** simplificar las mallas pesadas (carpa y lisa) para bajar el total del lago (~22 MB).
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -987,3 +992,6 @@ Blender.
   respaldo para las especies sin modelo libre. Plan M4 a M7 y candidatos del lago en 7f.
 - **2026-11-18** · **M4 hecha:** la trucha arcoíris y la carpa (escaneo CC0 de ffish.asia) se ven en 3D en la tarjeta
   de captura. `glb_slim.py` ahora quita del archivo lo que no se dibuja (la trucha joven, un caracol de adorno).
+- **2026-11-18** · Las 7 especies del lago ya tienen modelo 3D en la tarjeta de captura (cinco son dobles parecidos,
+  escaneos CC0 de ffish.asia). `FishModel.js` carga modelos con esqueleto y fijos; `glb_slim.py` convierte
+  materiales antiguos y quita lo que no se dibuja.
