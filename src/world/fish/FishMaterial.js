@@ -512,6 +512,32 @@ function surface( prop, lodFade ) {
 		// huge scales with dark edges
 		let rims = smoothstep( 0.8, 0.97, sf ) * sfade * bodyK;
 		c *= 1.0 - rims * 0.35;
+	} else if ( pat == ${ PT( 'rainbowTrout' ) } || pat == ${ PT( 'brownTrout' ) } ) {
+		// trouts: small spots on the back, the dorsal fin and the tail; the rainbow has a pink band along the
+		// flank, the brown black and red spots with pale halos down the sides
+		let rainbow = pat == ${ PT( 'rainbowTrout' ) };
+		let q = vec2f( z, y ) * select( 70.0, 95.0, rainbow );
+		let cell = floor( q );
+		let jit = vec2f( fishHash( cell + 3.1 ), fishHash( cell + 7.7 ) ) - 0.5;
+		let rs = mix( 0.12, 0.22, fishHash( cell + 1.3 ) );
+		let dd = length( fract( q ) - 0.5 - jit * 0.5 );
+		let dots = ( 1.0 - smoothstep( rs, rs + 0.08, dd ) ) * step( select( 0.55, 0.5, rainbow ), fishHash( cell + seed * 5.0 ) );
+		let onFin = select( 0.0, 1.0, P == ${ PA( 'CAUDAL' ) } || P == ${ PA( 'DORSAL1' ) } );
+		let area = max( bodyK * smoothstep( select( -0.5, -0.1, rainbow ), 0.3, h ) * ( 1.0 - tBelly ), onFin );
+		let red = select( 0.0, step( 0.72, fishHash( cell + 9.1 ) ) * smoothstep( 0.35, -0.15, h ) * bodyK, ! rainbow );
+		let halo = ( 1.0 - smoothstep( rs + 0.08, rs + 0.18, dd ) ) * dots * red;
+		c = mix( c, vec3f( 0.86, 0.82, 0.7 ), halo * 0.6 );
+		c = mix( c, mix( vec3f( 0.03, 0.03, 0.03 ), vec3f( 0.62, 0.12, 0.08 ), red ), dots * area * 0.85 );
+		let band = fishBand( h, 0.02, 0.12, fwH + 0.08 ) * bodyK * select( 0.0, 1.0, rainbow );
+		c = mix( c, vec3f( 0.82, 0.38, 0.44 ), band * 0.55 );
+	} else if ( pat == ${ PT( 'carp' ) } ) {
+		// big bronze scales with darker edges
+		let rims = smoothstep( 0.8, 0.97, sf ) * sfade * bodyK;
+		c *= 1.0 - rims * 0.3;
+	} else if ( pat == ${ PT( 'capitan' ) } ) {
+		// dark mottling on a scaleless olive skin
+		let m = smoothstep( 0.45, 0.7, fishVnoise( vec2f( z, y ) * 60.0 + seed * 9.0 ) ) * bodyK * ( 1.0 - tBelly );
+		c = mix( c, vec3f( 0.07, 0.07, 0.05 ), m * 0.6 );
 	}
 
 	// ---- lateral line (a row of pores along a dark line)

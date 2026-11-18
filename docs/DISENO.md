@@ -109,6 +109,7 @@ hacia arriba (mapas de nivel más alto).
 | D53 | **Portada global:** una página propia desde la que se gestiona todo: partidas (continuar, crear, borrar), mapas (la cadena con abiertos, bloqueados y por llegar), progreso y registro de cada partida, y ajustes generales (idioma, calidad, sonido). Reemplaza la pantalla de inicio sobre la isla | Con varios mapas no tiene sentido cargar un mapa entero para mostrar el menú | 2026-11-18 |
 | D54 | **Desde la portada se continúa donde quedó la partida:** los mapas se ven, pero "Jugar" abre el mapa de la partida; cambiar de mapa sigue siendo viajar en el juego, desde el amarre y con costo (D20) | El viaje conserva su sentido | 2026-11-18 |
 | D55 | **La portada es una página ligera aparte, sin 3D:** abre al instante con el arte del juego de fondo; "Jugar" carga la página del juego con el mapa de la partida y "Salir al menú" vuelve. La dirección principal es la portada; el juego pasa a otra página | Rápida, desacoplada del motor, y no carga un mapa para mostrar un menú | 2026-11-18 |
+| D56 | **Multiplicador de XP con dos mapas:** el lago y la isla quedan los dos en ×1.0 mientras falten los mapas 2 a 5 (D45, D52). El lago ya da menos XP y dinero por pez que la isla (especies más fáciles); el ×3.05 de la isla (D32) se aplica cuando exista la cadena completa | Con la isla libre, ×3.05 haría saltarse el lago | 2026-11-18 |
 
 ---
 
@@ -677,7 +678,7 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 | L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | **Hecha** (2026-11-18) |
 | L2 | Viaje | Desde el amarre del bote (E): destinos y costo; vender o soltar la nevera antes de viajar (D20) | Pendiente |
 | L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | **Hecha** (2026-11-18, prototipo) |
-| L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | Pendiente |
+| L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | **Hecha** (2026-11-18) |
 | L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | Pendiente |
 | Pulido | Por capas | Vegetación fría (pinos, eucaliptos, frailejones, juncos), pieles de peces de agua dulce, sonido de montaña, niebla y cielo de altura | Después |
 
@@ -731,7 +732,26 @@ petróleo oscura (no turquesa); una franja verde clara muy marcada sobre los baj
 cerros redondeados y bajos con capas de montañas al fondo (no picos empinados); pinos y eucaliptos en la orilla;
 cielo nublado de páramo; muelles de madera con lanchas de colores. (La foto no se guarda en el repositorio.)
 
-**A resolver en L4 (con el simulador):** con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
+**Mapa grande (N) y minimapa por mapa (2026-11-18):** cada mapa define el área que cubren el minimapa y el mapa
+grande (`minimap` en `maps/*.js`; el lago cubre todo el valle). La tecla **N** abre el mapa entero, con el norte
+arriba: tu posición y hacia dónde miras, los nombres de los spots (el actual en dorado), Joe, Marta y el bote.
+
+**Entrega L4, cómo quedó la pesca en el lago:**
+- **7 especies** en `FishTable.js` (datos de D30): guapucha, carachi y pejerrey (básica), trucha arcoíris y carpa
+  (intermedia), trucha café (avanzada) y el capitán de la sabana (protegido: captura y suelta).
+- **Modelos:** el pejerrey usa el modelo del pejerrey de mar (es de la misma familia); las otras 6 son especies
+  nuevas del generador de peces (`FishSpecies.js`, `FishMaterial.js`): trucha arcoíris (lomo oliva, banda rosada,
+  puntos negros), trucha café (dorada con puntos oscuros y rojos), carpa (bronce, escamas grandes, dorsal larga),
+  capitán (bagre alargado, sin escamas, manchado; todavía sin bigotes), guapucha y carachi (pequeños y pardos).
+- **El agua del lago** tiene sus propios tipos (`habitat` en `maps/lake.js`): juncos (bajos), muelle,
+  desembocadura (brazo oeste), bahía de lodo (este) y profundo. Cada uno es un spot: Orilla de juncos, Muelle del
+  pueblo, Desembocadura, Bahía de lodo y Centro profundo. Lo que pica en cada uno sigue el diseño (juncos: guapucha,
+  carachi, capitán; muelle: pejerrey y truchas pequeñas; desembocadura: trucha arcoíris y algo de café; bahía: carpa
+  y capitán; centro: truchas grandes, café y carpa).
+- XP: los dos mapas en ×1.0 (D56).
+- 6 tests nuevos. Probado en el navegador: tarjetas de captura de las especies nuevas, especies por spot, mapa grande.
+
+**Resuelto en L4:** el multiplicador de XP (D56). con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
 
 ## 7e. Plan de la portada (D53–D55)
@@ -884,3 +904,5 @@ arranque).
   franja verde de los bajos, cerros redondeados, pinos y eucaliptos, cielo nublado).
 - **2026-11-18** · Pulido visual del lago (primera pasada): agua de Tota con la franja verde de los bajos, cielo
   nublado de páramo, cerros redondeados, río que nace en una quebrada.
+- **2026-11-18** · Mapa grande con la tecla N y minimapa que cubre todo el mapa. **L4 hecha:** las 7 especies del
+  lago con modelo y sus 5 spots; ya se pesca en el lago. Decidido D56 (XP ×1.0 en los dos mapas por ahora).

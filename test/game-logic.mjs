@@ -443,7 +443,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const m = activeMap();
 	ok( DEFAULT_MAP === 'island' && currentMapId() === 'island' && m === MAPS.island && mapById( 'nope' ) === null, 'maps: the island is the default and active map (in Node)' );
 	ok( WORLD === m.layout && WORLD.pier.x === 55 && WORLD.reef.radius === 58, 'maps: the world layout is the one of the active map' );
-	ok( m.species.length === 18 && m.species.every( ( id ) => FISH[ id ] ) && m.species.length === FISH_IDS.length, 'maps: the island lists its 18 species' );
+	ok( m.species.length === 18 && m.species.every( ( id ) => FISH[ id ] ), 'maps: the island lists its 18 species' );
 	ok( LICENSES === m.licenses && LICENSES[ 2 ].price === 500 && ISLAND_SPOTS === m.spots, 'maps: licences and spots come from the map' );
 	let onlyMap = true;
 	for ( let i = 0; i < 400; i ++ ) if ( ! m.species.includes( pickSpecies( habitatAt( { depth: 8, reefDist: 20, pierDist: 30 } ), 12, rng ) ) ) onlyMap = false;
@@ -466,6 +466,29 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const st = new GameState( { getItem: () => null, setItem: () => {} } );
 	st.mapId = 'lake'; st.homeMap = 'island';
 	ok( st.toJSON().map === 'island', 'lake: a test visit (?map=lake) keeps the game on its own map' );
+
+}
+// ---- the lake's fish and water (L4)
+{
+
+	const L = MAPS.lake;
+	ok( L.species.length === 7 && L.species.every( ( id ) => FISH[ id ] && FISH[ id ].model ) && L.species.every( ( id ) => ! MAPS.island.species.includes( id ) ), 'lake: 7 species of its own, each with a model' );
+	const tier = ( id ) => FISH[ id ].license;
+	ok( [ 'guapucha', 'carachi', 'pejerrey' ].every( ( id ) => tier( id ) === 1 ) && tier( 'rainbowTrout' ) === 2 && tier( 'carp' ) === 2 && tier( 'brownTrout' ) === 3 && FISH.capitan.protected, 'lake: licences as approved (D30), the capitán protected' );
+	ok( L.spots.length === 5 && L.spots.map( ( s ) => s.id ).join() === 'reeds,pier,river,mud,deep', 'lake: its 5 spots' );
+	const top = ( h ) => Object.entries( h ).sort( ( a, b ) => b[ 1 ] - a[ 1 ] )[ 0 ][ 0 ];
+	const hab = ( x, z, depth, pierDist = 300 ) => L.habitat( { x, z, depth, pierDist, reefDist: 5000 } );
+	ok( top( hab( - 330, 70, 2 ) ) === 'reeds' && top( hab( 55, 38, 4.4, 1 ) ) === 'pier' && top( hab( - 760, 262, 2 ) ) === 'river' && top( hab( 560, 150, 2.5 ) ) === 'mud' && top( hab( 60, 520, 36 ) ) === 'deep', 'lake: each place is its spot' );
+	ok( Object.values( hab( 200, 200, 5.5 ) ).reduce( ( a, b ) => a + b, 0 ) > 0.05 && Object.values( hab( 0, 0, 0.1 ) ).every( ( v ) => v === 0 ), 'lake: fish everywhere in the water, nothing on the sand' );
+	let lw = true;
+	for ( const id of L.species ) {
+
+		const f = FISH[ id ], lo = fishLengthCm( id, f.kg[ 0 ] ), hi = fishLengthCm( id, f.kg[ 1 ] );
+		if ( ! ( lo > 4 && hi < 120 && hi > lo ) ) lw = false;
+
+	}
+
+	ok( lw, 'lake: plausible lengths (a 4 kg rainbow trout is ' + Math.round( fishLengthCm( 'rainbowTrout', 4 ) ) + ' cm)' );
 
 }
 console.log( `value check ${ value }` );

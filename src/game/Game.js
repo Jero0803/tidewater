@@ -290,6 +290,8 @@ export class Game {
 		}
 
 		this.updateLicence( dt );
+		// N: the big map of the whole map
+		if ( this.minimap && inp.hit( 'KeyN' ) && ! ( app.ui && app.ui.ui && app.ui.ui.photoMode ) ) this.minimap.toggleBig();
 		if ( this._gearNote && this.hud ) {
 
 			const g = this._gearNote;
@@ -551,7 +553,10 @@ export class Game {
 		const rect = ( x0, x1, z0, z1 ) => Math.hypot( Math.max( x0 - b.x, 0, b.x - x1 ), Math.max( z0 - b.z, 0, b.z - z1 ) );
 		const walk = rect( P.x - P.width / 2, P.x + P.width / 2, P.zStart, P.zEnd );
 		const head = rect( P.x - P.headWidth / 2, P.x + P.headWidth / 2, P.zEnd - P.headDepth, P.zEnd );
-		return habitatAt( { depth, reefDist, pierDist: Math.min( walk, head ) } );
+		const pierDist = Math.min( walk, head );
+		// maps with their own water types (the lake) compute them; the island uses Bites.habitatAt
+		if ( this.map && this.map.habitat ) return this.map.habitat( { x, z, depth, pierDist, reefDist } );
+		return habitatAt( { depth, reefDist, pierDist } );
 
 	}
 

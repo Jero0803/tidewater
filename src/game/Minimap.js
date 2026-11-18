@@ -1,7 +1,9 @@
 import { WORLD } from '../world/WorldLayout.js';
 import { STAND } from './FishStand.js';
 import { CHANDLERY } from './Chandlery.js';
-import { SPOTS } from './Spots.js';
+import { SPOTS, spotOf } from './Spots.js';
+import { activeMap } from '../maps/registry.js';
+import { loc } from '../i18n.js';
 
 // Minimap, lower right: the island baked once from the terrain data into a 2D canvas (depth-tinted
 // sea, reef and seagrass, sand, grass and forest by height, rock, paths, village pads, the pier,
@@ -13,9 +15,11 @@ import { SPOTS } from './Spots.js';
 // Per frame it only writes a few CSS transforms. The bake runs in row chunks over the first frames.
 //   const map = new Minimap( hudEl, game );  map.update( dt );  map.highlight( [ 'joe', 'marta' ] )
 
-const N = 640; // baked canvas size (px)
-const EXT = 1280; // metres covered by the bake
-const X0 = - EXT / 2, Z0 = - 180 - EXT / 2; // world at canvas (0, 0): the island sits north of the bay
+// the area baked, from the active map (maps/*.js minimap: the island sits north of its bay; the lake covers the valley)
+const MM = activeMap().minimap || { x0: - 640, z0: - 820, ext: 1280, res: 640 };
+const N = MM.res; // baked canvas size (px)
+const EXT = MM.ext; // metres covered by the bake
+const X0 = MM.x0, Z0 = MM.z0; // world at canvas (0, 0)
 const PPM = N / EXT; // canvas px per metre
 const ROWS_PER_FRAME = 48;
 
@@ -63,6 +67,31 @@ const CSS = /* css */`
 @media (max-height: 860px) { .gm-map { right: calc(var(--tw-edge) + 58 * var(--tw-u)); } }
 @media (max-width: 640px) { .gm-map { width: calc(128 * var(--tw-u)); height: calc(128 * var(--tw-u)); } }
 @media (prefers-reduced-motion: reduce) { .gm-mk.is-hot > i, .gm-map-fish > i { animation: none; } }
+/* the big map (N): the whole baked map, north up */
+.gm-bigmap { position: absolute; inset: 0; display: none; place-items: center; background: rgba(4, 10, 16, 0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); pointer-events: none; z-index: 5; }
+.gm-bigmap.is-open { display: grid; }
+.gm-bigmap-card { padding: var(--tw-3); border-radius: var(--tw-r-lg); }
+.gm-bigmap-head { display: flex; align-items: baseline; gap: var(--tw-3); padding: 0 var(--tw-1) var(--tw-2); font: 500 var(--tw-fs-md) var(--tw-font); color: var(--tw-ink-2); }
+.gm-bigmap-head b { font-size: calc(17 * var(--tw-u)); font-weight: 600; color: var(--tw-ink); }
+.gm-bigmap-head .gm-bigmap-here { color: var(--tw-sun); }
+.gm-bigmap-head kbd { margin-left: auto; font: 600 var(--tw-fs-xs) var(--tw-mono); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--tw-line); color: var(--tw-ink-2); }
+.gm-bigmap-view { position: relative; width: min(78vh, 86vw); aspect-ratio: 1; border-radius: calc(10 * var(--tw-u)); overflow: hidden; background: #0b2c48;
+	box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
+.gm-bigmap-view canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gm-bigmap-marks { position: absolute; inset: 0; }
+.gm-bigmap-marks > * { position: absolute; transform: translate(-50%, -50%); }
+.gm-bigmap-spot { white-space: nowrap; font: 600 calc(11 * var(--tw-u)) var(--tw-font); letter-spacing: 0.03em; color: rgba(236, 246, 250, 0.9);
+	text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6); }
+.gm-bigmap-spot.is-here { color: var(--tw-sun); }
+.gm-bigmap-mk { display: grid; place-items: center; width: calc(22 * var(--tw-u)); height: calc(22 * var(--tw-u)); border-radius: 50%; color: #0b1418;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 0 0 1.5px rgba(255,255,255,0.85); }
+.gm-bigmap-mk svg { width: 64%; height: 64%; }
+.gm-bigmap-mk.is-joe { background: var(--tw-sun); }
+.gm-bigmap-mk.is-marta { background: var(--tw-aqua); }
+.gm-bigmap-mk.is-boat { background: #f2efe6; }
+.gm-bigmap-me svg { width: calc(22 * var(--tw-u)); height: calc(22 * var(--tw-u)); filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+.gm-bigmap-legend { display: flex; gap: var(--tw-4); padding: var(--tw-2) var(--tw-1) 0; font: 500 var(--tw-fs-sm) var(--tw-font); color: var(--tw-ink-3); }
+.gm-bigmap-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
 /* named spots (D40): their names on the map, and the one being fished under the window */
 .gm-spot { position: absolute; left: 0; top: 0; width: 0; height: 0; }
 .gm-spot > span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap; font: 600 calc(9 * var(--tw-u)) var(--tw-font);
@@ -160,6 +189,48 @@ export class Minimap {
 		this._hereSpot = undefined;
 		this.north = h( 'div', 'gm-map-n', 'N' );
 		this.marks.append( this.north );
+
+		// the big map (N)
+		this.big = h( 'div', 'gm-bigmap', `<div class="gm-bigmap-card tw-glass">
+			<div class="gm-bigmap-head"><b>${ activeMap().name }</b><span class="gm-bigmap-here"></span><kbd>N</kbd></div>
+			<div class="gm-bigmap-view"><canvas width="${ N }" height="${ N }"></canvas><div class="gm-bigmap-marks"></div></div>
+			<div class="gm-bigmap-legend"><span><i style="background:var(--tw-sun)"></i>${ loc( 'Joe · fish stand', 'Joe · puesto de pescado' ) }</span><span><i style="background:var(--tw-aqua)"></i>${ loc( 'Marta · chandlery', 'Marta · tienda náutica' ) }</span><span><i style="background:#f2efe6"></i>${ loc( 'Boat', 'Bote' ) }</span></div>
+		</div>` );
+		parent.append( this.big );
+		this.bigOpen = false;
+		this.bigCanvas = this.big.querySelector( 'canvas' );
+		this.bigHere = this.big.querySelector( '.gm-bigmap-here' );
+		const bigMarks = this.big.querySelector( '.gm-bigmap-marks' );
+		const at = ( el, x, z ) => {
+
+			el.style.left = `${ ( x - X0 ) / EXT * 100 }%`;
+			el.style.top = `${ ( z - Z0 ) / EXT * 100 }%`;
+
+		};
+
+		this._bigAt = at;
+		this.bigSpots = SPOTS.filter( ( s ) => s.label.x >= X0 && s.label.x <= X0 + EXT && s.label.z >= Z0 && s.label.z <= Z0 + EXT ).map( ( s ) => {
+
+			const el = h( 'div', 'gm-bigmap-spot', s.name );
+			at( el, s.label.x, s.label.z );
+			bigMarks.append( el );
+			return { spot: s, el };
+
+		} );
+		const bmk = ( kind, icon, x, z ) => {
+
+			const el = h( 'div', 'gm-bigmap-mk is-' + kind, icon );
+			if ( x !== undefined ) at( el, x, z );
+			bigMarks.append( el );
+			return el;
+
+		};
+
+		bmk( 'joe', ICON.fish, STAND.x, STAND.z );
+		bmk( 'marta', ICON.anchor, CHANDLERY.x, CHANDLERY.z );
+		this.bigBoat = bmk( 'boat', ICON.boat );
+		this.bigMe = h( 'div', 'gm-bigmap-me', '<svg viewBox="0 0 24 24"><path d="M12 2 20 21 12 16.5 4 21Z" fill="#fff" stroke="#0b1418" stroke-width="1.4" stroke-linejoin="round"/></svg>' );
+		bigMarks.append( this.bigMe );
 		this.fish = [ h( 'div', 'gm-map-fish', '<i></i><i></i>' ), h( 'div', 'gm-map-fish', '<i></i><i></i>' ) ];
 		this.fish.forEach( ( f ) => this.marks.prepend( f ) );
 		this._fishPts = [];
@@ -203,6 +274,41 @@ export class Minimap {
 		if ( el[ k ] === on ) return;
 		el[ k ] = on;
 		el.classList.toggle( cls, on );
+
+	}
+
+	// the big map: open / close (N); the baked map is copied in when it opens
+	toggleBig( force ) {
+
+		this.bigOpen = force ?? ! this.bigOpen;
+		this.big.classList.toggle( 'is-open', this.bigOpen );
+		if ( this.bigOpen ) {
+
+			const ctx = this.bigCanvas.getContext( '2d' );
+			ctx.clearRect( 0, 0, N, N );
+			ctx.drawImage( this.canvas, 0, 0 );
+			this._updateBig();
+
+		}
+
+		return this.bigOpen;
+
+	}
+
+	_updateBig() {
+
+		const app = this.game.app, cam = app.camera;
+		const e = cam.matrixWorld.elements;
+		this._bigAt( this.bigMe, cam.position.x, cam.position.z );
+		// north up: the arrow points along the view
+		this.bigMe.style.transform = `translate(-50%, -50%) rotate(${ Math.atan2( - e[ 8 ], e[ 10 ] ) }rad)`;
+		const b = app.boatCtl;
+		const aboard = app.player.mode === 'boat' || app.player.mode === 'deck';
+		this.bigBoat.style.display = b && ! aboard ? '' : 'none';
+		if ( b ) this._bigAt( this.bigBoat, b.position.x, b.position.z );
+		const spot = this._hereSpot || null;
+		this.bigHere.textContent = spot ? spot.name : '';
+		for ( const s of this.bigSpots ) this._toggle( s.el, 'is-here', s.spot === spot );
 
 	}
 
@@ -418,6 +524,7 @@ export class Minimap {
 
 		// the N on the rim
 		place( this.north, 0, - 1e6, 9 );
+		if ( this.bigOpen ) this._updateBig();
 
 		// fish finder: the richest water nearby, refreshed now and then
 		const finder = this.game.state.stats.finder;

@@ -34,6 +34,16 @@ export const FISH = {
 	tuna: { name: loc( 'Blackfin tuna', 'Atún aleta negra' ), sci: 'Thunnus atlanticus', lw: [ 0.0145, 3.0 ], model: 'tuna', habitat: { deep: 1 }, kg: [ 3, 14 ], price: 16, fight: 0.85, stamina: 16, time: 'dawnDusk', rarity: 0.5, license: 3 },
 	mahi: { name: loc( 'Mahi-mahi', 'Dorado' ), sci: 'Coryphaena hippurus', lw: [ 0.0079, 3.0 ], model: 'mahi', habitat: { deep: 0.8 }, kg: [ 4, 18 ], price: 14, fight: 0.8, stamina: 15, time: 'day', rarity: 0.4, license: 3 },
 	tarpon: { name: loc( 'Tarpon', 'Sábalo' ), sci: 'Megalops atlanticus', lw: [ 0.0077, 3.02 ], model: 'tarpon', habitat: { pier: 0.35, bay: 0.5, shallows: 0.15 }, kg: [ 10, 45 ], price: 4, fight: 1, stamina: 24, time: 'night', rarity: 0.2, license: 3 },
+
+	// ---- Map 1 · the mountain lake (docs/DISENO.md D30; sizes, prices and length-weight approximate, to validate).
+	// Habitats are the lake's water types (maps/lake.js habitat): reeds, pier, river (the mouth), mud (the bay), deep.
+	guapucha: { name: loc( 'Guapucha', 'Guapucha' ), sci: 'Grundulus bogotensis', lw: [ 0.01, 3.0 ], model: 'guapucha', habitat: { reeds: 1, pier: 0.4 }, kg: [ 0.005, 0.02 ], price: 2, fight: 0.02, stamina: 1, time: 'day', rarity: 1, license: 1 },
+	carachi: { name: loc( 'Carachi', 'Carachi' ), sci: 'Orestias sp.', lw: [ 0.015, 3.0 ], model: 'carachi', habitat: { reeds: 1, pier: 0.6, river: 0.3, mud: 0.5 }, kg: [ 0.02, 0.15 ], price: 3, fight: 0.05, stamina: 1.5, time: 'day', rarity: 1, license: 1 },
+	pejerrey: { name: loc( 'Argentinian silverside', 'Pejerrey' ), sci: 'Odontesthes bonariensis', lw: [ 0.006, 3.1 ], model: 'silverside', habitat: { reeds: 0.3, pier: 1, river: 0.5, deep: 0.4 }, kg: [ 0.1, 1.2 ], price: 4, fight: 0.15, stamina: 2.5, time: 'day', rarity: 1, license: 1 },
+	capitan: { name: loc( 'Savanna catfish', 'Capitán de la sabana' ), sci: 'Eremophilus mutisii', lw: [ 0.006, 3.0 ], model: 'capitan', habitat: { reeds: 0.4, mud: 0.5 }, kg: [ 0.1, 0.8 ], price: 0, fight: 0.25, stamina: 4, time: 'night', rarity: 1, license: 1, protected: true },
+	rainbowTrout: { name: loc( 'Rainbow trout', 'Trucha arcoíris' ), sci: 'Oncorhynchus mykiss', lw: [ 0.0107, 3.04 ], model: 'rainbowTrout', habitat: { pier: 0.35, river: 1, deep: 0.8 }, kg: [ 0.2, 4 ], price: 6, fight: 0.45, stamina: 6, time: 'dawnDusk', rarity: 1, license: 2 },
+	carp: { name: loc( 'Common carp', 'Carpa común' ), sci: 'Cyprinus carpio', lw: [ 0.0174, 3.1 ], model: 'carp', habitat: { mud: 1, deep: 0.5 }, kg: [ 0.5, 12 ], price: 2, fight: 0.55, stamina: 10, time: 'any', rarity: 1, license: 2 },
+	brownTrout: { name: loc( 'Brown trout', 'Trucha café' ), sci: 'Salmo trutta', lw: [ 0.0105, 3.0 ], model: 'brownTrout', habitat: { river: 0.15, deep: 0.45 }, kg: [ 0.5, 6 ], price: 8, fight: 0.55, stamina: 8, time: 'dawnDusk', rarity: 1, license: 3 },
 };
 
 export const FISH_IDS = Object.keys( FISH );

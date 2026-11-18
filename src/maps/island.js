@@ -76,6 +76,9 @@ export const ISLAND = {
 		{ tier: 3, id: 'advanced', price: 1000, minLevel: 7 },
 	],
 
+	// the area the minimap and the big map (N) cover: x0, z0 = north-west corner (m), ext = side (m), res = px
+	minimap: { x0: - 640, z0: - 820, ext: 1280, res: 640 },
+
 	// world systems this map has (read by App when building the world; the island has all of them)
 	features: { reef: true, surf: true, seabirds: true, whale: true, palms: true },
 };

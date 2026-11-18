@@ -25,6 +25,8 @@ export const PATTERN = {
 	silverside: 0, chromis: 1, grunt: 2, yellowtail: 3, tang: 4, sergeant: 5, wrasse: 6, parrot: 7,
 	angel: 8, barracuda: 9, redSnapper: 10, grouper: 11, tuna: 12, mahi: 13, mullet: 14, needlefish: 15,
 	jack: 16, tarpon: 17, stingray: 18, eagleRay: 19, turtle: 20,
+	// Map 1 · the mountain lake (fresh water)
+	guapucha: 21, carachi: 22, rainbowTrout: 23, brownTrout: 24, carp: 25, capitan: 26,
 };
 
 const spiny = ( from, to, rays, h, rake, notch = 0.16 ) => ( { from, to, rays, spiny: true, h, rake, notch } );
@@ -348,6 +350,61 @@ export const SPECIES = {
 
 // Skin colours (sRGB): back, flank, belly, fins, fin edges; the shader adds the species'
 // markings (stripes, bars, spots) on top.
+// ---- Map 1 · the mountain lake (docs/DISENO.md D30): basic anatomy, own colours and markings
+// rainbow trout: fusiform salmonid, one soft dorsal mid-back, big mouth, nearly square tail
+SPECIES.rainbowTrout = {
+	pattern: PATTERN.rainbowTrout, body: 0.84, sec: 2.15,
+	top: [ [ 0, 0.008 ], [ 0.03, 0.03 ], [ 0.08, 0.055 ], [ 0.16, 0.078 ], [ 0.28, 0.096 ], [ 0.42, 0.103 ], [ 0.56, 0.097 ], [ 0.7, 0.08 ], [ 0.84, 0.058 ], [ 1, 0.046 ] ],
+	bot: [ [ 0, 0.008 ], [ 0.03, 0.028 ], [ 0.08, 0.05 ], [ 0.16, 0.07 ], [ 0.28, 0.086 ], [ 0.42, 0.092 ], [ 0.56, 0.086 ], [ 0.7, 0.07 ], [ 0.84, 0.052 ], [ 1, 0.042 ] ],
+	wid: [ [ 0, 0.008 ], [ 0.04, 0.034 ], [ 0.12, 0.056 ], [ 0.25, 0.066 ], [ 0.42, 0.066 ], [ 0.6, 0.054 ], [ 0.8, 0.036 ], [ 1, 0.022 ] ],
+	mouth: { corner: 0.12, y: - 0.006, tip: - 0.002, protrude: 0.002 },
+	eye: { u: 0.1, y: 0.026, r: 0.018 }, opercle: 0.24,
+	scales: 0.012, scaleVis: 0.25, lateral: 0.42, arch: 0.05,
+	dorsal: [ soft( 0.4, 0.53, 12, [ [ 0, 0.075 ], [ 0.3, 0.08 ], [ 1, 0.03 ] ], [ 0.45, 0.9 ] ) ],
+	anal: [ soft( 0.66, 0.76, 10, [ [ 0, 0.06 ], [ 1, 0.025 ] ], [ 0.55, 0.9 ] ) ],
+	pectoral: { u: 0.26, y: - 0.04, len: 0.12, base: 0.022, rays: 13, shape: 'rounded', spread: 0.45 },
+	pelvic: { u: 0.47, len: 0.08, rays: 9 },
+	caudal: { shape: 'truncate', len: 0.17, span: 0.14, fork: 0.88, rays: 19 },
+	iris: 0xb8a060, irid: 0.35, metal: 0.35,
+};
+// brown trout: the same build, a little heavier at the head
+SPECIES.brownTrout = { ...SPECIES.rainbowTrout, pattern: PATTERN.brownTrout, mouth: { corner: 0.13, y: - 0.006, tip: - 0.002, protrude: 0.002 }, iris: 0xc89040, metal: 0.2, irid: 0.15 };
+// common carp: deep, humped back, one long dorsal with a serrated first ray, big scales, small mouth
+SPECIES.carp = {
+	pattern: PATTERN.carp, body: 0.82, sec: 2.25,
+	top: [ [ 0, 0.006 ], [ 0.03, 0.03 ], [ 0.08, 0.062 ], [ 0.16, 0.1 ], [ 0.28, 0.135 ], [ 0.42, 0.146 ], [ 0.56, 0.136 ], [ 0.7, 0.105 ], [ 0.84, 0.068 ], [ 1, 0.05 ] ],
+	bot: [ [ 0, 0.006 ], [ 0.03, 0.024 ], [ 0.08, 0.048 ], [ 0.16, 0.076 ], [ 0.28, 0.098 ], [ 0.42, 0.104 ], [ 0.56, 0.096 ], [ 0.7, 0.078 ], [ 0.84, 0.056 ], [ 1, 0.046 ] ],
+	wid: [ [ 0, 0.006 ], [ 0.05, 0.034 ], [ 0.15, 0.06 ], [ 0.3, 0.074 ], [ 0.5, 0.07 ], [ 0.7, 0.052 ], [ 0.9, 0.03 ], [ 1, 0.022 ] ],
+	mouth: { corner: 0.06, y: - 0.008, tip: - 0.004, protrude: 0.004 },
+	eye: { u: 0.12, y: 0.034, r: 0.017 }, opercle: 0.25,
+	scales: 0.05, scaleVis: 0.95, lateral: 0.4, arch: 0.1,
+	dorsal: [ soft( 0.36, 0.73, 20, [ [ 0, 0.09 ], [ 0.15, 0.075 ], [ 1, 0.035 ] ], [ 0.5, 0.85 ] ) ],
+	anal: [ soft( 0.69, 0.78, 7, [ [ 0, 0.075 ], [ 1, 0.03 ] ], [ 0.55, 0.9 ] ) ],
+	pectoral: { u: 0.27, y: - 0.05, len: 0.13, base: 0.026, rays: 16, shape: 'rounded', spread: 0.45 },
+	pelvic: { u: 0.42, len: 0.1, rays: 9 },
+	caudal: { shape: 'forked', len: 0.2, span: 0.15, fork: 0.6, rays: 19 },
+	iris: 0xc8a040, irid: 0.1, metal: 0.3,
+};
+// capitán de la sabana (Eremophilus mutisii): a scaleless Andean catfish, flat broad head, small dorsal, rounded tail
+SPECIES.capitan = {
+	pattern: PATTERN.capitan, body: 0.87, sec: 1.9,
+	top: [ [ 0, 0.01 ], [ 0.04, 0.024 ], [ 0.1, 0.04 ], [ 0.2, 0.055 ], [ 0.35, 0.065 ], [ 0.5, 0.066 ], [ 0.65, 0.058 ], [ 0.8, 0.046 ], [ 1, 0.036 ] ],
+	bot: [ [ 0, 0.01 ], [ 0.04, 0.026 ], [ 0.1, 0.04 ], [ 0.2, 0.052 ], [ 0.35, 0.058 ], [ 0.5, 0.058 ], [ 0.65, 0.052 ], [ 0.8, 0.042 ], [ 1, 0.034 ] ],
+	wid: [ [ 0, 0.014 ], [ 0.05, 0.05 ], [ 0.14, 0.072 ], [ 0.3, 0.066 ], [ 0.5, 0.054 ], [ 0.7, 0.04 ], [ 1, 0.022 ] ],
+	mouth: { corner: 0.05, y: - 0.006, tip: - 0.004, protrude: 0 },
+	eye: { u: 0.08, y: 0.03, r: 0.009 }, opercle: 0.2,
+	scales: 0, scaleVis: 0, lateral: 0.3, arch: 0,
+	dorsal: [ soft( 0.5, 0.6, 9, [ [ 0, 0.05 ], [ 1, 0.025 ] ], [ 0.5, 0.85 ] ) ],
+	anal: [ soft( 0.6, 0.86, 18, [ [ 0, 0.035 ], [ 1, 0.03 ] ], [ 0.6, 0.85 ] ) ],
+	pectoral: { u: 0.18, y: - 0.04, len: 0.1, base: 0.02, rays: 9, shape: 'rounded', spread: 0.5 },
+	pelvic: { u: 0.48, len: 0.06, rays: 6 },
+	caudal: { shape: 'rounded', len: 0.13, span: 0.09, fork: 1.0, rays: 15 },
+	iris: 0x4a4430, irid: 0, metal: 0.04,
+};
+// guapucha (Grundulus bogotensis) and carachi: small drab fishes of the shore, the build of a small perch-like fish
+SPECIES.guapucha = { ...SPECIES.grunt, pattern: PATTERN.guapucha, scales: 0.03, scaleVis: 0.55, iris: 0xb8b090, metal: 0.4, irid: 0.3 };
+SPECIES.carachi = { ...SPECIES.grunt, pattern: PATTERN.carachi, scales: 0.025, scaleVis: 0.45, iris: 0x9c9470, metal: 0.15, irid: 0.1 };
+
 export const SKIN = {
 	silverside: { back: 0x6d8a7a, flank: 0xc4ccce, belly: 0xe6eaea, fin: 0xa8b4ae, edge: 0x98a4a0, rough: 0.3 },
 	chromis: { back: 0x173a78, flank: 0x2764b8, belly: 0x5588c4, fin: 0x2d62b0, edge: 0x0c1424, rough: 0.4 },
@@ -370,4 +427,10 @@ export const SKIN = {
 	stingray: { back: 0x6c604c, flank: 0x7a6c56, belly: 0xd8d6d0, fin: 0x4c4236, edge: 0x8a7c66, rough: 0.5 },
 	eagleRay: { back: 0x14181e, flank: 0x1c2028, belly: 0xe0e2e2, fin: 0x101418, edge: 0x2a2e36, rough: 0.35 },
 	turtle: { back: 0x3e3220, flank: 0x86683a, belly: 0xc8b884, fin: 0x4a4238, edge: 0x9a9280, rough: 0.45 },
+	guapucha: { back: 0x5a6a48, flank: 0xb8bca4, belly: 0xe2e2d2, fin: 0xa09a78, edge: 0x6c6a50, rough: 0.35 },
+	carachi: { back: 0x4c5040, flank: 0x8c8c74, belly: 0xd8d4c0, fin: 0x6c6a58, edge: 0x44443a, rough: 0.4 },
+	rainbowTrout: { back: 0x4a5a3c, flank: 0xbcc0b4, belly: 0xeeece6, fin: 0x8c8a74, edge: 0x5c5a48, rough: 0.3 },
+	brownTrout: { back: 0x5a4a2c, flank: 0xbc9e5c, belly: 0xeadcb0, fin: 0x8a7444, edge: 0x5a4a2c, rough: 0.32 },
+	carp: { back: 0x5a4a22, flank: 0xb08a3c, belly: 0xe2cfa0, fin: 0x8a6c3a, edge: 0x5c4424, rough: 0.38 },
+	capitan: { back: 0x3a3a30, flank: 0x5c5a4a, belly: 0xb8b2a0, fin: 0x3c3a32, edge: 0x2c2a24, rough: 0.55 },
 };

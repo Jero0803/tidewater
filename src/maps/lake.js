@@ -1,11 +1,10 @@
 import { loc } from '../i18n.js';
-import { mapName } from './catalog.js';
+import { mapName, catalogEntry } from './catalog.js';
 import { ISLAND } from './island.js';
 
 // Map 1 · the mountain lake (docs/DISENO.md D30, D50–D52, section 7d), inspired by Lake Tota. A prototype (L3): its
 // own terrain and calm water; the village, the pier, the traders and the boat stand where they stand on the island
-// (the lake's north shore reuses the island's beach). Species, spots and the XP multiplier of the lake come in L4:
-// until then it fishes like the island.
+// (the lake's north shore reuses the island's beach). L4: its 7 species and its 5 spots.
 export const LAKE = {
 	id: 'lake',
 	name: mapName( 'lake' ),
@@ -21,15 +20,40 @@ export const LAKE = {
 
 	vendors: ISLAND.vendors,
 
-	// L4 brings the lake's species and spots (D30); until then the island's
-	species: ISLAND.species,
+	// the 7 species of the lake (D30; listed in the catalog so the landing page knows them too)
+	species: catalogEntry( 'lake' ).species,
+
+	// the 5 spots of the lake (D30): each one is one of the lake's water types (habitat below)
 	spots: [
-		{ id: 'shallows', name: loc( 'Playa Blanca', 'Playa Blanca' ), label: { x: - 30, z: 8 } },
-		{ id: 'pier', name: loc( 'Village pier', 'Muelle del pueblo' ), label: { x: 30, z: 25 } },
-		{ id: 'reef', name: loc( 'Reef', 'Arrecife' ), label: { x: 5000, z: 5000 } },
-		{ id: 'bay', name: loc( 'Open lake', 'Lago abierto' ), label: { x: 10, z: 160 } },
-		{ id: 'deep', name: loc( 'Deep centre', 'Centro profundo' ), label: { x: 60, z: 560 } },
+		{ id: 'reeds', name: loc( 'Reed shore', 'Orilla de juncos' ), label: { x: - 330, z: 70 } },
+		{ id: 'pier', name: loc( 'Village pier', 'Muelle del pueblo' ), label: { x: 150, z: 8 } },
+		{ id: 'river', name: loc( 'River mouth', 'Desembocadura' ), label: { x: - 720, z: 230 } },
+		{ id: 'mud', name: loc( 'Mud bay', 'Bahía de lodo' ), label: { x: 560, z: 150 } },
+		{ id: 'deep', name: loc( 'Deep centre', 'Centro profundo' ), label: { x: 60, z: 470 } },
 	],
+
+	// the water types under a point of the lake (weights; Bites.pickSpecies matches them with FISH[id].habitat):
+	// the reed shores (shallow), around the pier, the river mouth (the western arm), the mud bay (east), the deep
+	// water. Between them the weights stay above zero, so fish bite everywhere in the water.
+	habitat( { x, z, depth, pierDist } ) {
+
+		const h = { reeds: 0, pier: 0, river: 0, mud: 0, deep: 0 };
+		if ( depth < 0.25 ) return h;
+		const s = ( e0, e1, v ) => {
+
+			const t = Math.min( 1, Math.max( 0, ( v - e0 ) / ( e1 - e0 ) ) );
+			return t * t * ( 3 - 2 * t );
+
+		};
+
+		h.pier = s( 9, 2, pierDist ) * s( 0.6, 2, depth );
+		h.river = 1 - s( 140, 300, Math.hypot( x + 790, z - 268 ) );
+		h.mud = s( 380, 460, x ) * ( 1 - s( 5, 9, depth ) );
+		h.deep = s( 4, 16, depth ) * ( 1 - h.river ) * ( 1 - h.mud );
+		h.reeds = s( 6, 1.5, depth ) * ( 1 - h.river ) * ( 1 - h.mud ) * ( 1 - h.pier );
+		return h;
+
+	},
 
 	// the lake's licences (D37 lake prices ×5 for the 120-minute day, D47: basic $10, intermediate $35 at level 4,
 	// advanced $60 at level 7, each ×5)
@@ -39,6 +63,9 @@ export const LAKE = {
 		{ tier: 2, id: 'intermediate', price: 175, minLevel: 4 },
 		{ tier: 3, id: 'advanced', price: 300, minLevel: 7 },
 	],
+
+	// the minimap and the big map (N) cover the whole valley
+	minimap: { x0: - 1024, z0: - 1024, ext: 2048, res: 1024 },
 
 	features: { reef: false, surf: false, seabirds: true, whale: false, palms: false },
 

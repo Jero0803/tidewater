@@ -2157,6 +2157,7 @@ export class UI {
 						${ row( k( 'I' ), loc( 'Cooler and fish log', 'Nevera y registro de pesca' ) ) }
 						${ row( k( 'F' ), loc( 'Free camera', 'Cámara libre' ) ) }
 						${ row( k( 'T' ), loc( 'Pause time', 'Pausar el tiempo' ) ) }
+						${ row( k( 'N' ), loc( 'Map', 'Mapa' ) ) }
 						${ row( k( 'L' ), loc( 'Flashlight', 'Linterna' ) ) }
 						${ row( k( 'M' ), loc( 'Mute', 'Silenciar' ) ) }
 					</section>
