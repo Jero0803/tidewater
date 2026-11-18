@@ -6,6 +6,7 @@ import { levelFromXp, LICENSES, LICENSE_WARN_SECONDS, DAY_SECONDS, licenseTierOf
 import { activeMap, MAPS } from '../maps/registry.js';
 import { travelOptions } from './Travel.js';
 import { BAITFISH } from './GameState.js';
+import { renderTackleShop } from './ShopPanel.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -681,11 +682,13 @@ export class GameHUD {
 
 		this.standOpen = false;
 		this.stand.classList.remove( 'is-open' );
+		this.stand.classList.remove( 'sh-wide' );
 
 	}
 
 	renderStand() {
 
+		this.stand.classList.remove( 'sh-wide' );
 		const s = this.game.state;
 		const v = this.vendor || { name: loc( 'Fish buyer', 'Comprador de pescado' ) };
 		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span><button class="gm-mini" data-sell="${ f.id }">${ loc( 'Sell', 'Vender' ) }</button></div>` ).join( '' );
@@ -704,6 +707,9 @@ export class GameHUD {
 
 GameHUD.prototype.renderShop = function () {
 
+	// maps with tackle by pieces get the shop in a grid (ShopPanel.js, D81); the others keep this list
+	if ( activeMap().tackle ) return renderTackleShop( this );
+	this.stand.classList.remove( 'sh-wide' );
 	const s = this.game.state;
 	const v = this.vendor;
 	// on maps with tackle by pieces the float rig grades are gone: rods are bought by pieces (E3)

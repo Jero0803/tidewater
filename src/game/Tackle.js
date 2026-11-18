@@ -24,7 +24,7 @@ export const ROD_BREAK = 1.25;
 
 // tech: float (bobber), spin (lures), bottom (sinker); castM: cast distance; cost $, level: minimum level
 export const RODS = {
-	floatUL: { name: loc( 'Telescopic float rod 3 m', 'Telescópica de flotador 3 m' ), tech: 'float', power: 'UL', castM: 18, cost: 0, level: 1 },
+	floatUL: { name: loc( 'Telescopic float rod 3 m', 'Telescópica de flotador 3 m' ), tech: 'float', power: 'UL', castM: 18, cost: 25, level: 1 }, // the starter rod: given in a new game
 	floatL: { name: loc( 'Telescopic float rod 4 m', 'Telescópica de flotador 4 m' ), tech: 'float', power: 'L', castM: 22, cost: 60, level: 2 },
 	spinUL: { name: loc( 'Spinning rod 1.8 m', 'Spinning 1.8 m' ), tech: 'spin', power: 'UL', castM: 24, cost: 70, level: 2 },
 	spinL: { name: loc( 'Spinning rod 2.1 m', 'Spinning 2.1 m' ), tech: 'spin', power: 'L', castM: 30, cost: 120, level: 3 },
@@ -35,7 +35,7 @@ export const RODS = {
 
 // reel: m/s; dragMax: kg; cap25: metres of 0.25 mm line it holds (other diameters scale with the cross-section)
 export const REELS = {
-	r1000: { name: loc( 'Reel 1000', 'Carrete 1000' ), reel: 0.9, dragMax: 3, cap25: 120, cost: 0, level: 1 },
+	r1000: { name: loc( 'Reel 1000', 'Carrete 1000' ), reel: 0.9, dragMax: 3, cap25: 120, cost: 20, level: 1 }, // the starter reel: given in a new game
 	r2000: { name: loc( 'Reel 2000', 'Carrete 2000' ), reel: 1.0, dragMax: 4, cap25: 150, cost: 50, level: 2 },
 	r2500: { name: loc( 'Reel 2500', 'Carrete 2500' ), reel: 1.1, dragMax: 6, cap25: 180, cost: 90, level: 3 },
 	r3000: { name: loc( 'Reel 3000', 'Carrete 3000' ), reel: 1.2, dragMax: 8, cap25: 200, cost: 110, level: 5 },

@@ -215,9 +215,9 @@ export class Game {
 	}
 
 	// buy or extend a licence of this map (the shop)
-	buyLicense( tier ) {
+	buyLicense( tier, days = 1 ) {
 
-		const ok = this.state.buyLicense( tier );
+		const ok = this.state.buyLicense( tier, days );
 		if ( ok ) {
 
 			this._licTier = this.state.licenseTier;
