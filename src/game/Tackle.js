@@ -120,7 +120,9 @@ export function rigStats( rig ) {
 	return {
 		tech: rod.tech, power: rod.power, stiff: pw.stiff,
 		castM: rod.castM, reelSpeed: reel.reel, dragMax: reel.dragMax,
-		lineKg: line.kg, lineD: line.d, lineCap: Math.round( reel.cap25 * ( 0.25 / line.d ) ** 2 ),
+		lineKg: line.kg, lineD: line.d, // what is on the reel: the spool (150 m) or what the reel holds of this diameter, whichever is less (as in
+		// Fishing Planet: a small reel takes only part of a spool)
+		lineCap: Math.round( Math.min( LINE_SPOOL_M, reel.cap25 * ( 0.25 / line.d ) ** 2 ) ),
 		rodMax: pw.line[ 1 ] * ROD_BREAK,
 		// what hangs on the line: the lure, or the float / sinker plus the bait
 		castG: lure ? lure.g : ( rod.tech === 'bottom' ? ( rig.sinker || 0 ) : ( rig.float || 0 ) ) + ( BAITS[ rig.bait ]?.g || 0 ),

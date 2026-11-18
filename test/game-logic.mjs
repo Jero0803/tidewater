@@ -567,7 +567,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	// the starter rod (D72)
 	const s = rigStats( STARTER_RIG );
 	ok( rigReady( STARTER_RIG ) && rigProblems( STARTER_RIG ).length === 0, 'tackle: the starter rod is ready, nothing out of range' );
-	ok( s.tech === 'float' && s.lineKg === 2.5 && s.castM === 18 && s.dragMax === 3 && s.lineCap === Math.round( 120 * ( 0.25 / 0.16 ) ** 2 ), 'tackle: starter stats (float, 2.5 kg line, 18 m cast, 3 kg drag, capacity by line diameter)' );
+	ok( s.tech === 'float' && s.lineKg === 2.5 && s.castM === 18 && s.dragMax === 3 && s.lineCap === 150 && rigStats( { rod: 'bottomMH', reel: 'r4000', line: 'm40' } ).lineCap === Math.round( 250 * ( 0.25 / 0.4 ) ** 2 ), 'tackle: starter stats (float, 2.5 kg line, 18 m cast, 3 kg drag); on the reel: the 150 m spool or what the reel holds' );
 	ok( RODS[ STARTER_RIG.rod ].cost <= 25 && REELS[ STARTER_RIG.reel ].cost <= 20, 'tackle: starter rod and reel are the cheapest (given in a new game)' );
 
 	// what doesn't fit

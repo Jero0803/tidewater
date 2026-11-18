@@ -155,7 +155,7 @@ const CAST = 3, NIBBLES = 2.5, CARD = 4;
 const goodSpot = { a: 1 };
 const OLD_MULT = { juvenile: 0, common: 1, trophy: 1.5, unique: 3 };
 const NEW_MULT = Object.fromEntries( SIZE_CLASSES.map( ( c ) => [ c.id, c.mult ] ) );
-const basePrice = ( id ) => FISH[ id ].price / ( FISH[ id ].hourMul || 1 );
+const basePrice = ( id ) => FISH[ id ].price; // hourMul is a separate multiplier (FishTable PER_HOUR), not in price
 const money = ( id, kg, mult ) => FISH[ id ].protected ? 0 : basePrice( id ) * kg * mult[ sizeClass( id, kg ).id ];
 const xpOf = ( id, kg ) => sizeClass( id, kg ).xp * difficulty( id ) + XP_PER_KG * kg; // sin hourMul ni especie nueva
 const fightOld = ( id, kg ) => {

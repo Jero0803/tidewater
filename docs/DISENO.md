@@ -1543,3 +1543,7 @@ armar las tres cañas queda para E4.
   activa, para qué peces sirve, qué le es compatible, comprar, comprar y armar, armar y vender al 50 %; la pestaña
   Principal con las tres cañas (elegir la activa) y los paquetes por especie; bote y bodega; licencias por 1, 3 o 7 días.
   La isla sigue con la lista vieja. La caña y el carrete iniciales cuestan $25 y $20 si se compran otra vez.
+- **2026-11-18** · Corregido: en el carrete va la bobina (150 m) o lo que el carrete admite de ese grosor, lo que sea
+  menos (como en Fishing Planet, donde un carrete 1500 solo admite 125 m de una bobina de 150 y el resto queda aparte).
+  Antes el carrete inicial daba 293 m. Con el equipo correcto las peleas no cambian; el liviano se queda sin hilo con
+  peces grandes. El pedazo que sobra no se guarda por ahora. Corregido también el precio base en `equipo-lago.mjs`.
