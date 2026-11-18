@@ -57,6 +57,16 @@ Más adelante, **varios escenarios o mapas** que se desbloquean con la progresi�
 | D5 | No se adapta: moneda premium, licencias por tiempo real, aparejos complejos, 110 niveles (con 20–30 basta) | No aportan diversión a este juego o sobran para su contenido | 2026-11-17 |
 | D6 | Cambiar de mapa recargará la página, como el idioma | Un mapa a la vez; simple y seguro | 2026-11-17 |
 | D7 | Se definen las bases y los números **antes** de escribir código | Pedido del dueño del proyecto | 2026-11-17 |
+| D8 | **Progresión escalable, sin final.** No se fija cuánto dura el juego: se fija **cuánta experiencia (XP) hace falta para abrir el siguiente mapa**. Cada mapa agrega niveles y contenido sin rehacer lo anterior | El juego crece con cada mapa nuevo | 2026-11-17 |
+| D9 | **Peces por spot.** Cada mapa tiene spots con nombre (muelle, arrecife, veril…) y cada spot tiene su propia lista de especies y probabilidades | Más claro para el jugador y más fácil de diseñar y equilibrar por mapa | 2026-11-17 |
+| D10 | **Licencias por pez, no por spot.** Se puede pescar en cualquier spot; la licencia da derecho a quedarse con ciertas especies | Equilibra sin cerrar lugares: los peces caros (profundo) piden licencia | 2026-11-17 |
+| D11 | **Tres licencias: básica, intermedia y avanzada.** Cada especie pertenece a una (reparto en la sección 7) | Claro para el jugador y escala a mapas nuevos | 2026-11-17 |
+| D12 | **Las licencias duran días del juego** | Gasto recurrente que mantiene viva la economía | 2026-11-17 |
+| D13 | **Sin licencia: hay que soltar el pez, pero da XP y cuenta en el registro** | Sin castigo, pero motiva comprar la licencia | 2026-11-17 |
+| D14 | **Reparto de especies aprobado** (tabla en la sección 7): básica = 7 especies de orilla y muelle, intermedia = 6 de arrecife y bahía, avanzada = 5 de profundo más el sábalo | Ordena por spot, valor y dificultad | 2026-11-17 |
+| D15 | **Las licencias duran tiempo real**, no horas del juego | Independiente del reloj del juego y de la velocidad del tiempo | 2026-11-17 |
+| D16 | **El día del juego es simulado:** el reloj avanza solo mientras se juega (alba, día, ocaso, noche) | El ciclo del día importa para qué pica | 2026-11-17 |
+| D17 | **Se podrá viajar entre mapas** y se diseña desde la Fase 1 (qué se guarda por mapa y qué viaja con el jugador) | Evita rehacer el guardado cuando lleguen los mapas | 2026-11-17 |
 
 ---
 
@@ -120,7 +130,7 @@ lo que importa son las ideas.
 
 | Fase | Contenido | Problemas que resuelve | Esfuerzo | Riesgo | Estado |
 |---|---|---|---|---|---|
-| **1. Progresión** | Clases de tamaño, nivel y XP, desbloqueos por nivel, licencias por zona | 1, 6 (y parte de 3) | Medio | Bajo (no toca la pelea) | **Definiendo** |
+| **1. Progresión** | Clases de tamaño; nivel y XP con umbral para el siguiente mapa; desbloqueos por nivel; **spots con su lista de peces**; **licencias por pez** | 1, 6 (y parte de 3) | Medio | Bajo-medio (no toca la pelea; los spots cambian cómo se elige el pez que pica) | **Definiendo** |
 | 2. Consecuencias | Carnadas que se gastan y preferencias por especie; desgaste y reparación | 5, 7 | Medio | Medio | Pendiente |
 | 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | 3, 4 | Alto | Medio | Pendiente |
 | 4. Objetivos | Encargos de Joe; torneo de los 10 más pesados | Variedad y metas | Medio | Bajo | Pendiente |
@@ -144,8 +154,66 @@ lo que importa son las ideas.
 Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 con su número.
 
 **Metas medibles**
-- [ ] ¿Cuánto debe durar llegar al máximo? (propuesta inicial: 3–5 horas de juego)
-- [ ] ¿Cuánto más debe pagar el profundo frente al muelle, contando licencia y diésel? (propuesta: como mucho 3×)
+- [x] ~~¿Cuánto debe durar llegar al máximo?~~ Reemplazada por D8: se mide la XP para abrir el siguiente mapa.
+- [x] ~~¿Cuánto más debe pagar el profundo frente al muelle?~~ Reemplazada por D9 y D10: el equilibrio se
+  ajusta con la lista de peces de cada spot y el precio de las licencias. La relación entre spots se sigue
+  midiendo con el simulador como referencia.
+- [ ] XP necesaria para abrir el mapa 2, y cómo crece para los siguientes
+
+**Spots (D9)**
+- [ ] Lista de spots de la isla actual y qué especies tiene cada uno
+- [ ] ¿Qué pasa entre spots? (propuesta: el spot más cercano, o una lista genérica de "aguas abiertas")
+
+**Licencias por pez (D10–D13)**
+- [x] ~~¿Por especie o por grupo?~~ Tres licencias (D11).
+- [x] ~~¿Duración?~~ Días del juego (D12).
+- [x] ~~¿Sin licencia?~~ Soltar, con XP (D13).
+- [x] ~~Reparto de especies~~ Aprobado (D14, tabla abajo).
+- [ ] ¿Las licencias son acumulativas? (propuesta: sí, la intermedia incluye la básica y la avanzada incluye las dos)
+- [ ] ¿Qué especies son libres? (propuesta: ninguna; la básica es barata y se regala al empezar)
+- [ ] ¿La licencia también pide nivel mínimo? (propuesta: intermedia y avanzada sí)
+- [ ] Tiempo real (D15): ¿reloj de pared (vence aunque no juegues) o tiempo jugado (solo corre con el juego abierto)?
+  (propuesta: tiempo jugado; con reloj de pared, quien juega un rato cada semana pierde casi todas sus licencias)
+- [ ] Precio y duración de cada una (se calcula con el simulador)
+
+Reparto aprobado (D14):
+
+| Licencia | Especies | Dónde | $/kg |
+|---|---|---|---|
+| Básica | Pejerrey cabezón, Lisa rayada, Agujón, Sargento mayor, Ronco amarillo, Cromis azul, Cirujano azul | Orilla, muelle, arrecife (pequeños) | $3–8 |
+| Intermedia | Rabirrubia, Pez perro, Loro brilloso, Ángel reina, Jurel común, Barracuda | Arrecife y bahía | $5–16 |
+| Avanzada | Pargo colorado, Mero de Nassau, Atún aleta negra, Dorado, Sábalo | Aguas profundas, bahía de noche (sábalo) | $4–18 |
+
+**Reloj del juego (necesario para D12)**
+
+Hallazgo: el reloj viene detenido (empieza a las 16:12; la tecla T lo pone a 0.05 h/s, un día = 8 min reales)
+y el panel de ajustes deja mover la hora a mano. Con eso una licencia por días se puede estirar (pausando) o
+gastar (adelantando), y las preferencias de hora de los peces se pueden forzar.
+- [x] ~~¿Cómo se cuenta el tiempo?~~ Licencias en tiempo real (D15); día del juego simulado (D16).
+- [ ] Duración de un día del juego en minutos reales (hoy 8 min cuando corre; propuesta: 20–30 min)
+- [ ] ¿Qué pasa con el control de hora del panel de ajustes? (propuesta: en el juego queda bloqueado y solo se
+  puede mover en el modo foto, para no forzar la hora de los peces)
+- [ ] ¿El reloj se pausa con el menú, la tienda o la tarjeta de captura? (propuesta: no se pausa, salvo con la pausa explícita T)
+
+**Viaje entre mapas (D17)**
+
+Propuesta inicial, para discutir:
+
+| Tema | Propuesta |
+|---|---|
+| Cómo se viaja | Desde el amarre del bote, con E se abre un mapa de viaje con los destinos desbloqueados |
+| Qué lo desbloquea | La XP (D8): cada mapa pide un nivel mínimo |
+| Costo | Un pasaje o diésel según la distancia (gasto que ordena la progresión) |
+| Qué viaja contigo | Dinero, nivel y XP, equipo y mejoras (caña, carrete, sedal, bote) |
+| Qué es de cada mapa | Licencias (cada mapa tiene sus especies y sus tres licencias), registro de pesca y récords por mapa, vendedores |
+| Peces en la nevera | Hay que venderlos o soltarlos antes de viajar (o se pierden al viajar) |
+| Técnico | Cambiar de mapa recarga la página (D6); el guardado se organiza en datos globales + datos por mapa |
+
+- [ ] ¿Se viaja desde el bote, desde un muelle o desde un menú?
+- [ ] ¿El viaje cuesta? ¿Cuánto?
+- [ ] ¿Las licencias son por mapa o globales?
+- [ ] ¿Qué pasa con los peces en la nevera al viajar?
+- [ ] ¿El equipo y las mejoras del bote son globales?
 
 **Clases de tamaño**
 - [ ] Umbrales de cada clase por especie (propuesta: por percentil del rango de peso actual)
@@ -156,11 +224,6 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
 - [ ] Número de niveles (20–30) y forma de la curva
 - [ ] XP por pez (por clase, especie, especie nueva)
 - [ ] Qué desbloquea cada nivel (mejoras de Marta, licencias, más adelante mapas)
-
-**Licencias**
-- [ ] Zonas con licencia (propuesta: muelle y orilla gratis; arrecife y profundo con permiso)
-- [ ] Duración (propuesta: un día del juego) y precio
-- [ ] Qué pasa si se pesca sin licencia (multa, no se puede vender, o no pica)
 
 **Compatibilidad**
 - [ ] Partidas guardadas existentes: ¿con qué nivel empiezan? (propuesta: calcularlo desde el registro de pesca)
@@ -183,3 +246,10 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
 - **2026-11-17** · Clonado el original, traducido al español, selector de idioma, publicado en GitHub Pages.
   Auditoría con simulador; guardado el simulador. Investigado Fishing Planet; propuesta de 4 fases más mapas.
   Decidido: definir bases antes de programar, Fase 1 antes que mapas pero diseñada por mapa. Creado este documento.
+- **2026-11-17** · Decididos D8 (progresión escalable medida en XP por mapa), D9 (peces por spot) y D10
+  (licencias por pez). Reemplazadas las metas de duración y de relación profundo/muelle.
+- **2026-11-17** · Decididos D11 (tres licencias), D12 (duran días del juego) y D13 (sin licencia: soltar con XP).
+  Propuesto reparto de especies. Hallazgo: el reloj del juego viene detenido y la hora se puede mover desde el
+  panel, lo que hay que resolver para que las licencias por días funcionen.
+- **2026-11-17** · Decididos D14 (reparto aprobado), D15 (licencias en tiempo real), D16 (día del juego simulado)
+  y D17 (viajar entre mapas, diseñado desde la Fase 1). Agregada la propuesta de viaje entre mapas.
