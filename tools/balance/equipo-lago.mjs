@@ -10,67 +10,27 @@
 globalThis.location = { search: '?lang=es' };
 globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 const { FISH } = await import( '../../src/game/FishTable.js' );
-const { CatchMinigame } = await import( '../../src/game/CatchMinigame.js' );
+const { CatchMinigame, STAMINA } = await import( '../../src/game/CatchMinigame.js' );
 
 let seed = 11;
 const rng = () => ( ( seed = ( seed * 16807 ) % 2147483647 ) / 2147483647 );
+const arg = ( k, d ) => Number( ( process.argv.find( ( a ) => a.startsWith( `--${ k }=` ) ) || '' ).split( '=' )[ 1 ] ) || d;
 
 // ---------------------------------------------------------------- catálogo (src/game/Tackle.js, E1)
-const { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, biteMul } = await import( '../../src/game/Tackle.js' );
+const { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, biteMul, rigStats, fightTackle } = await import( '../../src/game/Tackle.js' );
 const kitHookCost = ( h ) => HOOKS[ h ].cost;
 
 // ---------------------------------------------------------------- modelo
-// fuerza del pez con sedales realistas (la de P1 está pensada para sedales de 7 a 50 kg)
-export const fishForce = ( id, kg ) => Math.max( 0.05, kg * ( 0.25 + 0.6 * FISH[ id ].fight ) + 0.05 );
 
-// aguante del pez (segundos de presión plena para cansarlo): P1 daba 3.5 × aguante × tamaño^0.35 y la pelea duraba
-// 11–25 s con el equipo correcto; la meta es que sacar un pez lleve al menos 1 minuto (D73)
-const arg = ( k, d ) => Number( ( process.argv.find( ( a ) => a.startsWith( `--${ k }=` ) ) || '' ).split( '=' )[ 1 ] ) || d;
-export const STAMINA = { min: arg( 'smin', 180 ), k: arg( 'sk', 4 ), size: 0.35 };
-export const staminaOf = ( id, kg ) => {
-
-	const f = FISH[ id ];
-	return STAMINA.min + STAMINA.k * f.stamina * Math.pow( Math.max( kg / f.kg[ 1 ], 0.05 ), STAMINA.size );
-
-};
 
 
 export function fightKit( id, kg, kit, player ) {
 
-	const rod = RODS[ kit.rod ], pw = POWERS[ rod.power ], reel = REELS[ kit.reel ], line = LINES[ kit.line ];
-	const lineCap = reel.cap25 * ( 0.25 / line.d ) ** 2;
-	const g = new CatchMinigame( { species: id, kg, lineKg: line.kg, reelSpeed: reel.reel, distance: 18, lineCap, rng } );
-	g.force = fishForce( id, kg );
-	g.staminaMax = staminaOf( id, kg );
-	const baseSetDrag = g.setDrag.bind( g );
-	g.setDrag = ( n ) => { baseSetDrag( n ); g.dragKg = Math.min( g.dragKg, reel.dragMax ); };
-	g.setDrag( g.drag );
-	const p = PREFS[ id ];
-	const hold = p.mouth * Math.pow( kg, 0.6 ) + 0.15; // kg que aguanta el anzuelo clavado
-	const rodMax = pw.line[ 1 ] * 1.25;
-	const small = kit.hook > p.hook[ 1 ]; // anzuelo más pequeño que su rango: se suelta más
-	let st = 'fighting', tearT = 0, rodT = 0, cause = null;
-	for ( let i = 0; i < 60 * 240 && st === 'fighting'; i ++ ) {
-
-		const input = player( g );
-		st = g.update( 1 / 60, input );
-		if ( st !== 'fighting' ) { cause = g.cause; break; }
-		// lo que llega al anzuelo: la caña blanda se dobla y se come parte del tirón; levantada, menos
-		// (modelo de E2: el anzuelo no ve la carga fija de recoger de P1, que crece con el sedal, sino el tirón del
-		// pez, la resistencia del agua al arrastrarlo y lo que agrega levantar la caña, que crece con su potencia)
-		const water = input.reel ? 0.25 * Math.pow( kg, 0.7 ) * ( input.fast ? 1.6 : 1 ) : 0;
-		// levantar la caña solo carga el anzuelo en la medida en que el pez se resiste (un pez diminuto sube sin más)
-		const lift = input.pull ? Math.min( 0.3 * pw.line[ 0 ], g.pull() ) : 0;
-		const onHook = Math.min( g.tensionKg, g.pull() + water + lift );
-		const hookLoad = onHook * ( 0.55 + 0.9 * pw.stiff ) * ( g.mode === 'jump' ? 1.5 : 1 );
-		tearT = hookLoad > hold * ( small ? 0.7 : 1 ) ? tearT + 1 / 60 : Math.max( 0, tearT - 1 / 30 );
-		if ( tearT > 0.2 ) { st = 'escaped'; cause = 'tear'; break; }
-		rodT = g.tensionKg > rodMax ? rodT + 1 / 60 : 0;
-		if ( rodT > 0.15 ) { st = 'snapped'; cause = 'rod'; break; }
-
-	}
-
-	return { st, cause, t: g.time };
+	const st = rigStats( kit );
+	const g = new CatchMinigame( { species: id, kg, lineKg: st.lineKg, reelSpeed: st.reelSpeed, distance: 18, lineCap: st.lineCap, tackle: fightTackle( id, kit ), rng } );
+	let state = 'fighting';
+	for ( let i = 0; i < 60 * 240 && state === 'fighting'; i ++ ) state = g.update( 1 / 60, player( g ) );
+	return { st: state, cause: state === 'fighting' ? null : g.cause, t: g.time };
 
 }
 
@@ -183,15 +143,21 @@ for ( const [ id, kit ] of Object.entries( RIGHT ) ) {
 
 }
 
-// ---------------------------------------------------------------- 5. ritmo: no toda picada engancha (D74)
-// Antes (P1): cada picada terminaba en pez si se clavaba con la boya hundida; ~7 s de espera en un buen spot.
-// Ahora: espera más larga (y dividida por la picada del equipo), robo de carnada en los toques, clavar antes de
-// tiempo espanta, clavar a tiempo engancha con una probabilidad.
+// ---------------------------------------------------------------- 5. ritmo y valores por hora (D74, D75, D78)
+// Antes (P1): cada picada clavada era un pez; ~7 s de espera en un buen spot; clases de tamaño con dinero ×1.5 el
+// trofeo y ×3 el único. Ahora: espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %, pelea de al
+// menos un minuto, y el dinero casi por peso (trofeo ×1.1, único ×1.2; D78). El factor por especie es lo que hay que
+// multiplicar el precio y la XP de cada pez para que la hora rinda lo mismo que antes (FISH[ id ].hourMul).
 const { biteDelay, rollWeight, HOOKING } = await import( '../../src/game/Bites.js' );
-const { fishValue } = await import( '../../src/game/FishTable.js' );
+const { sizeClass, SIZE_CLASSES, difficulty, XP_PER_KG } = await import( '../../src/game/Progression.js' );
 export const RHYTHM = { ...HOOKING, waitMul: arg( 'wait', HOOKING.waitMul ), early: 0.1, lateShare: 0.3, rebait: 2 };
 const CAST = 3, NIBBLES = 2.5, CARD = 4;
 const goodSpot = { a: 1 };
+const OLD_MULT = { juvenile: 0, common: 1, trophy: 1.5, unique: 3 };
+const NEW_MULT = Object.fromEntries( SIZE_CLASSES.map( ( c ) => [ c.id, c.mult ] ) );
+const basePrice = ( id ) => FISH[ id ].price / ( FISH[ id ].hourMul || 1 );
+const money = ( id, kg, mult ) => FISH[ id ].protected ? 0 : basePrice( id ) * kg * mult[ sizeClass( id, kg ).id ];
+const xpOf = ( id, kg ) => sizeClass( id, kg ).xp * difficulty( id ) + XP_PER_KG * kg; // sin hourMul ni especie nueva
 const fightOld = ( id, kg ) => {
 
 	const g = new CatchMinigame( { species: id, kg, lineKg: 7, reelSpeed: 1.1, distance: 18, rng } );
@@ -201,30 +167,30 @@ const fightOld = ( id, kg ) => {
 
 };
 
-console.log( '\n## 5. Ritmo: peces por hora antes (P1, todo engancha) y ahora (espera ×' + RHYTHM.waitMul + ', robo ' + pct( RHYTHM.steal ) + ', enganche ' + pct( RHYTHM.hookFirst ) + ' / ' + pct( RHYTHM.hookLate ) + ')\n' );
-console.log( '| Pez (con su equipo) | Antes: peces/h | Antes: $/h | Ahora: peces/h | Ahora: $/h | Picadas que enganchan | Espera media | Factor para conservar $/h |' );
-console.log( '|---|---|---|---|---|---|---|---|' );
-const H = 3600 * 4; // horas simuladas por especie
-for ( const id of [ 'pejerrey', 'rainbowTrout', 'carp', 'brownTrout' ] ) {
+console.log( '\n## 5. Ritmo y valores por hora: antes (P1) y ahora (espera ×' + RHYTHM.waitMul + ', robo ' + pct( RHYTHM.steal ) + ', enganche ' + pct( RHYTHM.hookFirst ) + ' / ' + pct( RHYTHM.hookLate ) + ', pelea D73, clases D78)\n' );
+console.log( '| Pez (con su equipo) | Antes: peces/h | Antes: $/h | Antes: XP/h | Ahora: peces/h | Picadas que enganchan | Factor $ | Factor XP | hourMul en el juego |' );
+console.log( '|---|---|---|---|---|---|---|---|---|' );
+const H = 3600 * arg( 'horas', 6 );
+const RIGHT5 = { guapucha: 'Flotador UL (inicial)', carachi: 'Flotador UL (inicial)', pejerrey: 'Flotador UL (inicial)', capitan: 'Flotador L lombriz', rainbowTrout: 'Spinning L trucha', carp: 'Fondo M carpa', brownTrout: 'Spinning ML trucha café' };
+export const FACTORS = {};
+for ( const [ id, kitName ] of Object.entries( RIGHT5 ) ) {
 
-	const kit = KITS[ { pejerrey: 'Flotador UL (inicial)', rainbowTrout: 'Spinning L trucha', carp: 'Fondo M carpa', brownTrout: 'Spinning ML trucha café' }[ id ] ];
-	let t = 0, n0 = 0, v0 = 0;
+	const kit = KITS[ kitName ];
+	let t = 0, n0 = 0, v0 = 0, x0 = 0;
 	while ( t < H ) {
 
 		t += CAST + biteDelay( goodSpot, 12, rng ) + NIBBLES;
 		const kg = rollWeight( id, rng ), r = fightOld( id, kg );
 		t += r.t;
-		if ( r.ok ) { n0 ++; v0 += fishValue( id, kg ); t += CARD; }
+		if ( r.ok ) { n0 ++; v0 += money( id, kg, OLD_MULT ); x0 += xpOf( id, kg ); t += CARD; }
 
 	}
 
-	let t1 = 0, n1 = 0, v1 = 0, bites = 0, hooked = 0, waited = 0;
+	let t1 = 0, n1 = 0, v1 = 0, x1 = 0, bites = 0, hooked = 0;
 	const mul = biteMul( id, kit ).total;
 	while ( t1 < H ) {
 
-		const w = biteDelay( goodSpot, 12, rng ) * RHYTHM.waitMul / mul;
-		waited += w;
-		t1 += CAST + w + NIBBLES;
+		t1 += CAST + biteDelay( goodSpot, 12, rng ) * RHYTHM.waitMul / mul + NIBBLES;
 		bites ++;
 		if ( rng() < RHYTHM.steal ) { t1 += RHYTHM.rebait; continue; } // se llevó la carnada en los toques
 		if ( rng() < RHYTHM.early && rng() < RHYTHM.spook ) { t1 += RHYTHM.rebait; continue; } // clavó antes y lo espantó
@@ -233,11 +199,27 @@ for ( const id of [ 'pejerrey', 'rainbowTrout', 'carp', 'brownTrout' ] ) {
 		hooked ++;
 		const kg = rollWeight( id, rng ), r = fightKit( id, kg, kit, PLAYERS.bueno );
 		t1 += r.t;
-		if ( r.st === 'caught' ) { n1 ++; v1 += fishValue( id, kg ); t1 += CARD; }
+		if ( r.st === 'caught' ) { n1 ++; v1 += money( id, kg, NEW_MULT ); x1 += xpOf( id, kg ); t1 += CARD; }
 
 	}
 
-	const f0 = n0 / ( t / 3600 ), f1 = n1 / ( t1 / 3600 ), m0 = v0 / ( t / 3600 ), m1 = v1 / ( t1 / 3600 );
-	console.log( `| ${ NAMES[ id ] } | ${ f0.toFixed( 0 ) } | $${ m0.toFixed( 0 ) } | ${ f1.toFixed( 0 ) } | $${ m1.toFixed( 0 ) } | ${ pct( hooked / bites ) } | ${ Math.round( waited / bites ) } s | ×${ ( m0 / m1 ).toFixed( 1 ) } |` );
+	const h0 = t / 3600, h1 = t1 / 3600;
+	const fm = v1 > 0 ? ( v0 / h0 ) / ( v1 / h1 ) : null, fx = ( x0 / h0 ) / ( x1 / h1 );
+	FACTORS[ id ] = { money: fm, xp: fx };
+	console.log( `| ${ NAMES[ id ] } | ${ ( n0 / h0 ).toFixed( 0 ) } | $${ ( v0 / h0 ).toFixed( 0 ) } | ${ ( x0 / h0 ).toFixed( 0 ) } | ${ ( n1 / h1 ).toFixed( 0 ) } | ${ pct( hooked / bites ) } | ${ fm ? '×' + fm.toFixed( 1 ) : '—' } | ×${ fx.toFixed( 1 ) } | ×${ FISH[ id ].hourMul || 1 } |` );
+
+}
+
+// la isla no cambia de pelea ni de ritmo: solo pierde lo que D78 quita a trofeos y únicos; su hourMul lo devuelve
+console.log( '\n**La isla:** mismo ritmo y pelea; factor para compensar las clases de D78 (valor medio por pez antes / ahora)\n' );
+console.log( '| Especie | Factor | hourMul en el juego |' );
+console.log( '|---|---|---|' );
+const { catalogEntry } = await import( '../../src/maps/catalog.js' );
+const islandSpecies = catalogEntry( 'island' ).species;
+for ( const id of islandSpecies ) {
+
+	let a = 0, b = 0;
+	for ( let i = 0; i < 20000; i ++ ) { const kg = rollWeight( id, rng ); a += money( id, kg, OLD_MULT ); b += money( id, kg, NEW_MULT ); }
+	console.log( `| ${ FISH[ id ].name } | ×${ ( a / b ).toFixed( 2 ) } | ×${ FISH[ id ].hourMul || 1 } |` );
 
 }

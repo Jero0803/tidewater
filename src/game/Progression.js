@@ -5,12 +5,13 @@ import { activeMap } from '../maps/registry.js';
 // plain data, no DOM and no state of their own, so they run in Node (tests, tools/balance) as well as in the game.
 
 // ---- size classes (D: clases de tamaño). t = where the weight sits in the species' range, 0 (lightest) .. 1.
-// mult scales the price per kg (juveniles are released, never sold); xp is the base XP of the class.
+// mult scales the price per kg (juveniles are released, never sold; trophy and unique fetch little more, D78: the
+// class pays mostly in XP, as in Fishing Planet); xp is the base XP of the class.
 export const SIZE_CLASSES = [
 	{ id: 'juvenile', upTo: 0.15, mult: 0, xp: 1 },
 	{ id: 'common', upTo: 0.70, mult: 1, xp: 3 },
-	{ id: 'trophy', upTo: 0.92, mult: 1.5, xp: 10 },
-	{ id: 'unique', upTo: Infinity, mult: 3, xp: 40 },
+	{ id: 'trophy', upTo: 0.92, mult: 1.1, xp: 10 },
+	{ id: 'unique', upTo: Infinity, mult: 1.2, xp: 40 },
 ];
 
 export function sizeClass( species, kg ) {
@@ -25,11 +26,12 @@ export function sizeClass( species, kg ) {
 export function classValue( species, kg ) {
 
 	if ( isProtected( species ) ) return 0;
-	return Math.round( FISH[ species ].price * kg * sizeClass( species, kg ).mult );
+	return Math.round( FISH[ species ].price * FISH[ species ].hourMul * kg * sizeClass( species, kg ).mult );
 
 }
 
-// ---- experience (D32): ( class XP × difficulty + 3 per kg + 20 for a new species ) × the map's multiplier.
+// ---- experience (D32): ( ( class XP × difficulty + 3 per kg ) × the species' xpMul (D75) + 20 for a new species ) × the
+// map's multiplier.
 // The map multiplier is 1.25 per map along the chain; the island is the first map until the lower maps exist (D25).
 export const XP_PER_KG = 3;
 export const NEW_SPECIES_XP = 20;
@@ -41,7 +43,7 @@ export const mapXpMultiplier = ( mapIndex = 0 ) => MAP_XP_GROWTH ** mapIndex;
 export function catchXp( species, kg, { newSpecies = false, mapIndex = 0 } = {} ) {
 
 	const c = sizeClass( species, kg );
-	const raw = c.xp * difficulty( species ) + XP_PER_KG * kg + ( newSpecies ? NEW_SPECIES_XP : 0 );
+	const raw = ( c.xp * difficulty( species ) + XP_PER_KG * kg ) * FISH[ species ].xpMul + ( newSpecies ? NEW_SPECIES_XP : 0 );
 	return Math.round( raw * mapXpMultiplier( mapIndex ) );
 
 }

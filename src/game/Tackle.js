@@ -176,6 +176,29 @@ export function biteMul( species, rig ) {
 
 }
 
+// What the fight needs from the rig for this fish (CatchMinigame `tackle`, E2)
+export function fightTackle( species, rig ) {
+
+	const s = rigStats( rig );
+	if ( ! s ) return null;
+	const pw = POWERS[ s.power ];
+	return { stiff: s.stiff, rodMax: s.rodMax, rodMin: pw.line[ 0 ], dragMax: s.dragMax, mouth: PREFS[ species ]?.mouth ?? 2, smallHook: hookTooSmall( species, rig ) };
+
+}
+
+// Until the new shop (E3) the float rig grades stand for these rods of the catalogue (the lake): the starter rod, then
+// stronger rods, reels and lines. Bait stays maggots and the bite multiplier is off until baits can be chosen.
+export const GRADE_RIGS = [
+	STARTER_RIG,
+	{ rod: 'floatL', reel: 'r2000', line: 'm20', hook: 8, float: 3, sinker: null, bait: 'larva' },
+	{ rod: 'floatL', reel: 'r2500', line: 'm25', hook: 6, float: 6, sinker: null, bait: 'larva' },
+	{ rod: 'spinML', reel: 'r3000', line: 'm30', hook: 4, float: 6, sinker: null, bait: 'larva' },
+	{ rod: 'bottomM', reel: 'r4000', line: 'm35', hook: 4, float: null, sinker: 40, bait: 'larva' },
+	{ rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 2, float: null, sinker: 60, bait: 'larva' },
+	{ rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 1, float: null, sinker: 60, bait: 'larva' },
+];
+export const gradeRig = ( grade ) => GRADE_RIGS[ Math.max( 0, Math.min( GRADE_RIGS.length - 1, grade | 0 ) ) ];
+
 // a smaller hook than the fish's mouth: bites fine, comes out more in the fight (E2)
 export const hookTooSmall = ( species, rig ) => !! ( PREFS[ species ] && ! isLure( rig.bait ) && rig.hook > PREFS[ species ].hook[ 1 ] );
 

@@ -25,10 +25,19 @@ import { FISH } from './FishTable.js';
 //   g.setDrag( n ) / g.drag (1 .. 10), g.dragKg, g.tensionKg, g.tension (0..1+ of lineKg), g.distance (m),
 //   g.lineLeft (m), g.stamina (0..1), g.mode ('hold' | 'run' | 'come' | 'jump' | 'dive'), g.runDir (-1 | 1),
 //   g.angle (rad, the fish's bearing offset from where it was hooked), g.slipping, g.surge (0..1),
-//   g.cause ('line' | 'spooled' | 'snag' | 'slack' | 'jump'), g.band (kept for the old callers)
+//   g.cause ('line' | 'spooled' | 'snag' | 'slack' | 'jump' | with tackle: 'tear' | 'rod'), g.band (old callers)
 
+// With tackle by pieces (docs/DISENO.md 7h, E2: D63, D64, D73), pass `tackle` = { stiff, rodMax, dragMax, mouth,
+// smallHook } (Tackle.fightTackle): the fish pulls like a real one on 1.5–12 kg lines, tires in at least a minute,
+// the reel's drag can't pass its maximum, a stiff rod passes the jolts to the hook (it can tear out), and the rod
+// breaks above its limit. Without it the fight is the P1 one (the island until it has its catalogue).
+//   g.loads = { line, rod, reel } (0..1+): how close each piece is to failing (the three bars on screen); reel is
+//   what the drag holds against its setting (1 = the spool slips)
 export const DRAG_STEPS = 10;
 const TAU = Math.PI * 2;
+export const STAMINA = { min: 180, k: 4, size: 0.35 }; // D73: seconds of full pressure to tire a fish (with tackle)
+export const fishForce = ( f, kg ) => Math.max( 0.05, kg * ( 0.25 + 0.6 * f.fight ) + 0.05 ); // kg of pull (with tackle)
+export const fishStamina = ( f, kg ) => STAMINA.min + STAMINA.k * f.stamina * Math.pow( Math.max( kg / f.kg[ 1 ], 0.05 ), STAMINA.size );
 
 // the default fighting style of a species (FishTable.js may override any of these in `style`)
 function styleOf( f ) {
@@ -47,7 +56,7 @@ function styleOf( f ) {
 
 export class CatchMinigame {
 
-	constructor( { species, kg, lineKg = 7, reelSpeed = 1.1, distance = 15, drag = 5, lineCap = 150, rng = Math.random } ) {
+	constructor( { species, kg, lineKg = 7, reelSpeed = 1.1, distance = 15, drag = 5, lineCap = 150, tackle = null, rng = Math.random } ) {
 
 		const f = FISH[ species ];
 		this.species = species;
@@ -56,10 +65,26 @@ export class CatchMinigame {
 		this.lineKg = lineKg;
 		this.reelSpeed = reelSpeed;
 		this.style = styleOf( f );
-		// the fish's full pull (kg) when fresh and running; a guapucha hardly pulls, a big carp pulls its weight
-		this.force = Math.max( 0.15, kg * ( 0.35 + 1.4 * f.fight ) + 0.1 );
-		// seconds of full pressure it takes to tire it out
-		this.staminaMax = Math.max( 3, 3.5 * f.stamina * Math.pow( Math.max( kg / f.kg[ 1 ], 0.15 ), 0.35 ) );
+		this.tackle = tackle;
+		if ( tackle ) {
+
+			this.force = fishForce( f, kg );
+			this.staminaMax = fishStamina( f, kg );
+			// kg the hook holds in its mouth (less with a hook too small for it)
+			this.hold = ( tackle.mouth * Math.pow( kg, 0.6 ) + 0.15 ) * ( tackle.smallHook ? 0.7 : 1 );
+
+		} else {
+
+			// the fish's full pull (kg) when fresh and running; a guapucha hardly pulls, a big carp pulls its weight
+			this.force = Math.max( 0.15, kg * ( 0.35 + 1.4 * f.fight ) + 0.1 );
+			// seconds of full pressure it takes to tire it out
+			this.staminaMax = Math.max( 3, 3.5 * f.stamina * Math.pow( Math.max( kg / f.kg[ 1 ], 0.15 ), 0.35 ) );
+
+		}
+
+		this.tearT = 0; // seconds the hook has been overloaded
+		this.rodT = 0; // seconds the rod has been over its limit
+		this.loads = { line: 0, rod: 0, reel: 0 };
 		this.stamina = 1;
 		this.distance = distance;
 		this.lineCap = Math.max( lineCap, distance + 30 );
@@ -88,8 +113,9 @@ export class CatchMinigame {
 	setDrag( n ) {
 
 		this.drag = Math.max( 1, Math.min( DRAG_STEPS, Math.round( n ) ) );
-		// position 10 lets the line take 95 % of its strength before the spool slips
+		// position 10 lets the line take 95 % of its strength before the spool slips (never more than the reel gives)
 		this.dragKg = this.lineKg * 0.095 * this.drag;
+		if ( this.tackle ) this.dragKg = Math.min( this.dragKg, this.tackle.dragMax );
 
 	}
 
@@ -233,8 +259,28 @@ export class CatchMinigame {
 
 		};
 
+		// the three loads on screen: line against its strength, rod against its limit, drag held against its setting
+		const T = this.tackle;
+		const rodMax = T ? T.rodMax : L * 1.25;
+		this.loads.line = this.tensionKg / L;
+		this.loads.rod = this.tensionKg / rodMax;
+		this.loads.reel = Math.min( 1.05, want / Math.max( this.dragKg, 0.05 ) );
+
 		this.overload = this.tensionKg > L ? this.overload + dt : Math.max( 0, this.overload - dt * 3 );
 		if ( this.overload > 0.15 ) return end( 'snapped', 'line' );
+		if ( T ) {
+
+			// what reaches the hook: the fish's pull, the water's drag on it when reeled, and what lifting the rod adds
+			// (never more than the fish resists); a stiff rod passes more of it, a jump more still (7h, D64)
+			const water = reel ? 0.25 * Math.pow( this.kg, 0.7 ) * ( fast ? 1.6 : 1 ) : 0;
+			const lift = pull ? Math.min( 0.3 * T.rodMin, F ) : 0;
+			const onHook = Math.min( this.tensionKg, F + water + lift ) * ( 0.55 + 0.9 * T.stiff ) * ( this.mode === 'jump' ? 1.5 : 1 );
+			this.tearT = onHook > this.hold ? this.tearT + dt : Math.max( 0, this.tearT - dt * 2 );
+			if ( this.tearT > 0.2 ) return end( 'escaped', 'tear' );
+			this.rodT = this.tensionKg > rodMax ? this.rodT + dt : 0;
+			if ( this.rodT > 0.15 ) return end( 'snapped', 'rod' );
+
+		}
 		if ( this.distance > this.lineCap ) return end( 'snapped', 'spooled' );
 		// a jump on a tight line with the rod lifted can throw the hook (once per jump)
 		if ( this.mode === 'jump' && ! this.jumpHit && this.modeT < 0.6 ) {

@@ -8,7 +8,8 @@ import { travelOptions } from './Travel.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
-//   bottom centre the fight: line tension with its safe band, the fish's stamina, line out
+//   bottom centre the fight: the loads on line, rod and reel (three bars), line out / on the reel, the drag dial,
+//   the fish's stamina
 //   centre        "!" when a fish takes the bait
 //   panels        inventory (I / Tab) and the fish stand's offer
 //   catch card    full screen: the world dims and blurs, the fish lies side-on in its own studio light
@@ -35,15 +36,25 @@ const CSS = /* css */`
 .gm-fight-call.is-warn { color: var(--tw-coral); }
 .gm-fight-call.is-good { color: var(--tw-aqua); }
 .gm-fight-dist { font-family: var(--tw-mono); color: var(--tw-ink-2); }
-.gm-tension { position: relative; height: calc(12 * var(--tw-u)); border-radius: 99px; background: var(--tw-fill-2); overflow: hidden; }
-.gm-band { position: absolute; top: 0; bottom: 0; background: rgba(var(--tw-aqua-rgb), 0.28); border-left: 1px solid rgba(var(--tw-aqua-rgb), 0.6); border-right: 1px solid rgba(var(--tw-aqua-rgb), 0.6); }
-.gm-danger { position: absolute; top: 0; bottom: 0; right: 0; width: 8%; background: rgba(255, 122, 133, 0.35); }
-.gm-needle { position: absolute; top: -2px; bottom: -2px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--tw-ink); box-shadow: 0 0 8px rgba(255,255,255,0.6); }
-.gm-needle.is-hot { background: var(--tw-coral); box-shadow: 0 0 10px var(--tw-coral); }
+.gm-loads { display: flex; align-items: flex-end; gap: var(--tw-3); }
+.gm-load { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--tw-ink-3); font-size: var(--tw-fs-xs); }
+.gm-segs { display: flex; flex-direction: column-reverse; gap: 2px; width: calc(16 * var(--tw-u)); }
+.gm-segs > i { display: block; height: calc(4 * var(--tw-u)); border-radius: 1px; background: var(--seg); opacity: 0.16; transition: opacity 80ms; }
+.gm-segs > i.is-on { opacity: 1; box-shadow: 0 0 4px var(--seg); }
+.gm-load.is-hot { color: var(--tw-coral); }
+.gm-meter { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: var(--tw-3); }
+.gm-out { text-align: right; font-family: var(--tw-mono); color: var(--tw-ink-3); font-size: var(--tw-fs-sm); line-height: 1.1; }
+.gm-out b { display: block; color: var(--tw-ink); font: 700 calc(34 * var(--tw-u)) var(--tw-mono); letter-spacing: -0.02em; }
+.gm-out.is-low b { color: var(--tw-coral); }
+.gm-dial { position: relative; width: calc(56 * var(--tw-u)); height: calc(56 * var(--tw-u)); }
+.gm-dial svg { width: 100%; height: 100%; }
+.gm-dial line { stroke: var(--tw-fill-2); stroke-width: 3; stroke-linecap: round; }
+.gm-dial line.is-on { stroke: var(--tw-sun); }
+.gm-dial b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 var(--tw-fs-md) var(--tw-mono); color: var(--tw-ink); }
+.gm-dial span { position: absolute; left: 0; right: 0; bottom: -2px; text-align: center; font-size: var(--tw-fs-xs); color: var(--tw-ink-3); }
 .gm-stamina { margin-top: var(--tw-2); display: flex; align-items: center; gap: var(--tw-2); color: var(--tw-ink-3); font-size: var(--tw-fs-sm); }
 .gm-stamina-bar { flex: 1; height: calc(4 * var(--tw-u)); border-radius: 99px; background: var(--tw-fill-2); overflow: hidden; }
 .gm-stamina-bar > span { display: block; height: 100%; background: var(--tw-sun); }
-.gm-drag-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--tw-sun); box-shadow: 0 0 6px rgba(255, 200, 80, 0.7); }
 .gm-fight-row { margin-top: var(--tw-2); display: flex; justify-content: space-between; align-items: center; gap: var(--tw-3); color: var(--tw-ink-2); font-size: var(--tw-fs-sm); font-family: var(--tw-mono); }
 .gm-fight-row b { color: var(--tw-ink); font-weight: 600; }
 .gm-fight-row .is-low { color: var(--tw-coral); }
@@ -238,6 +249,23 @@ const h = ( tag, cls, html ) => {
 
 };
 
+// the fight's load bars (16 segments, blue to red) and the drag dial's 10 ticks (D71)
+const LOAD_COLORS = Array.from( { length: 16 }, ( _, i ) => {
+
+	const t = i / 15, stops = [ [ 0, 70, 120, 255 ], [ 0.35, 40, 200, 170 ], [ 0.6, 120, 220, 60 ], [ 0.78, 250, 210, 60 ], [ 0.9, 250, 140, 50 ], [ 1, 240, 70, 60 ] ];
+	let j = 0;
+	while ( j < stops.length - 2 && t > stops[ j + 1 ][ 0 ] ) j ++;
+	const a = stops[ j ], b = stops[ j + 1 ], u = ( t - a[ 0 ] ) / ( b[ 0 ] - a[ 0 ] );
+	return `rgb(${ [ 1, 2, 3 ].map( ( c ) => Math.round( a[ c ] + ( b[ c ] - a[ c ] ) * u ) ).join( ',' ) })`;
+
+} );
+const DIAL_TICKS = Array.from( { length: 10 }, ( _, i ) => {
+
+	const a = ( - 225 + i * 30 ) * Math.PI / 180, c = Math.cos( a ), n = Math.sin( a );
+	return `<line x1="${ ( 28 + 20 * c ).toFixed( 1 ) }" y1="${ ( 28 + 20 * n ).toFixed( 1 ) }" x2="${ ( 28 + 26 * c ).toFixed( 1 ) }" y2="${ ( 28 + 26 * n ).toFixed( 1 ) }"/>`;
+
+} ).join( '' );
+
 export class GameHUD {
 
 	constructor( ui, game ) {
@@ -273,17 +301,25 @@ export class GameHUD {
 
 		this.fight = h( 'div', 'gm-fight tw-glass', `
 			<div class="gm-fight-head"><span class="gm-fight-call">${ loc( 'Fish on!', '¡Pez enganchado!' ) }</span><span class="gm-fight-dist">0 m</span></div>
-			<div class="gm-tension"><span class="gm-danger"></span><span class="gm-drag-mark"></span><span class="gm-needle"></span></div>
-			<div class="gm-fight-row"><span class="gm-drag">${ loc( 'Drag', 'Freno' ) } <b>5</b>/10</span><span class="gm-run"></span><span class="gm-line">${ loc( 'Line', 'Hilo' ) } <b>0</b> m</span></div>
+			<div class="gm-loads">
+				${ [ [ 'line', loc( 'Line', 'Sedal' ) ], [ 'rod', loc( 'Rod', 'Caña' ) ], [ 'reel', loc( 'Reel', 'Carrete' ) ] ].map( ( [ k, name ] ) => `<div class="gm-load" data-k="${ k }"><div class="gm-segs">${ LOAD_COLORS.map( ( c ) => `<i style="--seg:${ c }"></i>` ).join( '' ) }</div>${ name }</div>` ).join( '' ) }
+				<div class="gm-meter">
+					<div class="gm-out"><b>0</b><span>/ 0 m</span></div>
+					<div class="gm-dial"><svg viewBox="0 0 56 56">${ DIAL_TICKS }</svg><b>5</b><span>${ loc( 'drag', 'freno' ) }</span></div>
+				</div>
+			</div>
+			<div class="gm-fight-row"><span class="gm-run"></span></div>
 			<div class="gm-stamina"><span>${ loc( 'Fish', 'Pez' ) }</span><span class="gm-stamina-bar"><span></span></span></div>
 			<div class="gm-fight-keys"><kbd>${ loc( 'LMB', 'Clic izq' ) }</kbd> ${ loc( 'reel', 'recoger' ) } · <kbd>Shift</kbd> ${ loc( 'fast', 'rápido' ) } · <kbd>${ loc( 'RMB', 'Clic der' ) }</kbd> ${ loc( 'pull', 'tirar' ) } · <kbd>${ loc( 'Wheel', 'Rueda' ) }</kbd> ${ loc( 'drag', 'freno' ) } · ${ loc( 'turn the rod against its run', 'gira la caña contra su carrera' ) }</div>` );
 		this.fCall = this.fight.querySelector( '.gm-fight-call' );
 		this.fDist = this.fight.querySelector( '.gm-fight-dist' );
-		this.fDragMark = this.fight.querySelector( '.gm-drag-mark' );
-		this.fDrag = this.fight.querySelector( '.gm-drag > b' );
-		this.fLine = this.fight.querySelector( '.gm-line > b' );
+		this.fLoads = Object.fromEntries( [ ...this.fight.querySelectorAll( '.gm-load' ) ].map( ( el ) => [ el.dataset.k, { el, segs: [ ...el.querySelectorAll( 'i' ) ] } ] ) );
+		this.fOut = this.fight.querySelector( '.gm-out b' );
+		this.fCap = this.fight.querySelector( '.gm-out span' );
+		this.fOutBox = this.fight.querySelector( '.gm-out' );
+		this.fDial = [ ...this.fight.querySelectorAll( '.gm-dial line' ) ];
+		this.fDrag = this.fight.querySelector( '.gm-dial b' );
 		this.fRun = this.fight.querySelector( '.gm-run' );
-		this.fNeedle = this.fight.querySelector( '.gm-needle' );
 		this.fStam = this.fight.querySelector( '.gm-stamina-bar > span' );
 
 		this.bite = h( 'div', 'gm-bite', '!' );
@@ -412,22 +448,32 @@ export class GameHUD {
 		this.fight.classList.toggle( 'is-on', !! fight );
 		if ( fight ) {
 
-			// tension of the line against its strength (the needle), the drag (the yellow mark), the break (red end)
-			const T = Math.min( fight.tension, 1.05 );
-			this.fNeedle.style.left = `${ T / 1.05 * 100 }%`;
-			this.fNeedle.classList.toggle( 'is-hot', fight.tension > 0.85 );
-			this.fDragMark.style.left = `${ Math.min( 1, fight.dragKg / fight.lineKg ) / 1.05 * 100 }%`;
+			// the three loads (D71, as in Fishing Planet): line against its strength, rod against its limit, the drag
+			// held against its setting (full = the spool gives line); segments from blue to red
+			for ( const k in this.fLoads ) {
+
+				const L = this.fLoads[ k ], v = fight.loads ? fight.loads[ k ] : ( k === 'line' ? fight.tension : 0 );
+				const n = Math.round( Math.min( 1, v ) * L.segs.length );
+				L.segs.forEach( ( seg, i ) => seg.classList.toggle( 'is-on', i < n ) );
+				L.el.classList.toggle( 'is-hot', k !== 'reel' && v > 0.85 );
+
+			}
+
+			// line out of the reel / what the reel holds, and the drag dial
+			this.fOut.textContent = Math.round( fight.distance );
+			this.fCap.textContent = `/ ${ Math.round( fight.lineCap ) } m`;
+			this.fOutBox.classList.toggle( 'is-low', fight.lineLeft < 25 );
+			this.fDial.forEach( ( t, i ) => t.classList.toggle( 'is-on', i < fight.drag ) );
+			this.fDrag.textContent = fight.drag;
 			this.fStam.style.width = `${ fight.stamina * 100 }%`;
 			this.fDist.textContent = `${ fight.distance.toFixed( 1 ) } m`;
-			this.fDrag.textContent = fight.drag;
-			this.fLine.textContent = Math.round( fight.lineLeft );
-			this.fLine.classList.toggle( 'is-low', fight.lineLeft < 25 );
 			// which way it runs on screen (its bearing grows to the left of the view, see Game.updateFight)
 			const running = fight.mode === 'run';
 			this.fRun.classList.toggle( 'is-on', running );
 			if ( running ) this.fRun.textContent = fight.runDir > 0 ? loc( '◀ running', '◀ corre' ) : loc( 'running ▶', 'corre ▶' );
 			let call = loc( 'Reel in', 'Recoge' ), cls = '';
 			if ( fight.mode === 'jump' ) { call = loc( 'It jumps! Let go of the right click', '¡Salta! Suelta el clic derecho' ); cls = 'is-warn'; }
+			else if ( fight.tearT > 0.05 ) { call = loc( 'The hook is tearing! Loosen the drag, rod down', '¡Se desgarra el anzuelo! Afloja el freno y baja la caña' ); cls = 'is-warn'; }
 			else if ( fight.tension > 0.85 ) { call = loc( 'Too tight! Loosen the drag', '¡Muy tenso! Afloja el freno' ); cls = 'is-warn'; }
 			else if ( fight.mode === 'dive' && fight.style.snag ) { call = loc( 'Heading for the weeds! Pull (right click)', '¡Va al fondo! Tira con el clic derecho' ); cls = 'is-warn'; }
 			else if ( running ) { call = fight.runDir > 0 ? loc( 'It runs left · turn the rod right', 'Corre a la izquierda · gira la caña a la derecha' ) : loc( 'It runs right · turn the rod left', 'Corre a la derecha · gira la caña a la izquierda' ); cls = 'is-warn'; }

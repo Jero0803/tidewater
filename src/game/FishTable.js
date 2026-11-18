@@ -74,6 +74,20 @@ const STYLES = {
 };
 for ( const k in STYLES ) if ( FISH[ k ] ) FISH[ k ].style = STYLES[ k ];
 
+// Value per hour (docs/DISENO.md D75, D78; measured with tools/balance/equipo-lago.mjs): hourMul scales the price per
+// kg and xpMul the XP of each fish so an hour of fishing yields what it did before. The lake has the new rhythm (not
+// every bite hooks, fights of a minute or more: 4 to 5 times fewer fish an hour); the island keeps its rhythm and only
+// gets back what the flatter size-class prices (trophy ×1.1, unique ×1.2) took. [ hourMul, xpMul ]
+const PER_HOUR = {
+	guapucha: [ 5.9, 4.8 ], carachi: [ 6.1, 5.4 ], pejerrey: [ 5.0, 3.8 ], capitan: [ 1, 3.6 ],
+	rainbowTrout: [ 6.4, 4.7 ], carp: [ 2.5, 2.2 ], brownTrout: [ 4.8, 3.9 ],
+	silverside: [ 1.26, 1 ], mullet: [ 1.28, 1 ], needlefish: [ 1.28, 1 ], sergeant: [ 1.26, 1 ], grunt: [ 1.26, 1 ],
+	chromis: [ 1.26, 1 ], tang: [ 1.26, 1 ], yellowtail: [ 1.28, 1 ], wrasse: [ 1.3, 1 ], parrot: [ 1.28, 1 ],
+	angel: [ 1.27, 1 ], jack: [ 1.3, 1 ], barracuda: [ 1.3, 1 ], redSnapper: [ 1.28, 1 ], grouper: [ 1.27, 1 ],
+	tuna: [ 1.28, 1 ], mahi: [ 1.28, 1 ], tarpon: [ 1.27, 1 ],
+};
+for ( const id in FISH ) [ FISH[ id ].hourMul, FISH[ id ].xpMul ] = PER_HOUR[ id ] || [ 1, 1 ];
+
 export const FISH_IDS = Object.keys( FISH );
 
 // $ value of a fish; trophy-sized ones fetch a bit more per kg
@@ -81,7 +95,7 @@ export function fishValue( id, kg ) {
 
 	const f = FISH[ id ];
 	const t = ( kg - f.kg[ 0 ] ) / Math.max( f.kg[ 1 ] - f.kg[ 0 ], 1e-6 );
-	return Math.max( 1, Math.round( f.price * kg * ( 1 + 0.25 * Math.max( 0, t - 0.7 ) / 0.3 ) ) );
+	return Math.max( 1, Math.round( f.price * f.hourMul * kg * ( 1 + 0.25 * Math.max( 0, t - 0.7 ) / 0.3 ) ) );
 
 }
 

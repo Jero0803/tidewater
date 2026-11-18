@@ -130,6 +130,8 @@ hacia arriba (mapas de nivel más alto).
 | D74 | **No toda picada engancha:** espera ×3.5 (dividida por la picada del equipo), robo de carnada en los toques (15 %), clavar en un toque espanta al pez (60 %), clavar con la boya hundida engancha el 75 % al principio de la ventana y el 55 % al final. Algo más de la mitad de las picadas terminan en pez; un pez cada 2 a 2.5 min | Pedido del jugador del proyecto: hoy toda picada clavada es un pez | 2026-11-18 |
 | D75 | **La economía se conserva por hora:** con 4 a 5 veces menos peces por hora, el precio por kg y la XP de cada especie suben por su factor (pejerrey ×4.4, trucha arcoíris ×5.5, carpa ×1.7, trucha café ×3.6; el resto y los valores finales se miden en E1 con `npm run balance` puesto al día). Licencias, equipo y viaje no cambian | Sin esto el lago duraría unas 20 h en vez de 5 (D32) | 2026-11-18 |
 | D76 | **Los trofeos del mar pelean de 5 a 15 minutos**, como en Fishing Planet (un pez espada único de 448 kg tardó ~12.5 min y no era el récord del jugador, de 530 kg). Se calibra con la isla y los mapas de mar; en el lago los más grandes quedan en 2.5–3.5 min (D73) | Lo vio el jugador del proyecto en su propia pelea | 2026-11-18 |
+| D77 | **Avanzar el tiempo**, como en Fishing Planet: una ventana para saltar solo hacia adelante a una hora del mismo día o del siguiente, con la curva de actividad de los peces; 10 min de juego entre usos; no durante una pelea ni con el sedal en el agua; la licencia no corre con el salto; la nevera se queda. Cambia D42 (la hora se puede adelantar con esta ventana) | Con el día de 120 min, esperar el amanecer para la trucha toma casi una hora real | 2026-11-18 |
+| D78 | **El dinero va casi por peso y la clase se premia en XP**, como en Fishing Planet: trofeo ×1.1 y único ×1.2 en dinero (antes ×1.5 y ×3); la XP de la clase no cambia. En la isla, el precio por kg de cada especie sube ×1.26–1.30 para que la hora rinda lo mismo | En FP un único da ×1.1 de dinero por kg y ×2.9 de XP por kg | 2026-11-18 |
 
 ---
 
@@ -1051,6 +1053,9 @@ diseño de filas y categorías, con precio y "comprar" en vez de "vender".
 | La misma pelea, 3 min después (tercera captura) | Según la hora del chat, pasaron 3 min 11 s reales (más de 7 min de pelea en total) y **el pez había sacado más hilo** (de 100 a 143 m de 367). Caña levantada (tirando), las tres barras a media carga. **El estado del sedal y del carrete bajó un punto durante la pelea** (57 → 56 %, 75 → 74 %): el desgaste corre mientras se pelea | Un pez grande puede **ganar hilo** aunque lleve minutos peleando: la pelea tiene idas y vueltas, no solo recoger. El desgaste queda fuera por ahora (D67); si se agrega, se gasta peleando |
 | La misma pelea, 4 min después (cuarta captura) | Unos 11 min de pelea en total. **El pez ya está cerca: 32 m de 367.** El carrete vuelve a naranja (el pez tira cerca del final y el freno suelta) y la caña se dobla mucho. El estado siguió bajando: sedal 56 → 54 %, caña 65 → 63 %, carrete 74 → 73 % | **El final de la pelea también tiene carreras:** el pez cansado todavía tira cerca del bote. Nuestra pelea ya lo hace (un pez que no está cansado al llegar cerca hace otra carrera) |
 | La captura (quinta captura) | **Pez espada único de 448 kg, sacado tras ~12.5 min de pelea** (enganchado hacia las 15:36 según el chat, sacado a las 15:48:45). Tarjeta: el personaje sostiene el pez en tercera persona sobre la cubierta; nombre con la clase en color ("Pez espada Único"), peso, largo y dinero; **XP ganada con la barra de nivel que se llena** y una tecla para ver los modificadores de XP; botones **Liberar el pez** y **Llevar consigo**; aviso del modo foto; el chat anuncia la captura | **Sí:** la tarjeta de captura (ya existe, con el pez 3D) suma la clase en color, la barra de nivel que se llena con la XP ganada y el **desglose de la XP** (clase, primera captura de la especie, licencia). Liberar / guardar ya existe. Atajo al modo foto desde la tarjeta. Sin chat (no hay multijugador) |
+| Siguiente pez (séptima captura) | Sacado el pez espada a las 15:48:45, **el siguiente picó a las 15:53: unos 4 min entre un pez y el siguiente** (tarjeta, volver a armar, curricán y espera). La bodega pasó de 971 a 1,419 kg (el pez espada de 448 kg). Otra pelea larga, con 78 m fuera y el carrete en naranja | Referencia de ritmo para el mar (D74, D76): unos 4 min hasta la siguiente picada más 10 o más min de pelea, o sea **pocos peces grandes por hora**. En el lago (D74) un pez cada 2 a 2.5 min |
+| Segundo pez espada (octava captura) | **Pez espada común de 199 kg, ~7 min de pelea** (picó a las 15:53, sacado a las 15:59:48). $74,320 y 20,813 XP. Comparado con el único de 448 kg ($182,942 y 136,391 XP): **el dinero va casi en proporción al peso** ($373/kg el común, $408/kg el único: ×1.1) y **la XP premia mucho la clase** (104 XP/kg el común, 304 XP/kg el único: ×2.9 por kg, ×6.5 en total). El estado del equipo bajó otros 2 puntos por pieza | **Por decidir:** nuestro juego hace lo contrario en dinero (el único vale ×3 por kg, el trofeo ×1.5; `Progression.js` SIZE_CLASSES). Se podría acercar a FP: dinero casi por peso (único ×1.2) y la clase premiada sobre todo en XP. Se revisa con los valores por hora de E2 (D75) |
+| Avanzar el tiempo (novena captura) | Ventana para saltar a otra hora: se elige la hora con flechas (23:00) y muestra **el clima a esa hora y la actividad de los peces** en tres tramos (noche 5, día 6, noche 6) con curvas de color; botones **Avanzar el tiempo**, **Día siguiente** y Cancelar. Tiene **espera entre usos** ("Se podrá tener acceso dentro de 07:58"). Aviso: al pasar al día siguiente **se venden todos los peces** de la nevera | **Propuesta D77** (abajo) |
 | Perfil (sexta captura) | Resultado: XP total, lo que falta para el siguiente nivel, peces capturados por clase (común 1,954, trofeo 377, único 65). **Récord por especie** con su modelo 3D, lugar, fecha, peso, largo y **el cebo con que se pescó** (el pez espada récord pesó 530 kg; el de 448 kg de la pelea no fue el más grande). **Retos** con insignia por niveles (I, II, III): pescar cierto número de peces con aparejos de flotador, con señuelos, con anzuelos sin rebaba | **Sí:** el registro de la portada (ya tiene récords) suma el cebo del récord, la fecha y el conteo por clase. Los retos van con las misiones (Fase 4) y premian usar cada técnica |
 | Centro | Brújula arriba; la caña en primera persona con las manos en el carrete y los portacañas del bote | La brújula y la caña ya existen. Las manos y los portacañas quedan para A1 |
 
@@ -1202,6 +1207,19 @@ Valores de partida: pejerrey ×4.4, trucha arcoíris ×5.5, carpa ×1.7, trucha 
 se miden en E1. Las licencias, el equipo y el viaje no cambian (ya se calculan por hora o por banda). Cada pez vale
 más y se siente más.
 
+**D77 · Avanzar el tiempo (aprobada).** Con el día de 120 min (D47), esperar el amanecer para la trucha
+puede tomar casi una hora real. Como en Fishing Planet: una ventana (desde la pausa o una tecla) para saltar **solo hacia
+adelante** a una hora del mismo día o del siguiente, con la curva de actividad de los peces (la de D71) para elegir.
+**Espera de 10 min de juego entre usos.** No se puede durante una pelea ni con el sedal en el agua. **La licencia no
+corre con el salto** (cuenta tiempo jugado, D19 y D41), así que saltar no la gasta ni la alarga. Los peces de la nevera
+se quedan (no hay venta automática: se venden con el vendedor). **Cambia D42:** la hora sigue sin poder moverse hacia
+atrás ni libremente fuera del modo foto, pero se puede adelantar con esta ventana.
+
+**Valores por hora medidos (E2, D75 y D78).** Multiplicadores aplicados en `FishTable.js` (precio × `hourMul`, XP ×
+`xpMul`): guapucha ×5.9 / ×4.8, carachi ×6.1 / ×5.4, pejerrey ×5.0 / ×3.8, capitán — / ×3.6 (protegido), trucha arcoíris
+×6.4 / ×4.7, carpa ×2.5 / ×2.2, trucha café ×4.8 / ×3.9. La isla: ×1.26–1.30 en dinero (solo compensa D78), XP ×1.
+`npm run balance` sigue midiendo la isla con la pelea P1; el lago se mide con `equipo-lago.mjs`.
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1216,7 +1234,7 @@ más y se siente más.
 | Entrega | Qué | Estado |
 |---|---|---|
 | E1 | Datos y reglas, sin cambiar el juego: `src/game/Tackle.js` (catálogo del lago, preferencias por especie, caña armada, problemas de armado, multiplicador de picada) y el enganche de D74 en `Bites.js`; `equipo-lago.mjs` lee de ahí; 28 tests | **Hecha** (2026-11-18) |
-| E2 | Pelea: al menos 1 minuto (D73), fuerza realista del pez, la potencia de la caña amortigua o desgarra, la pieza más débil manda, rotura de caña; tres barras de carga, metros fuera, freno como dial; el juego empieza a usar la picada y el enganche de E1; valores por hora (D75) con `npm run balance` puesto al día | Pendiente |
+| E2 | Pelea con equipo en el lago (`map.tackle`): fuerza realista, aguante de D73, freno tope del carrete, desgarre según la rigidez, caña rota; tres barras de carga por segmentos, metros fuera / capacidad, dial del freno; espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %; `hourMul` y `xpMul` por especie (D75) y clases de D78. Provisional hasta E3: cada grado del aparejo de flotador equivale a una caña del catálogo (`GRADE_RIGS`), el multiplicador de picada por cebo está apagado y la caña rota no se pierde. La isla sigue con la pelea P1 | **Hecha** (2026-11-18) |
 | E3 | Tienda nueva por pestañas con filtro por pez, fichas, paquetes por especie, comprar y equipar, vender al 50 %; guardado versión 4 | Pendiente |
 | E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
 | E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa | Pendiente |
@@ -1392,3 +1410,13 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
 - **2026-11-18** · **E1 hecha:** `src/game/Tackle.js` con el catálogo del lago, las preferencias de cada especie, la caña
   armada (estadísticas y problemas de armado) y el multiplicador de picada; el enganche de D74 en `Bites.js`. El juego
   no cambia todavía: la picada nueva, la pelea larga y los valores por hora (D75) entran juntos en E2. 28 tests nuevos.
+- **2026-11-18** · Anotado en 7h: en Fishing Planet pasaron ~4 min entre sacar el pez espada y la siguiente picada.
+- **2026-11-18** · Anotado en 7h: en Fishing Planet el dinero va casi por peso y la XP premia la clase (un único da ×6.5
+  de XP por ×2.25 de peso). Nuestro juego premia la clase también en dinero (×3); por decidir en E2.
+- **2026-11-18** · Anotada en 7h la ventana "Avanzar el tiempo" de Fishing Planet y propuesta D77 (saltar hacia adelante
+  con la curva de actividad, 10 min entre usos, la licencia no corre con el salto). Por decidir.
+- **2026-11-18** · Decididos D77 (avanzar el tiempo) y D78 (dinero casi por peso, la clase en XP). **E2 hecha:** el lago
+  pesca con la pelea nueva (al menos 1 minuto, la caña amortigua o desgarra, freno tope del carrete, caña rota), las
+  tres barras de carga, metros fuera / capacidad y el dial del freno; no toda picada engancha; valores por hora por
+  especie. Provisional hasta E3: cada grado del aparejo equivale a una caña del catálogo y la picada por cebo está
+  apagada. La isla sigue igual (solo compensa D78). Probado en el navegador; 16 tests nuevos.

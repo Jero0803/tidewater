@@ -2,7 +2,8 @@ import { loc } from '../i18n.js';
 import { Vector3, Color } from '../engine/index.js';
 import { WORLD } from '../world/WorldLayout.js';
 import { FISH } from './FishTable.js';
-import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
+import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome } from './Bites.js';
+import { gradeRig, rigStats, fightTackle } from './Tackle.js';
 import { CatchMinigame, rodSide, DRAG_STEPS } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
@@ -501,11 +502,12 @@ export class Game {
 			case 'windup': return { key: loc( 'LMB', 'Clic izq' ), text: loc( 'Release to cast (hold longer to cast farther)', 'Suelta para lanzar (mantén más tiempo para llegar más lejos)' ) };
 			case 'flying': return null;
 			case 'floating':
+				if ( b && b.phase === 'empty' ) return { key: loc( 'RMB', 'Clic der' ), text: loc( 'No bait · right-click to reel in, then cast again', 'Sin carnada · clic derecho para recoger y vuelve a lanzar' ) };
 				if ( b && b.phase === 'take' ) return { key: loc( 'LMB', 'Clic izq' ), text: loc( 'Strike now!', '¡Clava ahora!' ) };
 				if ( b && b.phase === 'nibble' ) return { key: '…', text: loc( 'Something\'s nibbling · wait until the bobber is pulled under', 'Algo está picando · espera a que la boya se hunda' ) };
 				return { key: loc( 'RMB', 'Clic der' ), text: loc( 'Waiting for a bite · right-click to reel the line in', 'Esperando una picada · clic derecho para recoger el sedal' ) };
 			case 'retrieving': return { key: loc( 'RMB', 'Clic der' ), text: loc( 'Reeling in', 'Recogiendo' ) };
-			case 'fighting': return { key: loc( 'Wheel', 'Rueda' ), text: loc( 'Drag: loosen it when the needle nears red, tighten it when the fish takes too much line', 'Freno: aflójalo si la aguja se acerca al rojo, apriétalo si el pez se lleva mucho hilo' ) };
+			case 'fighting': return { key: loc( 'Wheel', 'Rueda' ), text: loc( 'Drag: loosen it when the line or rod bar nears red, tighten it when the fish takes too much line', 'Freno: aflójalo si la barra del sedal o de la caña llega al rojo, apriétalo si el pez se lleva mucho hilo' ) };
 			case 'landing': return null;
 			default: return null;
 
@@ -628,7 +630,7 @@ export class Game {
 		}
 
 		const hab = this.habitat();
-		this.bite = { phase: 'wait', t: biteDelay( hab, this.hour ) };
+		this.bite = { phase: 'wait', t: this.nextBiteDelay( hab ) };
 		// the spot's name when the bobber lands somewhere new (D40); the minimap always shows it
 		const spot = spotOf( hab );
 		if ( spot && spot !== this._castSpot ) this.toast( `${ spot.name } · ${ this.rod.depth.toFixed( 1 ) } m`, 2200 );
@@ -649,11 +651,32 @@ export class Game {
 
 	}
 
+	// the rig in hand: until the new shop (E3) each float rig grade stands for a rod of the catalogue (Tackle.js)
+	rig() {
+
+		return gradeRig( this.state.upgrades.rig );
+
+	}
+
+	// seconds to the next bite: on maps with tackle by pieces the wait is longer (D74); the bite multiplier of the
+	// bait stays off until baits can be chosen (E3)
+	nextBiteDelay( hab ) {
+
+		return this.map.tackle ? biteDelayFor( hab, this.hour, 1 ) : biteDelay( hab, this.hour );
+
+	}
+
 	updateBite( dt ) {
 
 		const rod = this.rod;
 		const b = this.bite;
-		if ( ! b ) return;
+		if ( ! b || b.phase === 'empty' ) {
+
+			if ( b ) rod.dip = Math.max( 0, rod.dip - dt * 3 );
+			return;
+
+		}
+
 		b.t -= dt;
 		// bobber motion for the cues
 		if ( b.phase === 'nibble' ) rod.dip = Math.max( 0, Math.sin( Math.min( 1, ( b.pulse || 0 ) ) * Math.PI ) * 0.45 );
@@ -684,12 +707,21 @@ export class Game {
 
 			b.nibbles --;
 			b.pulse = 0;
+			// D74: a nibbling fish can take the bait without pulling the bobber under
+			if ( this.map.tackle && nibbleOutcome( {}, Math.random ) === 'steal' ) {
+
+				this.bite = { phase: 'empty' };
+				this.toast( loc( 'It stole the bait · reel in (right click) and cast again', 'Se robó la carnada · recoge (clic derecho) y vuelve a lanzar' ), 2600 );
+				return;
+
+			}
+
 			if ( b.nibbles > 0 ) b.t = 0.6 + Math.random() * 1.0;
 			else {
 
 				b.phase = 'take';
 				// big, strong fish give a (slightly) shorter window
-				b.t = 2.4 - FISH[ b.species ].fight * 0.5;
+				b.t = b.window = 2.4 - FISH[ b.species ].fight * 0.5;
 				if ( this.app.audio && this.app.audio.fishSplash ) this.app.audio.fishSplash( rod.bobber, 0.35 );
 
 			}
@@ -697,7 +729,7 @@ export class Game {
 		} else if ( b.phase === 'take' ) {
 
 			this.toast( loc( 'It took the bait and ran', 'Se llevó la carnada y escapó' ), 1800 );
-			this.bite = { phase: 'wait', t: biteDelay( this.habitat(), this.hour ) };
+			this.bite = this.map.tackle ? { phase: 'empty' } : { phase: 'wait', t: this.nextBiteDelay( this.habitat() ) };
 
 		}
 
@@ -706,17 +738,46 @@ export class Game {
 	strike() {
 
 		const b = this.bite;
-		if ( ! b || b.phase === 'wait' || b.phase === 'nibble' ) {
+		const tackle = this.map.tackle;
+		if ( ! b || b.phase === 'wait' || b.phase === 'nibble' || b.phase === 'empty' ) {
 
-			// too early: a nibbling fish isn't hooked yet; it keeps nibbling (a hint, no penalty)
-			if ( b && b.phase === 'nibble' ) this.toast( loc( 'Not yet · wait for it to pull under', 'Todavía no · espera a que se hunda' ), 1500 );
+			if ( b && b.phase === 'nibble' ) {
+
+				// too early: with tackle by pieces it usually scares the fish off (D74); before, only a hint
+				if ( tackle && strikeOutcome( 'nibble', 0, Math.random ) === 'spooked' ) {
+
+					this.bite = { phase: 'wait', t: this.nextBiteDelay( this.habitat() ) };
+					this.toast( loc( 'You struck too early and scared it off', 'Clavaste antes de tiempo y lo espantaste' ), 2200 );
+
+				} else this.toast( loc( 'Not yet · wait for it to pull under', 'Todavía no · espera a que se hunda' ), 1500 );
+
+			}
+
 			return;
 
 		}
 
-		const g = this.state.stats;
-		// the spool holds more line with heavier gear (120 m on the starter rig, 270 m on the top one)
-		this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: g.lineKg, reelSpeed: g.reelSpeed, distance: Math.max( 3, this.rod.lineOut ), drag: this.dragPos, lineCap: 120 + g.lineKg * 3 } );
+		// not every strike hooks it (D74): better early in the window
+		if ( tackle && strikeOutcome( 'take', 1 - b.t / ( b.window || 2 ), Math.random ) === 'missed' ) {
+
+			this.bite = { phase: 'empty' };
+			this.toast( loc( 'Missed it · the bait is gone, reel in and cast again', 'Falló el enganche · se fue la carnada, recoge y vuelve a lanzar' ), 2600 );
+			return;
+
+		}
+
+		if ( tackle ) {
+
+			const rig = this.rig(), st = rigStats( rig );
+			this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: st.lineKg, reelSpeed: st.reelSpeed, distance: Math.max( 3, this.rod.lineOut ), drag: this.dragPos, lineCap: st.lineCap, tackle: fightTackle( b.species, rig ) } );
+
+		} else {
+
+			const g = this.state.stats;
+			// the spool holds more line with heavier gear (120 m on the starter rig, 270 m on the top one)
+			this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: g.lineKg, reelSpeed: g.reelSpeed, distance: Math.max( 3, this.rod.lineOut ), drag: this.dragPos, lineCap: 120 + g.lineKg * 3 } );
+
+		}
 		// where it was hooked: the fight's sideways angle turns from this bearing (atan2( x, z ))
 		const pp = this.app.player.position, bb = this.rod.bobber;
 		this.fight.bearing0 = Math.atan2( bb.x - pp.x, bb.z - pp.z );
@@ -767,7 +828,8 @@ export class Game {
 
 		} else if ( st === 'snapped' ) {
 
-			const why = f.cause === 'spooled' ? loc( 'It took all the line on the reel · tighten the drag sooner', 'Se llevó todo el hilo del carrete · aprieta el freno antes' )
+			const why = f.cause === 'rod' ? loc( 'The rod broke! · the fish was too much for it: loosen the drag', '¡Se rompió la caña! · el pez era demasiado para ella: afloja el freno' )
+				: f.cause === 'spooled' ? loc( 'It took all the line on the reel · tighten the drag sooner', 'Se llevó todo el hilo del carrete · aprieta el freno antes' )
 				: f.cause === 'snag' ? loc( 'It wrapped the line in the weeds · pull (right click) when it dives', 'Enredó el hilo en el fondo · tira con el clic derecho cuando baja' )
 					: loc( 'Snap! The line broke · loosen the drag on its runs', '¡Zas! Se rompió el sedal · afloja el freno en sus carreras' );
 			this.toast( why, 3200 );
@@ -776,7 +838,8 @@ export class Game {
 
 		} else {
 
-			this.toast( f.cause === 'jump' ? loc( 'It threw the hook in the jump · let go of the right click when it jumps', 'Se soltó en el salto · suelta el clic derecho cuando salta' )
+			this.toast( f.cause === 'tear' ? loc( 'The hook tore out · a stiff rod and a hard pull: loosen the drag, rod down', 'Se desgarró el anzuelo · caña rígida y mucha fuerza: afloja el freno y baja la caña' )
+				: f.cause === 'jump' ? loc( 'It threw the hook in the jump · let go of the right click when it jumps', 'Se soltó en el salto · suelta el clic derecho cuando salta' )
 				: loc( 'It threw the hook · slack line, keep reeling', 'Se soltó del anzuelo · el sedal quedó flojo, sigue recogiendo' ), 3000 );
 			this.rod.endFight();
 

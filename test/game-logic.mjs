@@ -1,7 +1,7 @@
 // Plain-node tests of the fishing game logic (no GPU): bites, the catch fight, inventory, save.
 import { FISH, FISH_IDS, fishValue, fishLengthCm } from '../src/game/FishTable.js';
 import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, lureHitOutcome, HOOKING } from '../src/game/Bites.js';
-import { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, STARTER_RIG, rigStats, rigProblems, rigReady, biteMul, hookTooSmall } from '../src/game/Tackle.js';
+import { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, STARTER_RIG, rigStats, rigProblems, rigReady, biteMul, hookTooSmall, fightTackle, gradeRig, GRADE_RIGS } from '../src/game/Tackle.js';
 import { catalogEntry } from '../src/maps/catalog.js';
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
@@ -232,7 +232,8 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 
 	// value: price × kg × class multiplier, juveniles worth nothing
 	ok( classValue( 'grunt', 0.35 ) === 0, 'value: juveniles are worth $0' );
-	ok( classValue( 'grunt', 0.8 ) === Math.round( 7 * 0.8 ) && classValue( 'grunt', 1.0 ) === Math.round( 7 * 1.0 * 1.5 ) && classValue( 'grunt', 1.2 ) === Math.round( 7 * 1.2 * 3 ), 'value: common ×1, trophy ×1.5, unique ×3' );
+	const gp = 7 * FISH.grunt.hourMul;
+	ok( classValue( 'grunt', 0.8 ) === Math.round( gp * 0.8 ) && classValue( 'grunt', 1.0 ) === Math.round( gp * 1.0 * 1.1 ) && classValue( 'grunt', 1.2 ) === Math.round( gp * 1.2 * 1.2 ), 'value: price × hourMul (D75); common ×1, trophy ×1.1, unique ×1.2 (D78)' );
 
 	// XP: ( class XP × difficulty + 3/kg + 20 if new ) × map multiplier
 	ok( Math.abs( difficulty( 'grunt' ) - 1.5 ) < 1e-9 && Math.abs( difficulty( 'tarpon' ) - 3 ) < 1e-9, 'XP: difficulty 1 + 2 × fight' );
@@ -600,6 +601,71 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	let b = 99; const r2 = () => ( ( b = ( b * 1664525 + 1013904223 ) >>> 0 ) / 4294967296 );
 	const hab = { shallows: 1 };
 	ok( Math.abs( biteDelayFor( hab, 12, 0.5, r1 ) - biteDelay( hab, 12, r2 ) * HOOKING.waitMul / 0.5 ) < 1e-9, 'hooking: the wait is ×3.5 and divided by the rig\'s bite multiplier' );
+
+}
+// ---- the fight with tackle by pieces (E2: D63, D64, D71, D73, D75, D78)
+{
+
+	let sd = 4242;
+	const r = () => ( ( sd = ( sd * 1664525 + 1013904223 ) >>> 0 ) / 4294967296 );
+	const good = ( g ) => {
+
+		if ( g.tension > 0.8 && g.drag > 2 ) g.setDrag( g.drag - 1 );
+		else if ( g.tension < 0.3 && ! g.slipping && g.drag < 7 ) g.setDrag( g.drag + 1 );
+		return { reel: ! g.slipping || g.mode === 'come', fast: g.mode === 'come', pull: g.mode === 'dive' || g.mode === 'hold', side: g.mode === 'run' ? - g.runDir * 0.8 : 0 };
+
+	};
+	const fightWith = ( species, kg, rig, player = good ) => {
+
+		const st = rigStats( rig );
+		const g = new CatchMinigame( { species, kg, lineKg: st.lineKg, reelSpeed: st.reelSpeed, distance: 18, lineCap: st.lineCap, tackle: fightTackle( species, rig ), rng: r } );
+		let s = 'fighting';
+		for ( let i = 0; i < 60 * 300 && s === 'fighting'; i ++ ) s = g.update( 1 / 60, player( g ) );
+		return g;
+
+	};
+	const trout = { rod: 'spinL', reel: 'r2500', line: 'f18', bait: 'spin2' };
+	const carpMH = { rod: 'bottomMH', reel: 'r4000', line: 'm40', hook: 2, sinker: 60, bait: 'corn' };
+
+	// D73: at least a minute with the right rig
+	const times = [ 0.3, 1, 2 ].map( ( kg ) => fightWith( 'rainbowTrout', kg, trout ) );
+	ok( times.every( ( g ) => g.state === 'caught' && g.time >= 60 ), `fight: a trout on its rod is landed and takes at least a minute (${ times.map( ( g ) => Math.round( g.time ) + ' s' ).join( ', ' ) })` );
+	const tiny = fightWith( 'guapucha', 0.008, STARTER_RIG );
+	ok( tiny.state === 'caught' && tiny.time >= 60, 'fight: even a guapucha on the starter rod takes a minute and does not tear out' );
+
+	// the reel's drag can't pass its maximum
+	const g = new CatchMinigame( { species: 'carp', kg: 5, lineKg: 20, reelSpeed: 1.3, tackle: fightTackle( 'carp', carpMH ), rng: r } );
+	g.setDrag( 10 );
+	const capped = g.dragKg;
+	g.setDrag( 3 );
+	ok( capped === REELS.r4000.dragMax && Math.abs( g.dragKg - 20 * 0.095 * 3 ) < 1e-9, 'fight: the drag never passes the reel\'s maximum (12 kg on a 20 kg line)' );
+	g.setDrag( 10 );
+	g.update( 1 / 60, { reel: true } );
+	ok( g.loads && g.loads.line > 0 && g.loads.rod > 0 && g.loads.reel > 0 && Math.abs( g.loads.line - g.tensionKg / 20 ) < 1e-9, 'fight: three loads (line, rod, reel) for the bars' );
+
+	// D64: a stiff rod with a hard fight tears the hook out of a trout; its own rod doesn't
+	let torn = 0;
+	for ( let i = 0; i < 20; i ++ ) if ( fightWith( 'brownTrout', 4, carpMH ).cause === 'tear' ) torn ++;
+	let tornOwn = 0;
+	for ( let i = 0; i < 20; i ++ ) if ( fightWith( 'brownTrout', 4, { rod: 'spinML', reel: 'r3000', line: 'f22', bait: 'minnow' } ).cause === 'tear' ) tornOwn ++;
+	ok( torn >= 8 && tornOwn === 0, `fight: the carp rod tears the hook out of a 4 kg brown trout (${ torn }/20), its own rod never (${ tornOwn }/20)` );
+
+	// the rod breaks above its limit: a heavy line on a light rod with the drag screwed down
+	const brk = { rod: 'floatUL', reel: 'r4000', line: 'm40', hook: 1, float: 6, bait: 'corn' };
+	let broke = 0;
+	for ( let i = 0; i < 10; i ++ ) if ( fightWith( 'carp', 10, brk, ( gg ) => { gg.setDrag( 10 ); return { reel: true, pull: true }; } ).cause === 'rod' ) broke ++;
+	ok( broke >= 5, `fight: a light rod breaks under a big carp on a heavy line with the drag locked (${ broke }/10)` );
+
+	// without tackle the fight is still the P1 one (the island)
+	const old = new CatchMinigame( { species: 'grunt', kg: 1, lineKg: 7, rng: r } );
+	ok( ! old.tackle && old.staminaMax < 60 && old.loads.line === 0, 'fight: without tackle it is the P1 fight' );
+
+	// D75 / D78: values per hour
+	ok( FISH.rainbowTrout.hourMul > 4 && FISH.rainbowTrout.xpMul > 3 && FISH.grunt.hourMul > 1.2 && FISH.grunt.xpMul === 1, 'values: lake species earn more per fish (new rhythm); island species only get back the flatter classes' );
+	ok( SIZE_CLASSES.find( ( c ) => c.id === 'unique' ).mult === 1.2 && SIZE_CLASSES.find( ( c ) => c.id === 'trophy' ).mult === 1.1, 'values: trophy ×1.1, unique ×1.2 (D78: the class pays mostly in XP)' );
+	ok( catchXp( 'carp', 3 ) === Math.round( ( sizeClass( 'carp', 3 ).xp * difficulty( 'carp' ) + 3 * 3 ) * FISH.carp.xpMul ), 'values: XP × the species\' xpMul' );
+	ok( activeMap().id !== 'lake' || activeMap().tackle === true, 'maps: the lake fishes with tackle by pieces' );
+	ok( gradeRig( 0 ) === STARTER_RIG && GRADE_RIGS.every( ( g2 ) => rigStats( g2 ) ) && rigStats( gradeRig( 6 ) ).lineKg > rigStats( gradeRig( 0 ) ).lineKg, 'tackle: every float rig grade stands for a rod of the catalogue until the new shop' );
 
 }
 console.log( `value check ${ value }` );

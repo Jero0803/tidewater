@@ -23,6 +23,10 @@ export const LAKE = {
 	// the 7 species of the lake (D30; listed in the catalog so the landing page knows them too)
 	species: catalogEntry( 'lake' ).species,
 
+	// tackle by pieces (docs/DISENO.md 7h, E2): the new fight, not every bite hooks, values per hour (Tackle.js).
+	// Maps without it (the island, until it has its catalogue) keep the P1 fight and rhythm.
+	tackle: true,
+
 	// the 5 spots of the lake (D30): each one is one of the lake's water types (habitat below)
 	spots: [
 		{ id: 'reeds', name: loc( 'Reed shore', 'Orilla de juncos' ), label: { x: - 330, z: 70 } },
