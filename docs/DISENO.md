@@ -136,6 +136,7 @@ hacia arriba (mapas de nivel más alto).
 | D80 | **Licencias por varios días, como en Fishing Planet:** se compran por 1 día, 3 días o 1 semana de juego (tiempo jugado, D19), con descuento (3 días ×2.8, semana ×6.3 el precio de un día). La tarjeta muestra qué especies deja guardar y cuáles hay que soltar. Sin licencia ilimitada | Menos visitas al vendedor; el gasto por hora casi no cambia | 2026-11-18 |
 | D81 | **Tienda en rejilla, como en Fishing Planet** (completa D65): tarjetas con imagen, nivel, cantidad del paquete, nombre, precio y Comprar; filtros a la izquierda (técnica, potencia o peso, tipo de cebo o señuelo, "para qué pez", en venta, nuevos); orden por nivel; panel del artículo con imagen grande, **para qué especies sirve**, con qué piezas es compatible, sus números comparados con lo equipado y una descripción | Lo vio el jugador del proyecto en la tienda de FP | 2026-11-18 |
 | D82 | **La licencia básica del mapa de inicio (el lago) es gratis y sin vencimiento**, como en Fishing Planet. Las demás licencias del lago y todas las de los otros mapas se siguen pagando por días (D80) | El inicio del lago era lento ($55–140/h) y además se cobraba la básica desde el segundo día |  2026-11-18 |
+| D83 | **Viaje rápido a los spots de orilla** desde el mapa grande (N): al hacer clic en un spot de orilla el jugador aparece en la orilla más cercana, gratis, fuera de una pelea y con el sedal recogido; el centro profundo sigue siendo en bote | Ahorra caminar sin quitar el mundo abierto (en FP se va directo a puntos fijos de orilla) | 2026-11-18 |
 | D84 | **Clases de tamaño en kilos por especie en el lago** (como en Fishing Planet): cada especie tiene sus kilos de juvenil, común, trofeo y único, elegidos para que ~25 % de lo que se pesca sea juvenil, ~55 % común, ~16 % trofeo y ~4 % único (trucha arcoíris: juvenil hasta 0.35 kg, común hasta 2.5, trofeo hasta 3.6). Una trucha de 1 kg es común y se vende. La isla sigue con el porcentaje del rango. Los juveniles se siguen soltando | En FP una trucha de 0.62 kg es común; aquí era juvenil hasta 0.77 kg y se soltaba con $0 | 2026-11-18 |
 | D85 | **La pelea crece con el tamaño del pez (cambia D73):** aguante = 95 s + 170 × peso^0.5 (kg reales). Con el equipo correcto y buen manejo: guapucha ~40 s, trucha de 0.3 kg ~65 s, de 1 kg ~1.5 min, de 2 kg ~2 min, de 3.5 kg ~4 min; carpa de 10 kg ~4.5 min. Los valores por hora (D75) se miden de nuevo: precio × 4.1–10.3 y XP × 2.5–9.2 según la especie | Medido en FP: una trucha joven sale en 30–50 s y una común de 1 kg en ~2–2.5 min; la diferencia de tamaño se tiene que sentir | 2026-11-18 |
 
@@ -1294,7 +1295,7 @@ llevar (en el panel del destino y la guía) y cada caña en dos o tres largos.
 desde el aire con **dos puntos de pesca** marcados en la orilla (por ejemplo "Pesca en las malezas de helecho"). Se elige
 uno y "Vamos a pescar" lleva directo ahí; cada punto es una zona chica de orilla para caminar. El día empieza a las 05:00.
 **Nuestro lago es distinto:** un mundo abierto donde se camina o se va en bote, con cinco spots con nombre que son tipos de
-agua (D30, D40), no lugares fijos. **Propuesta D83 (por decidir): viaje rápido a los spots** desde el mapa grande (N): al
+agua (D30, D40), no lugares fijos. **D83 (aprobada): viaje rápido a los spots** desde el mapa grande (N): al
 hacer clic en un spot de orilla (juncos, muelle, desembocadura, bahía de lodo) el jugador aparece en la orilla más cercana,
 gratis y fuera de una pelea; el centro profundo sigue siendo en bote. Ahorra caminar sin quitar el mundo abierto.
 
@@ -1362,7 +1363,7 @@ hora con su equipo: chicos ~30–36, trucha arcoíris ~20, trucha café ~16, car
 | E2 | Pelea con equipo en el lago (`map.tackle`): fuerza realista, aguante de D73, freno tope del carrete, desgarre según la rigidez, caña rota; tres barras de carga por segmentos, metros fuera / capacidad, dial del freno; espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %; `hourMul` y `xpMul` por especie (D75) y clases de D78. Provisional hasta E3: cada grado del aparejo de flotador equivale a una caña del catálogo (`GRADE_RIGS`), el multiplicador de picada por cebo está apagado y la caña rota no se pierde. La isla sigue con la pelea P1 | **Hecha** (2026-11-18) |
 | E3 | Tienda nueva en rejilla (D81) con filtros, panel del artículo, paquetes por especie, comprar y equipar, vender al 50 %; licencias por varios días (D80); pez carnada (D79); el multiplicador de picada por cebo se enciende; guardado versión 4 | **Hecha** (2026-11-18) |
 | E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
-| E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa | Pendiente |
+| E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa; viaje rápido a los spots (D83); avanzar el tiempo (D77) | Pendiente |
 | E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) | Pendiente |
 
 **Respuestas (2026-11-18):** con el equipo de carpa la trucha salía demasiado fácil; piezas separadas (D63); tres
@@ -1617,3 +1618,4 @@ armar las tres cañas queda para E4.
   preferidos de sémola, maíz, guisantes, pan, boilies y pellets. Nuestra carpa (0.5–12 kg, lago) queda como está; el
   pellet pasa a preferido.
 - **2026-11-18** · Comprobado en FP: carpas de 10 kg o más pelean ~4 min; la nuestra de 10 kg (caña de fondo MH), ~4.5 min. Coinciden.
+- **2026-11-18** · Decidido D83 (viaje rápido a los spots de orilla); entra en E5 junto con avanzar el tiempo (D77).
