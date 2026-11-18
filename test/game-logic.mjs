@@ -263,16 +263,17 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	lv.money = 1000;
 	ok( lv.licenseBlock( 2 ) === 'level' && ! lv.buyLicense( 2 ) && lv.money === 1000, 'v2: the intermediate licence needs level 4' );
 	lv.addXp( totalXpForLevel( 4 ) );
-	ok( lv.buyLicense( 2 ) && lv.money === 900 && lv.licenseTier === 2, 'v2: buying the intermediate licence' );
-	lv.money = 50;
+	ok( lv.buyLicense( 2 ) && lv.money === 1000 - LICENSES[ 2 ].price && lv.licenseTier === 2, 'v2: buying the intermediate licence' );
+	lv.money = LICENSES[ 1 ].price;
 	ok( lv.licenseBlock( 1 ) === null && lv.licenseBlock( 3 ) === 'level', 'v2: blocks by level before money' );
 	lv.addXp( totalXpForLevel( 7 ) );
+	lv.money = LICENSES[ 3 ].price - 1;
 	ok( lv.licenseBlock( 3 ) === 'money' && ! lv.buyLicense( 3 ), 'v2: cannot buy a licence without the money' );
 
 	// round trip
 	const sto = store();
 	const a = new GameState( sto );
-	a.money = 321; a.addXp( 1234 ); a.addPlayed( 0.75 ); a.addFish( 'grunt', 0.8 ); a.money = 500; a.buyLicense( 1 );
+	a.money = 321; a.addXp( 1234 ); a.addPlayed( 0.75 ); a.addFish( 'grunt', 0.8 ); a.money = 500; ok( a.buyLicense( 1 ), 'v2: buying the basic licence again' );
 	a.save();
 	const b = new GameState( sto );
 	ok( b.load() && b.money === a.money && b.xp === a.xp && b.xp > 1234 && b.playedSeconds === 0.75 && b.inventory.length === 1 && b.log.grunt.count === 1
@@ -354,7 +355,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 // ---- game clock (delivery 4: D16, D22, D42)
 {
 
-	ok( Math.abs( CLOCK_HOURS_PER_SECOND * LICENSE_SECONDS - 24 ) < 1e-9 && Math.abs( CLOCK_HOURS_PER_SECOND * 60 - 1 ) < 1e-9, 'clock: one game hour per real minute, a day = a licence' );
+	ok( Math.abs( CLOCK_HOURS_PER_SECOND * LICENSE_SECONDS - 24 ) < 1e-9 && Math.abs( CLOCK_HOURS_PER_SECOND * 300 - 1 ) < 1e-9, 'clock: one game hour every 5 real minutes, a day = a licence (D47)' );
 	ok( dayPhase( 6.5 ) === 'dawn' && dayPhase( 12 ) === 'day' && dayPhase( 18.5 ) === 'dusk' && dayPhase( 23 ) === 'night' && dayPhase( 2 ) === 'night' && dayPhase( 26 ) === 'night', 'clock: parts of the day' );
 	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) };
 	const a = new GameState( sto );

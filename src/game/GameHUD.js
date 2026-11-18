@@ -2,7 +2,7 @@ import { loc } from '../i18n.js';
 import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { UPGRADES, nextLevel, FUEL_PRICE } from './Gear.js';
 import { FishPortrait } from './FishPortrait.js';
-import { levelFromXp, LICENSES, licenseTierOf, dayPhase } from './Progression.js';
+import { levelFromXp, LICENSES, LICENSE_WARN_SECONDS, DAY_SECONDS, licenseTierOf, dayPhase } from './Progression.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -181,7 +181,13 @@ const CSS = /* css */`
 // names shown for licences and size classes
 export const licenseName = ( tier ) => [ loc( 'No', 'Sin' ), loc( 'Basic', 'Básica' ), loc( 'Intermediate', 'Intermedia' ), loc( 'Advanced', 'Avanzada' ) ][ tier ] ?? '';
 export const className = ( id ) => ( { juvenile: loc( 'Juvenile', 'Juvenil' ), common: loc( 'Common', 'Común' ), trophy: loc( 'Trophy', 'Trofeo' ), unique: loc( 'Unique', 'Único' ) } )[ id ] ?? '';
-const minutes = ( sec ) => `${ Math.ceil( sec / 60 ) } min`;
+// time left: "1 h 35 min" / "12 min"
+const minutes = ( sec ) => {
+
+	const m = Math.ceil( sec / 60 );
+	return m >= 60 ? `${ Math.floor( m / 60 ) } h${ m % 60 ? ` ${ m % 60 } min` : '' }` : `${ m } min`;
+
+};
 
 // why a catch went back in the water (GameState.lastCatch.reason), as one short line
 export function releaseText( info, state ) {
@@ -237,7 +243,7 @@ export class GameHUD {
 		this.licEl = this.purse.querySelector( '.gm-lic' );
 		// the game clock, next to the mode chip (top left): hour, part of the day, paused
 		this.clockEl = h( 'div', 'tw-mode gm-clock', `<b>16:12</b><span class="gm-phase"></span>` );
-		this.clockEl.title = loc( 'Game clock · one game hour per real minute · T pauses it', 'Reloj del juego · una hora del juego por minuto real · T lo pausa' );
+		this.clockEl.title = loc( 'Game clock · one game hour every 5 real minutes · T pauses it', 'Reloj del juego · una hora del juego cada 5 minutos reales · T lo pausa' );
 		this.clockTime = this.clockEl.querySelector( 'b' );
 		this.clockPhase = this.clockEl.querySelector( '.gm-phase' );
 		if ( ui.modeEl ) ui.modeEl.after( this.clockEl );
@@ -347,7 +353,7 @@ export class GameHUD {
 
 			this._last.lic = lic;
 			this.licEl.textContent = lic;
-			this.licEl.classList.toggle( 'is-low', ! tier || left < 120 );
+			this.licEl.classList.toggle( 'is-low', ! tier || left < LICENSE_WARN_SECONDS );
 			this.licEl.title = loc( 'Fishing licence of this map · counts down while you play', 'Licencia de pesca de este mapa · se descuenta mientras juegas' );
 			if ( this.standOpen && this.vendor && this.vendor.kind === 'shop' ) this.renderShop();
 
@@ -588,7 +594,7 @@ GameHUD.prototype.renderShop = function () {
 		<h2>${ v.name }</h2>
 		<p class="gm-sub">${ v.greeting } · ${ loc( 'You have', 'Tienes' ) } $${ s.money.toLocaleString() }</p>
 		${ this.progressLine() }
-		<div class="gm-list"><div class="gm-shop-head">${ loc( 'Licences · one game day of play (24 min)', 'Licencias · un día del juego jugado (24 min)' ) }</div>${ licRows }<div class="gm-shop-head">${ loc( 'Gear and boat', 'Equipo y bote' ) }</div>${ fuelRow }${ rows }</div>
+		<div class="gm-list"><div class="gm-shop-head">${ loc( `Licences · one game day of play (${ DAY_SECONDS / 60 } min)`, `Licencias · un día del juego jugado (${ DAY_SECONDS / 60 } min)` ) }</div>${ licRows }<div class="gm-shop-head">${ loc( 'Gear and boat', 'Equipo y bote' ) }</div>${ fuelRow }${ rows }</div>
 		<div class="gm-foot"><span class="gm-sub">${ loc( 'Upgrades take effect at once', 'Las mejoras se aplican al instante' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Leave (E)', 'Salir (E)' ) }</button></div>`;
 	this.stand.querySelector( '[data-close]' ).onclick = () => this.closeStand();
 	for ( const b of this.stand.querySelectorAll( '[data-buy]' ) ) b.onclick = () => this.game.buy( b.dataset.buy );

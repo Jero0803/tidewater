@@ -371,7 +371,7 @@ if ( show( 'fase1' ) ) {
 
 	}
 
-	table( [ 'Licencia', 'Spot', 'XP/h', '$/día de juego (24 min)', 'Neto tras pagar la licencia' ], rows );
+	table( [ 'Licencia', 'Spot', 'XP/h', `$/día de juego (${ P.DAY_SECONDS / 60 } min)`, 'Neto tras pagar la licencia' ], rows );
 	const xph = ( best[ 1 ] + best[ 2 ] + best[ 3 ] ) / 3;
 	console.log( `\nNiveles (curva ${ P.LEVEL_BASE_XP } × ${ P.LEVEL_GROWTH }^(N − 1)), a ~${ Math.round( xph ) } XP/h (media de los mejores spots):` );
 	for ( const L of [ 4, 7, 10, 20 ] ) console.log( `- Nivel ${ L }: ${ P.totalXpForLevel( L ).toLocaleString( 'es' ) } XP · ~${ ( P.totalXpForLevel( L ) / xph ).toFixed( 1 ) } h` );

@@ -157,7 +157,7 @@ export class AppUI {
 		// ---------------------------------------------------------------- Sky
 		const sky = ui.addTab( 'sky', loc( 'Sky', 'Cielo' ), 'sky' );
 		const sun = sky.addFolder( loc( 'Sun', 'Sol' ), { icon: 'clock' } );
-		const clockInfo = sun.addInfo( { label: loc( 'Clock', 'Reloj' ), get: () => loc( 'free in photo mode (P)', 'libre en modo foto (P)' ), tooltip: loc( 'The day runs by itself, one game hour per real minute; T pauses it. The hour can only be moved in photo mode, and it goes back when you leave it.', 'El día avanza solo, una hora del juego por minuto real; T lo pausa. La hora solo se mueve en el modo foto, y vuelve a la del juego al salir.' ) } );
+		const clockInfo = sun.addInfo( { label: loc( 'Clock', 'Reloj' ), get: () => loc( 'free in photo mode (P)', 'libre en modo foto (P)' ), tooltip: loc( 'The day runs by itself, one game hour every 5 real minutes; T pauses it. The hour can only be moved in photo mode, and it goes back when you leave it.', 'El día avanza solo, una hora del juego cada 5 minutos reales; T lo pausa. La hora solo se mueve en el modo foto, y vuelve a la del juego al salir.' ) } );
 		const timeCtl = sun.addTimeOfDay( { object: app.settings, key: 'timeOfDay' } );
 		sun.addSlider( { label: loc( 'Sun azimuth', 'Azimut del sol' ), object: app.settings, key: 'sunAzimuth', min: - 180, max: 180, step: 1, format: ( v ) => `${ Math.round( v ) }°`, tooltip: loc( 'Turns the sun\'s path around the island (0 = the real path: rises in the east, sets in the west).', 'Gira la trayectoria del sol alrededor de la isla (0 = la real: sale por el este y se pone por el oeste).' ) } );
 		let speed = null;

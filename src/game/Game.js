@@ -11,7 +11,7 @@ import { Chandlery } from './Chandlery.js';
 import { CatchDisplay } from './CatchDisplay.js';
 import { UPGRADES, fuelBurn } from './Gear.js';
 import { GameHUD, releaseText, licenseName } from './GameHUD.js';
-import { LICENSES } from './Progression.js';
+import { LICENSES, LICENSE_WARN_SECONDS } from './Progression.js';
 import { Minimap } from './Minimap.js';
 import { Guide } from './Guide.js';
 
@@ -150,10 +150,11 @@ export class Game {
 			this._licWarned = false;
 			s.emit();
 
-		} else if ( tier && left < 120 && ! this._licWarned ) {
+		} else if ( tier && left < LICENSE_WARN_SECONDS && ! this._licWarned ) {
 
 			this._licWarned = true;
-			this.toast( loc( `${ licenseName( tier ) } licence: 2 min left`, `Licencia ${ licenseName( tier ).toLowerCase() }: quedan 2 min` ), 3600 );
+			const min = Math.ceil( left / 60 );
+			this.toast( loc( `${ licenseName( tier ) } licence: ${ min } min left`, `Licencia ${ licenseName( tier ).toLowerCase() }: quedan ${ min } min` ), 3600 );
 
 		}
 

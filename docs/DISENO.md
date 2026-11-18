@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entregas 1 a 4 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias) y reloj de 24 minutos.
+**Estado:** programando la Fase 1. Entregas 1 a 4 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias) y reloj (día de 120 minutos, D47).
 
 ---
 
@@ -75,7 +75,7 @@ hacia arriba (mapas de nivel más alto).
 | D19 | **El tiempo de las licencias es tiempo jugado:** solo corre con el juego abierto | Quien juega poco no pierde sus licencias por no entrar | 2026-11-17 |
 | D20 | **Viaje entre mapas aprobado** como se propuso: desde el amarre del bote (E), destinos por nivel, con costo; viajan dinero, nivel, XP y equipo; licencias, registro, récords y vendedores son de cada mapa; los peces de la nevera se venden o sueltan antes de viajar | Separa datos globales y por mapa desde el principio | 2026-11-17 |
 | D21 | **Una licencia dura 1 día del juego jugado** (lo que dure un día simulado mientras se juega) | Se renueva seguido: gasto recurrente sin sentirse corto | 2026-11-17 |
-| D22 | **Un día del juego dura 24 minutos reales** (1 hora del juego = 1 minuto real). Por tanto una licencia dura 24 minutos de juego | Fácil de entender; se vive el ciclo completo del día | 2026-11-17 |
+| D22 | ~~Un día del juego dura 24 minutos reales~~ Reemplazada por D47 | | 2026-11-17 |
 | D23 | ~~Cadena represa → río → manglar → isla~~ Reemplazada por D27. **Cadena de mapas de la montaña al mar, en ambiente caribeño:** represa o lago (inicio) → río o quebrada → manglar o estuario → la isla actual | Como en el género: se empieza en aguas tranquilas y el mar es la meta. El ambiente caribeño reutiliza vegetación y sonidos | 2026-11-17 |
 | D24 | **La isla es el punto de referencia** de todo el diseño. Por ahora es el mapa más alto: los números (peces, precios, XP, licencias) se calibran en ella y se escalan **hacia abajo** para los mapas de inicio y, cuando se agreguen, **hacia arriba** para mapas de nivel más alto | Mapas y niveles son infinitos; hace falta un ancla fija desde la que medir | 2026-11-17 |
 | D25 | **Hasta que exista un mapa de nivel más bajo, la isla sigue siendo donde se empieza** (redactado antes de D27, que cambió la represa por la cadena de cinco), con su progresión interna de licencias. Cuando la represa esté lista pasa a ser el inicio, la isla se desbloquea por nivel y las partidas que ya estén en la isla se quedan ahí sin perder nada | El juego siempre es jugable mientras se construye la cadena | 2026-11-17 |
@@ -100,6 +100,7 @@ hacia arriba (mapas de nivel más alto).
 | D44 | **Guardado versión 2:** se conservan dinero, nevera y registro; cada mejora vieja pasa al grado más parecido por su valor (sedal y caña al aparejo de flotador, nevera a la bodega equivalente); el nivel inicial se calcula con la XP que habrían dado los peces del registro. Nadie pierde nada | Compatibilidad con las partidas actuales | 2026-11-18 |
 | D45 | **Mientras la isla sea el mapa de inicio, su multiplicador de XP es ×1.0** (el del primer mapa de la cadena). Cuando haya mapas por debajo, pasa a ×3.05 | Coherente con D25: el multiplicador depende de la posición del mapa en la cadena | 2026-11-18 |
 | D46 | **El reloj no se detiene con la tienda, el inventario ni la tarjeta de captura;** solo la pausa T lo detiene (y la licencia sigue corriendo, D41). En el modo foto la hora se puede mover, pero al salir vuelve a la del juego, que siguió corriendo por debajo | Simple y sin trucos con la hora de los peces | 2026-11-18 |
+| D47 | **Un día del juego dura 120 minutos reales** (1 hora del juego = 5 minutos reales; reemplaza D22). La licencia sigue durando un día del juego (D21), o sea 120 min de juego, y **su precio sube ×5** para mantener el equilibrio medido: en la isla básica $175, intermedia $500, avanzada $1,000. El aviso de licencia por vencer salta a los 5 min. Los precios de licencias de los demás mapas (sección 6) están calculados para un día de 24 min: se multiplican ×5 | Con 24 min el día pasaba demasiado rápido | 2026-11-18 |
 
 ---
 
@@ -460,7 +461,7 @@ Hallazgo: el reloj viene detenido (empieza a las 16:12; la tecla T lo pone a 0.0
 y el panel de ajustes deja mover la hora a mano. Con eso una licencia por días se puede estirar (pausando) o
 gastar (adelantando), y las preferencias de hora de los peces se pueden forzar.
 - [x] ~~¿Cómo se cuenta el tiempo?~~ Licencias en tiempo real (D15); día del juego simulado (D16).
-- [x] ~~Duración de un día~~ 24 minutos (D22).
+- [x] ~~Duración de un día~~ ~~24 minutos (D22)~~ 120 minutos (D47).
 - [x] ~~Control de hora del panel~~ Bloqueado en el juego, libre en el modo foto (D42).
 - [x] ~~¿El reloj se pausa con el menú, la tienda o la tarjeta de captura?~~ No; solo con la pausa T (D46).
 
@@ -502,7 +503,7 @@ viajes a vender: orilla y muelle 1 min, bahía 2, arrecife 2.5, profundo 5).
 porque premia la cantidad de peces. Sumando **3 XP por kilo**, todos los spots quedan parejos (~1,100–1,600 XP/h
 con equipo inicial) y mejorar el equipo da más XP (~2,200 XP/h con equipo medio en bahía y profundo).
 
-**Dinero por día del juego (24 min), equipo inicial:**
+**Dinero por día del juego (24 min, medido antes de D47; con 120 min es ×5), equipo inicial:**
 
 | Licencia | Mejor spot | $/día | Spot más rentable con equipo medio |
 |---|---|---|---|
@@ -542,10 +543,10 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
-| 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de 24 min jugados, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
+| 1 | Datos y reglas, sin interfaz | `src/game/Progression.js` (clases de tamaño, valor por clase, XP, curva de niveles, licencias acumulativas de un día jugado, especies protegidas); licencia de cada especie en `FishTable.js`; tests en `test/game-logic.mjs`; sección `fase1` en `npm run balance`. No cambia el comportamiento del juego | **Hecha** (2026-11-18) |
 | 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | **Hecha** (2026-11-18) |
 | 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | **Hecha** (2026-11-18) |
-| 4 | Reloj | Día de 24 min que avanza solo; hora del panel bloqueada salvo en el modo foto (D16, D22, D41, D42) | **Hecha** (2026-11-18) |
+| 4 | Reloj | Día que avanza solo (120 min, D47); hora del panel bloqueada salvo en el modo foto (D16, D41, D42) | **Hecha** (2026-11-18) |
 | 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
 | 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
 
@@ -591,7 +592,7 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 
 **Entrega 4, cómo quedó el reloj:**
 
-- El día avanza solo desde el arranque: 1 hora del juego por minuto real (`CLOCK_HOURS_PER_SECOND` en
+- El día avanza solo desde el arranque: 1 hora del juego cada 5 minutos reales (D47; `CLOCK_HOURS_PER_SECOND` en
   `Progression.js`). T lo pausa y lo reanuda a esa velocidad; las licencias siguen corriendo (D41).
 - **Reloj en el HUD**, arriba a la izquierda junto al modo: hora y parte del día (alba 5–8, día 8–17, ocaso 17–20,
   noche), "en pausa" en rojo.
@@ -676,3 +677,7 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - **2026-11-18** · **Entrega 4 hecha:** reloj de 24 minutos que avanza solo, reloj en el HUD, hora del panel
   bloqueada salvo en el modo foto, hora guardada con la partida. Decidido D46 (el reloj solo se detiene con T).
   5 tests nuevos (todos pasan).
+- **2026-11-18** · Decidido D47: el día de 24 min era muy corto; ahora dura 120 min (1 hora del juego = 5 min
+  reales). La licencia sigue durando un día y su precio sube ×5 (básica $175, intermedia $500, avanzada $1,000).
+  Medido con `npm run balance -- --solo=fase1`: mismas proporciones (básica ~$1,100 por día en la orilla, avanzada
+  ~$4,900 netos en el profundo); los niveles no cambian (se miden en horas de juego).

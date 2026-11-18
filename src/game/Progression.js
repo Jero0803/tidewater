@@ -75,12 +75,12 @@ export function levelFromXp( xp ) {
 
 }
 
-// ---- licences (D10–D14, D18–D22, D37, D41, D43). Tier 1 basic, 2 intermediate, 3 advanced; cumulative (a tier
-// covers the ones below it). Each lasts one game day of played time: 24 real minutes, counted in played seconds
-// so pausing the clock (T) does not stop it.
-export const DAY_SECONDS = 24 * 60;
+// ---- licences (D10–D14, D18–D21, D37, D41, D43, D47). Tier 1 basic, 2 intermediate, 3 advanced; cumulative (a
+// tier covers the ones below it). Each lasts one game day of played time: 120 real minutes (D47), counted in played
+// seconds so pausing the clock (T) does not stop it.
+export const DAY_SECONDS = 120 * 60;
 export const LICENSE_SECONDS = DAY_SECONDS;
-// the game clock (D16, D22): one game day in DAY_SECONDS of play, so one game hour per real minute
+// the game clock (D16, D47): one game day in DAY_SECONDS of play, so one game hour every 5 real minutes
 export const CLOCK_HOURS_PER_SECOND = 24 / DAY_SECONDS;
 
 // part of the day for the clock in the HUD (matches where Bites.activity peaks: dawn ~6:30, dusk ~18:30)
@@ -94,13 +94,16 @@ export function dayPhase( hour ) {
 
 }
 
-// prices and minimum levels while the island is the starting map (D37 island prices, D43 levels 4 and 7)
+// prices and minimum levels while the island is the starting map (D37 island prices for a 24-minute day, scaled ×5
+// with the 120-minute day, D47; D43 levels 4 and 7)
 export const LICENSES = [
 	null,
-	{ tier: 1, id: 'basic', price: 35, minLevel: 1 },
-	{ tier: 2, id: 'intermediate', price: 100, minLevel: 4 },
-	{ tier: 3, id: 'advanced', price: 200, minLevel: 7 },
+	{ tier: 1, id: 'basic', price: 175, minLevel: 1 },
+	{ tier: 2, id: 'intermediate', price: 500, minLevel: 4 },
+	{ tier: 3, id: 'advanced', price: 1000, minLevel: 7 },
 ];
+// the HUD and a toast warn when the active licence has this much left
+export const LICENSE_WARN_SECONDS = 5 * 60;
 
 export const licenseTierOf = ( species ) => FISH[ species ].license ?? 1;
 export const isProtected = ( species ) => !! FISH[ species ].protected;

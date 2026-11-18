@@ -77,7 +77,7 @@ export class App {
 		this.settings = {
 			timeOfDay: 16.2,
 			sunAzimuth: 0, // degrees: turns the sun's daily path about the vertical
-			timeSpeed: CLOCK_HOURS_PER_SECOND, // hours per real second: the game clock runs by itself (D16, D22)
+			timeSpeed: CLOCK_HOURS_PER_SECOND, // hours per real second: the game clock runs by itself (D16, D47)
 			exposure: 0.55,
 			renderScale: 1, // internal resolution (the temporal upscaler reconstructs the output), Performance tab
 		};
@@ -479,7 +479,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 	}
 
-	// T: pause the day or let it run again at the game clock (one game hour per real minute, D22). Licences keep
+	// T: pause the day or let it run again at the game clock (one game hour every 5 real minutes, D47). Licences keep
 	// counting played time while it is paused (D41). In photo mode the panel's own speed is kept.
 	toggleTime() {
 
