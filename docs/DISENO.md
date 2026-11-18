@@ -116,6 +116,20 @@ hacia arriba (mapas de nivel más alto).
 | D60 | **Guía de peces de cada mapa, en el juego y en la portada:** una ficha por especie con su imagen, nombre común y científico, dónde pica (spots), a qué hora, licencia que pide, rango de tamaño y tu récord. En el juego es una pestaña del inventario; en la portada va dentro de Progreso. Las imágenes se sacan del propio juego (una por especie), así se ven igual en los dos lados y la portada sigue sin motor. **Todo visible desde el inicio**, también los peces que aún no pescaste | Hoy no hay forma de saber qué peces tiene un mapa ni cómo son | 2026-11-18 |
 | D61 | **Los peces pasan a modelos 3D (GLB) como camino principal (completa D59):** la prueba con la trucha arcoíris de eb78 se ve muy superior a la ilustración (volumen real, nado animado). Cada especie usa un modelo 3D libre (CC0 / CC-BY de Sketchfab; los baja el jugador del proyecto y yo los reduzco con `tools/fish/glb_slim.py`). Un modelo sin esqueleto o sin animación también sirve: el motor lo hace nadar con la misma onda que hoy dobla a los peces. Los escaneos pesados se simplifican. **Las especies sin modelo libre conservan su piel ilustrada** (guapucha, carachi, capitán por ahora). Presupuesto: 2 a 4 MB por especie, y cada mapa carga solo sus especies, cuando se necesitan | La calidad del modelo 3D es muy superior; la ilustración queda de respaldo | 2026-11-18 |
 | D62 | **La pelea profunda se adelanta y va antes que las técnicas (cambia D38):** controles de Fishing Planet (clic izquierdo recoger, Shift rápido, clic derecho tirar, mouse a los lados, rueda o +/− freno, Espacio red), el pez 3D visible en el agua con sus saltos y la red al final, y cada especie con su manera de pelear. Las técnicas (spinning, fondo, curricán) siguen en la Fase 2 y usarán esta pelea | Probando el juego, la pelea de hoy (mantener el clic y vigilar una barra) se siente muy básica; con los peces en 3D la pelea es lo que más se nota | 2026-11-18 |
+| D63 | **Equipo por piezas, como en Fishing Planet (cambia D36):** caña (técnica y potencia UL a XH, con rango de sedal y de peso de señuelo), carrete (recogida, freno máximo, capacidad), sedal (resistencia y grosor), anzuelo o cabeza plomada (tamaño), carnada o señuelo, y boya o plomo según la técnica. Manda la pieza más débil; la caña se puede romper. Sin líderes, cebaderos ni boilies (D5 sigue) | Jugando, la caña de la carpa volvía trivial a la trucha: con un solo aparejo el sedal fuerte solo ayuda | 2026-11-18 |
+| D64 | **El equipo pesado con un pez liviano se castiga:** pica menos (recelo de la especie ante el sedal grueso, anzuelo fuera de su rango), la carnada o el señuelo tienen que ser de los que le gustan (preferidos ×1, aceptables ×0.4, el resto ×0.05; reemplaza los pesos por técnica de D34) y una caña demasiado rígida desgarra el anzuelo en los cabezazos y saltos. Números en 7h, provisionales hasta medirlos | La trucha salía demasiado fácil con el equipo de carpa | 2026-11-18 |
+| D65 | **Tres cañas armadas a la vez**, cada una con sus piezas, que se cambian con 1, 2 y 3. La tienda va por pestañas (cañas, carretes, sedales, anzuelos y boyas, carnadas, señuelos, bote y bodega, licencias) con filtro "para qué pez", ficha comparada con lo equipado y comprar y equipar | Como en Fishing Planet: llevar flotador, spinning y fondo listos | 2026-11-18 |
+| D66 | **Carnadas y señuelos se gastan:** la carnada se compra por paquetes y se gasta al pescar; el señuelo se pierde si se corta el sedal | Gasto recurrente, como el combustible; corta el sedal tiene costo | 2026-11-18 |
+| D67 | **Sin desgaste por ahora:** las piezas no se gastan ni se reparan; la caña solo se rompe si se pasa su límite. El desgaste queda para más adelante | Menos cosas que vigilar mientras se aprende el equipo por piezas | 2026-11-18 |
+| D68 | **El equipo de la mochila se puede vender por el 50 % de lo que costó** | Corregir una compra equivocada sin que comprar y vender sea un negocio | 2026-11-18 |
+| D69 | **La tienda tiene paquetes por especie** en su pestaña Principal ("Para la trucha", "Para la carpa"): todas las piezas de la caña correcta con un descuento del 15 % | Que un jugador nuevo sepa qué comprar para cada pez | 2026-11-18 |
+| D70 | **Misiones de "Primeros pasos" en el lago** que enseñan a armar cada caña (flotador para la guapucha, spinning para la trucha, fondo para la carpa, pececito para la trucha café) y regalan el cebo. Se ven en pantalla mientras se pescan. Las demás misiones siguen en la Fase 4 | Como en Fishing Planet, las misiones enseñan el equipo | 2026-11-18 |
+| D71 | **Pantallas al estilo de Fishing Planet:** curva de actividad de los peces por hora y especies pescadas en el mapa grande y la portada; guía con casillas por clase y cebos preferidos (completa D60); nevera con el cebo usado, la hora, peso, largo, XP y valor; en la pesca, **tres barras de carga (sedal, caña, carrete) en vez de la barra de tensión**, metros fuera / capacidad, freno como dial y la caña activa con su cebo | Lo que se vio en las capturas del jugador del proyecto | 2026-11-18 |
+| D72 | **Catálogo del lago aprobado como punto de partida** (tabla en 7h, medido con `tools/balance/equipo-lago.mjs`): 5 potencias, 7 cañas, 5 carretes, 9 sedales, anzuelos, boyas, plomos, 5 carnadas y 5 señuelos. Fuerza del pez ajustada a sedales realistas y desgarre del anzuelo según la rigidez de la caña. Camino normal del lago: $1,249 con la bodega (42 % de la banda) | Con el equipo de carpa la trucha pica 4 a 6 veces menos y se desgarra si se pelea fuerte; con su caña sale siempre | 2026-11-18 |
+| D73 | **Sacar un pez lleva al menos 1 minuto de pelea** con el equipo correcto y buen manejo: aguante del pez = 180 s + 4 × aguante de la especie × tamaño^0.35 (antes 3.5 × aguante × tamaño^0.35). Los típicos tardan 65–115 s y los grandes 2.5–3.5 min | Pedido del jugador del proyecto: la pelea de 11–25 s era muy corta | 2026-11-18 |
+| D74 | **No toda picada engancha:** espera ×3.5 (dividida por la picada del equipo), robo de carnada en los toques (15 %), clavar en un toque espanta al pez (60 %), clavar con la boya hundida engancha el 75 % al principio de la ventana y el 55 % al final. Algo más de la mitad de las picadas terminan en pez; un pez cada 2 a 2.5 min | Pedido del jugador del proyecto: hoy toda picada clavada es un pez | 2026-11-18 |
+| D75 | **La economía se conserva por hora:** con 4 a 5 veces menos peces por hora, el precio por kg y la XP de cada especie suben por su factor (pejerrey ×4.4, trucha arcoíris ×5.5, carpa ×1.7, trucha café ×3.6; el resto y los valores finales se miden en E1 con `npm run balance` puesto al día). Licencias, equipo y viaje no cambian | Sin esto el lago duraría unas 20 h en vez de 5 (D32) | 2026-11-18 |
+| D76 | **Los trofeos del mar pelean de 5 a 15 minutos**, como en Fishing Planet (un pez espada único de 448 kg tardó ~12.5 min y no era el récord del jugador, de 530 kg). Se calibra con la isla y los mapas de mar; en el lago los más grandes quedan en 2.5–3.5 min (D73) | Lo vio el jugador del proyecto en su propia pelea | 2026-11-18 |
 
 ---
 
@@ -912,6 +926,307 @@ oficial):
 | P2 | El pez 3D visible en el agua durante la pelea: carreras, olas y espuma, saltos | Pendiente |
 | P3 | La red para sacarlo y los sonidos (clic del freno, carrete); ajuste fino de cada especie | Pendiente |
 
+## 7h. Equipo por piezas, carnadas, señuelos y tienda nueva (aprobada, D63–D66, 2026-11-18)
+
+**Lo que se vio jugando:** hay un solo aparejo (el de flotador por grados) para todo. La caña que sirve para la
+carpa es la misma que se usa con la trucha, y nada castiga usar equipo pesado con un pez liviano. Medido con la
+pelea P1 (jugador simulado "bueno", 60 peleas):
+
+| Pez | Sedal 7 kg | 13 kg | 26 kg | 50 kg |
+|---|---|---|---|---|
+| Trucha arcoíris 3.5 kg | 100 %, 14 s | 100 %, 10 s | 100 %, 10 s | 100 %, 9 s |
+| Trucha café 4 kg | 100 %, 26 s | 100 %, 12 s | 100 %, 10 s | 100 %, 10 s |
+| Carpa 10 kg | 45 %, 223 s | 100 %, 51 s | 100 %, 17 s | 100 %, 13 s |
+
+Con el equipo de carpa, la trucha deja de ser una pelea. Además, carnadas y señuelos no existen todavía (la sección 5
+los dejaba para la Fase 2).
+
+**Idea central (como en Fishing Planet):** el equipo se arma por piezas y **cada pez pide su equipo**. Usar equipo
+pesado con un pez liviano tiene tres costos: **pica menos** (ve el sedal grueso, el anzuelo grande no le cabe en la
+boca), **el anzuelo se desgarra** (una caña rígida no amortigua los saltos ni los cabezazos) y **la carnada o el
+señuelo equivocados casi no le interesan**. Usar equipo liviano con un pez grande se paga cortando el sedal o
+rompiendo la caña.
+
+### Las piezas
+
+| Pieza | Qué decide | Ejemplo |
+|---|---|---|
+| **Caña** | Técnica (flotador, spinning, fondo; casting y curricán más adelante), **potencia** y largo de lance. La potencia fija el rango de sedal y de peso de señuelo que aguanta | Spinning ligera (L), 2–7 g, sedal 2–5 kg |
+| **Carrete** | Velocidad de recogida, freno máximo, capacidad de hilo | Carrete 2000: 0.8 m/s, freno 4 kg, 150 m |
+| **Sedal** | Resistencia (kg) y grosor; el grosor espanta a los peces recelosos | Monofilamento 0.18 mm, 3.5 kg |
+| **Anzuelo** (o cabeza plomada para los plásticos) | Tamaño: tiene que caber en la boca del pez | #12 para guapucha, #6 para trucha, #2 para carpa |
+| **Carnada o señuelo** | Qué peces se interesan | Lombriz, maíz, cucharilla |
+| **Flotador o plomo** | Según la técnica: boya para el flotador, plomo para el fondo | Boya de 2 g, plomo de 20 g |
+
+Sin líderes, sin anzuelos de pelo, sin cebaderos ni boilies: esa parte de D5 sigue en pie.
+
+**Potencias de caña:** ultraligera (UL), ligera (L), media-ligera (ML), media (M), media-pesada (MH), pesada (H) y
+extrapesada (XH). En el lago solo hacen falta UL a MH.
+
+**Manda la pieza más débil:** el sedal se corta por encima de su resistencia; el freno no puede pasar el máximo del
+carrete; si la tensión pasa el máximo de la caña, **la caña se rompe** (hay que comprar otra).
+
+### Cómo castiga el equipo equivocado (números provisionales, se miden con `tools/balance/fight.mjs`)
+
+1. **Recelo del pez:** cada especie tiene un recelo de 0 a 1 (trucha 0.8, pejerrey 0.5, carpa 0.4, guapucha 0.2).
+   Un sedal más grueso que el ideal del pez baja la picada: ×1 si es el ideal, hasta ×0.25 si es mucho más grueso,
+   según el recelo.
+2. **Anzuelo:** cada especie tiene un rango de anzuelos. Dentro del rango, picada normal. Un número más grande:
+   ×0.4 y la mitad de las picadas se escapan al clavar. Más pequeño: pica bien, pero se suelta más en la pelea.
+3. **Carnada o señuelo:** cada especie tiene preferidos (×1), aceptables (×0.4) y el resto (×0.05). Reemplaza el
+   peso por técnica de D34: la técnica se elige al elegir la caña y el cebo.
+4. **Caña rígida contra pez liviano (lo que arregla la trucha):** la caña amortigua los tirones. Si el pez pesa
+   menos que el mínimo de la potencia de la caña, los cabezazos y los saltos pueden **desgarrar el anzuelo** (más
+   en especies de boca blanda o que saltan, como la trucha). Si pesa más que el máximo, se dobla demasiado y se
+   puede romper.
+5. **Peso del señuelo fuera del rango de la caña:** lance más corto (muy liviano) o caña en riesgo (muy pesado).
+
+### Carnadas y señuelos del lago
+
+**Carnadas** (se compran por paquetes, se gastan al pescar y al perder el pez): larva, lombriz, maíz, masa de pan,
+pellet de trucha. **Señuelos** (se compran una vez y se pierden si se corta el sedal): cucharilla giratoria
+pequeña y mediana, cucharilla ondulante, pececito (crankbait pequeño), plástico blando con cabeza plomada.
+
+| Especie | Preferidos | Aceptables | Anzuelo | Potencia ideal |
+|---|---|---|---|---|
+| Guapucha | Larva, masa de pan | Lombriz | #14–#10 | UL |
+| Carachi | Larva, lombriz | Masa de pan | #12–#8 | UL–L |
+| Pejerrey | Larva, cucharilla pequeña | Lombriz | #10–#6 | UL–L |
+| Capitán de la sabana | Lombriz (fondo, de noche) | Larva | #8–#4 | L–ML |
+| Trucha arcoíris | Cucharilla giratoria, pellet de trucha | Lombriz, cucharilla ondulante, maíz | #8–#4 | L–ML |
+| Carpa común | Maíz, masa de pan | Lombriz, pellet | #6–#1 | M–MH |
+| Trucha café | Pececito, cucharilla ondulante | Lombriz (de noche), plástico blando | #6–#2 | ML–M |
+
+### La tienda (al estilo de Fishing Planet)
+
+- **Pestañas por categoría:** Cañas · Carretes · Sedales · Anzuelos y boyas · Carnadas · Señuelos · Bote y bodega ·
+  Licencias.
+- **Filtro "para qué pez"** y por técnica: al elegir la trucha, la tienda marca qué cañas, sedales, anzuelos y
+  cebos le sirven.
+- **Ficha de cada artículo:** sus números comparados con lo que tienes equipado (más / menos), las especies para las
+  que sirve, nivel mínimo y precio. Los bloqueados por nivel se ven con candado.
+- **Comprar y equipar** en un paso.
+- **Cañas armadas:** se pueden tener varias cañas armadas a la vez (cada una con su carrete, sedal, anzuelo y cebo)
+  y cambiar entre ellas con 1, 2 y 3. Así se puede llevar una de flotador para la carpa y una de spinning para la
+  trucha.
+- **Inventario** con una pestaña de equipo para armar y desarmar cañas.
+
+### Referencia: el inventario de Fishing Planet (captura del jugador del proyecto, 2026-11-18)
+
+La pantalla de inventario de FP tiene tres columnas bajo las pestañas generales (Mapa, Inventario, Tienda…):
+
+| Zona | Qué muestra en FP | Lo que adoptamos |
+|---|---|---|
+| Fila de arriba | Personaje, bote y los soportes de caña 1 a 7; el número va en color según el estado (verde lista, rojo incompleta o rota) | **Sí**, con 3 soportes (D65): 1, 2, 3 en verde si la caña está completa, en rojo si le falta una pieza o está rota |
+| Columna izquierda | Las piezas de la caña elegida, una por fila (caña, carrete, sedal, líder, cebo); la caña con su ficha: tipo, longitud, peso de cebo (g), peso del hilo (kg), potencia, acción, partes, anillas, durabilidad | **Sí**: caña, carrete, sedal, anzuelo, cebo y boya o plomo. Ficha de la caña con tipo, largo, peso de cebo, rango de sedal, potencia y durabilidad. Sin acción, partes ni anillas |
+| Centro | La caña armada dibujada en vertical, cada pieza en su lugar con su ranura (clic para cambiarla), metros de sedal que quedan en el carrete (367) e ícono de llave para reparar | **Sí**: la caña armada con sus ranuras y los metros que quedan. La llave solo si se aprueba el desgaste |
+| Columna derecha | Mochila, Especiales, Licencias, Almacén de pescado. Barra de íconos por categoría (todo, cañas, carretes, sedales, anzuelos, carnadas, señuelos…) y árbol plegable (Líneas y líderes → Líneas de mar → Fluorocarbono de mar). Cada fila: imagen, nombre, datos (largo, resistencia, diámetro, color), valor, info y vender o tirar. Buscador | **Sí**: Mochila (lo que tienes), Licencias y Nevera. Barra de íconos y árbol por categoría y técnica, filas con imagen, nombre, datos clave, info y vender. Sin buscador al principio (el catálogo del lago es corto) |
+
+**Inventario ≠ tienda:** en FP lo que compras va a la mochila y desde allí se arma la caña. La tienda usa el mismo
+diseño de filas y categorías, con precio y "comprar" en vez de "vender".
+
+**Lo que no adoptamos:** moneda premium (las monedas de oro), clubes, líderes, color del sedal, acción de la caña.
+
+### Referencia: el resto de Fishing Planet (capturas del jugador del proyecto, 2026-11-18)
+
+| Pantalla de FP | Qué tiene | Lo que adoptamos |
+|---|---|---|
+| **Mapa** | Panel izquierdo: tarjeta del lugar (nombre, hora, "Día 5/5" de la licencia), **actividad de los peces por hora** (curva de 05 a 21), temperatura del aire y del agua, viento, especies pescadas (36/85 con barra), licencia activa con su vencimiento y "Vamos a pescar" | **Sí, en el mapa grande (N) y en la portada:** curva de actividad por hora (sale de `time` de cada especie), especies pescadas del mapa (x/7 con barra) y licencia con lo que le queda. Sin clima por ahora |
+| **Guía de especies** | Lista con imagen y tres casillas por clase (común, trofeo, único: marcadas si ya la pescaste); ficha con descripción, **cebos preferidos y señuelos preferidos**, botón 3D | **Sí, completa D60:** casillas por clase de tamaño y, en la ficha, los cebos preferidos y aceptables de 7h. Así el jugador sabe qué comprar |
+| **Tienda** | Subpestañas: Principal (portada con **paquetes por tema**: "Maníaco del curricán", "Maestro del jigging"), Cañas, Carretes, Hilo, Equipo, Aparejos, Señuelos, Cebos, Engodo, Barcos, Licencias, Servicios. Fila de marcas | **Sí:** pestaña Principal con **paquetes por especie** ("Para la trucha": caña, carrete, sedal, anzuelos y cucharillas a un precio con descuento). Las pestañas de 7h. Sin engodo ni marcas (las marcas son inventadas, sin parecerse a reales) |
+| **Misiones** | Categorías (Diarias, Comenzando, De aventura, Explorador, Maestría, Colecciones, Peces monstruo). Cada misión **enseña a armar un equipo**: "monte un feeder con resistencia mínima de 1.5 kg, plomada y anzuelo #8", "capture la carpa con ese equipo"; recompensa en dinero y un artículo | **Sí, una parte ya:** misiones de "Primeros pasos" en el lago que enseñan a armar cada caña (flotador para la guapucha, spinning para la trucha, fondo para la carpa) y regalan el cebo. El resto de las misiones sigue en la Fase 4 |
+| **Inventario: personaje** | Ropa (gorra, lentes, chaqueta), linterna de cabeza, carro de aparejos, soporte de cañas, bote y su almacén. Abajo, **límites de la mochila**: peces 0/160, cañas 4/9, sedales 34/59, aparejos 218/459 | **No por ahora:** sin ropa ni carro. La linterna de cabeza puede volver para la noche. Sin límites de mochila (el catálogo es corto) |
+| **Almacén de pescado (nevera)** | Peso máximo por pez, peso total / capacidad, cantidad y valor total. Cada pez: nombre con su clase (joven, trofeo), **el cebo con el que se pescó**, la hora (mañana, madrugada), el clima, peso y largo, XP y dinero | **Sí:** la nevera muestra por pez su clase, el cebo usado, la hora, peso, largo, XP y valor; arriba, peso total / capacidad y valor total |
+
+### Referencia: la pantalla de pesca de Fishing Planet (captura del jugador del proyecto, 2026-11-18)
+
+| Zona | Qué tiene en FP | Lo que adoptamos |
+|---|---|---|
+| Arriba a la izquierda | Nivel, hora y día de la licencia, clima, el bote con la carga del almacén (971/3000 kg) y el peso máximo por pez, "F1 para ayuda" | **Sí:** nivel, hora, licencia y nevera (kg / capacidad). Ya existe casi todo; se agrega el peso máximo por pez si lo trae la bodega |
+| Izquierda, al medio | La misión que se sigue, con su tarea pendiente | **Sí**, con las misiones de "Primeros pasos" |
+| Arriba a la derecha | **La caña activa (número 3 en un círculo)** con el señuelo y la carnada dibujados y sus nombres; debajo, la boya | **Sí:** número de la caña (1, 2, 3), cebo con su nombre y cantidad que queda, y boya o plomo |
+| Derecha | **Tres barras verticales de carga: sedal, caña y carrete**, con su ícono debajo y el estado de cada pieza (57 %, 66 %, 75 %) | **Sí, reemplaza la barra de tensión única de P1:** cada barra se llena con la carga sobre esa pieza respecto a su límite; la más llena es la que va a fallar (la pieza más débil manda, D63). El porcentaje de estado solo si se aprueba el desgaste |
+| Abajo a la derecha | **Metros de sedal fuera / sedal en el carrete** en números grandes (110 / 367 m) y un dial del freno | **Sí:** metros fuera / capacidad del carrete y el freno como dial (hoy es un número) |
+| Durante la pelea (segunda captura) | Las tres barras se llenan **por segmentos con colores de azul a verde, amarillo, naranja y rojo**: en la captura el sedal y la caña van a media carga (verde) y el carrete casi lleno (amarillo y naranja: el freno está soltando hilo). La caña se ve doblada. El jugador del proyecto enganchó ese pez hacía 3 min 40 s y la pelea seguía | **Sí:** barras por segmentos con ese degradado; la del carrete se llena cuando el freno suelta hilo, así se ve cuándo aflojar o apretar. La caña 3D se dobla con la carga (ya lo hace). Confirma D73: los peces grandes pelean varios minutos |
+| La misma pelea, 3 min después (tercera captura) | Según la hora del chat, pasaron 3 min 11 s reales (más de 7 min de pelea en total) y **el pez había sacado más hilo** (de 100 a 143 m de 367). Caña levantada (tirando), las tres barras a media carga. **El estado del sedal y del carrete bajó un punto durante la pelea** (57 → 56 %, 75 → 74 %): el desgaste corre mientras se pelea | Un pez grande puede **ganar hilo** aunque lleve minutos peleando: la pelea tiene idas y vueltas, no solo recoger. El desgaste queda fuera por ahora (D67); si se agrega, se gasta peleando |
+| La misma pelea, 4 min después (cuarta captura) | Unos 11 min de pelea en total. **El pez ya está cerca: 32 m de 367.** El carrete vuelve a naranja (el pez tira cerca del final y el freno suelta) y la caña se dobla mucho. El estado siguió bajando: sedal 56 → 54 %, caña 65 → 63 %, carrete 74 → 73 % | **El final de la pelea también tiene carreras:** el pez cansado todavía tira cerca del bote. Nuestra pelea ya lo hace (un pez que no está cansado al llegar cerca hace otra carrera) |
+| La captura (quinta captura) | **Pez espada único de 448 kg, sacado tras ~12.5 min de pelea** (enganchado hacia las 15:36 según el chat, sacado a las 15:48:45). Tarjeta: el personaje sostiene el pez en tercera persona sobre la cubierta; nombre con la clase en color ("Pez espada Único"), peso, largo y dinero; **XP ganada con la barra de nivel que se llena** y una tecla para ver los modificadores de XP; botones **Liberar el pez** y **Llevar consigo**; aviso del modo foto; el chat anuncia la captura | **Sí:** la tarjeta de captura (ya existe, con el pez 3D) suma la clase en color, la barra de nivel que se llena con la XP ganada y el **desglose de la XP** (clase, primera captura de la especie, licencia). Liberar / guardar ya existe. Atajo al modo foto desde la tarjeta. Sin chat (no hay multijugador) |
+| Perfil (sexta captura) | Resultado: XP total, lo que falta para el siguiente nivel, peces capturados por clase (común 1,954, trofeo 377, único 65). **Récord por especie** con su modelo 3D, lugar, fecha, peso, largo y **el cebo con que se pescó** (el pez espada récord pesó 530 kg; el de 448 kg de la pelea no fue el más grande). **Retos** con insignia por niveles (I, II, III): pescar cierto número de peces con aparejos de flotador, con señuelos, con anzuelos sin rebaba | **Sí:** el registro de la portada (ya tiene récords) suma el cebo del récord, la fecha y el conteo por clase. Los retos van con las misiones (Fase 4) y premian usar cada técnica |
+| Centro | Brújula arriba; la caña en primera persona con las manos en el carrete y los portacañas del bote | La brújula y la caña ya existen. Las manos y los portacañas quedan para A1 |
+
+### Catálogo del lago (medido, D72, 2026-11-18)
+
+Script: `node --no-warnings tools/balance/equipo-lago.mjs` (pelea real de P1 con el modelo nuevo encima; 60 peleas
+por casilla). Números provisionales hasta probarlos jugando.
+
+**Potencias** (la rigidez es cuánto del tirón llega al anzuelo; la caña se rompe por encima de 1.25 × el máximo de
+su sedal):
+
+| Potencia | Sedal | Cebo | Rigidez |
+|---|---|---|---|
+| Ultraligera (UL) | 1–3 kg | 1–5 g | 0.2 |
+| Ligera (L) | 2–5 kg | 3–12 g | 0.35 |
+| Media-ligera (ML) | 3–7 kg | 5–20 g | 0.5 |
+| Media (M) | 5–10 kg | 10–40 g | 0.65 |
+| Media-pesada (MH) | 7–14 kg | 20–80 g | 0.8 |
+
+**Cañas**
+
+| Caña | Técnica | Potencia | Lance | Precio | Nivel |
+|---|---|---|---|---|---|
+| Telescópica 3 m | Flotador | UL | 18 m | Inicial | 1 |
+| Telescópica 4 m | Flotador | L | 22 m | $60 | 2 |
+| Spinning 1.8 m | Spinning | UL | 24 m | $70 | 2 |
+| Spinning 2.1 m | Spinning | L | 30 m | $120 | 3 |
+| Spinning 2.4 m | Spinning | ML | 34 m | $150 | 5 |
+| Fondo 3 m | Fondo | M | 40 m | $130 | 4 |
+| Fondo 3.6 m | Fondo | MH | 45 m | $220 | 7 |
+
+**Carretes** (capacidad en metros de sedal de 0.25 mm; con otro grosor cambia según el área)
+
+| Carrete | Recogida | Freno máximo | Capacidad | Precio | Nivel |
+|---|---|---|---|---|---|
+| 1000 | 0.9 m/s | 3 kg | 120 m | Inicial | 1 |
+| 2000 | 1.0 m/s | 4 kg | 150 m | $50 | 2 |
+| 2500 | 1.1 m/s | 6 kg | 180 m | $90 | 3 |
+| 3000 | 1.2 m/s | 8 kg | 200 m | $110 | 5 |
+| De fondo 4000 | 1.3 m/s | 12 kg | 250 m | $150 | 6 |
+
+**Sedales** (bobina de 150 m): monofilamento 0.12 mm 1.5 kg $8 · 0.16 mm 2.5 kg inicial · 0.20 mm 3.5 kg $12 ·
+0.25 mm 5 kg $15 · 0.30 mm 7 kg $18 · 0.35 mm 9 kg $22 · 0.40 mm 12 kg $26. Fluorocarbono (se ve como un sedal
+35 % más fino, para la trucha): 0.18 mm 3 kg $30 (nivel 4) · 0.22 mm 4.5 kg $36 (nivel 5).
+
+**Anzuelos** (sobre de 10): #14, #12, #10 $3 · #8, #6 $4 · #4, #2 $5 · #1 $6. **Boyas** (sobre de 5): 1, 3 y 6 g, $2
+a $4. **Plomos** (sobre de 5): 20, 40 y 60 g, $2 a $4. Se pierden con el sedal.
+
+**Carnadas** (una por picada): larvas 30 por $4 · lombrices 20 por $5 · maíz 40 por $3 (nivel 2) · masa de pan 25 por
+$3 · pellet de trucha 30 por $6 (nivel 3). **Señuelos** (por unidad, se pierden al cortar): cucharilla giratoria #1
+3 g $8 (nivel 2) · #2 6 g $10 (nivel 3) · ondulante 8 g $10 (nivel 4) · plástico blando con cabeza 5 g $6 (nivel 4) ·
+pececito 5 cm 6 g $14 (nivel 5).
+
+**Equipo inicial (regalado):** telescópica 3 m UL, carrete 1000, monofilamento 0.16 mm, anzuelos #12, boyas de 3 g,
+30 larvas y una lata de lombrices.
+
+**Modelo medido:**
+- **Picada** = sedal × cebo × anzuelo. Sedal: ×1 hasta el grosor ideal de la especie; más grueso baja según su
+  recelo (mínimo ×0.25). Cebo: preferido ×1, aceptable ×0.4, otro ×0.05. Anzuelo más grande que su rango: ×0.2
+  (pica menos y la mitad se escapa al clavar).
+- **Fuerza del pez** con sedales realistas: peso × (0.25 + 0.6 × fuerza de la especie) + 0.05 kg (la de P1 estaba
+  pensada para sedales de 7 a 50 kg).
+- **Lo que llega al anzuelo** = (tirón del pez + resistencia del agua al recoger + lo que agrega levantar la caña,
+  que crece con su potencia pero nunca pasa el tirón del pez) × (0.55 + 0.9 × rigidez), ×1.5 en los saltos. Si pasa lo que aguanta la boca del pez
+  (boca × peso^0.6; trucha 1.5, carpa 2.4), el anzuelo se desgarra. **Cambio para E2:** la carga fija de recoger de
+  P1 (17 % del sedal) deja de crecer con el sedal.
+
+**Picada de cada equipo** (multiplicador):
+
+| Equipo | Guapucha | Carachi | Pejerrey | Capitán | Trucha arcoíris | Carpa | Trucha café |
+|---|---|---|---|---|---|---|---|
+| Flotador UL, 0.16, #12, larvas (inicial) | 0.90 | 0.94 | 1.00 | 0.40 | 0.05 | 0.05 | 0.05 |
+| Spinning L, flúor 0.18, cucharilla #2 | 0.01 | 0.01 | 0.40 | 0.05 | **1.00** | 0.05 | 0.40 |
+| Spinning ML, flúor 0.22, pececito | 0.01 | 0.01 | 0.01 | 0.05 | 0.05 | 0.05 | **1.00** |
+| Fondo M, 0.30, #4, maíz | 0.01 | 0.00 | 0.00 | 0.05 | 0.16 | **1.00** | 0.03 |
+| Fondo MH, 0.40, #2, maíz | 0.00 | 0.00 | 0.00 | 0.01 | 0.02 | 0.80 | 0.01 |
+| Fondo MH, 0.40, cucharilla #2 | 0.00 | 0.00 | 0.02 | 0.04 | 0.25 | 0.04 | 0.10 |
+
+**Pelea** con el aguante de D73 (% sacados y tiempo medio; jugador "bueno" que aprieta el freno y levanta la caña /
+jugador "suave" con freno 3 y la caña abajo; "tiempo" = pasó de 4 min):
+
+| Pez | Flotador UL | Spinning L | Spinning ML | Fondo M | Fondo MH |
+|---|---|---|---|---|---|
+| Guapucha, pejerrey, capitán | 100 %, 64–75 s | 100 %, 64–72 s | 100 %, 64–72 s | 100 %, 63–70 s | 100 %, 63–70 s |
+| Trucha arcoíris 1.5 kg | 100 % 72 s / 100 % 157 s | 100 % 69 s / 100 % 119 s | 100 % 68 s / 100 % 87 s | 100 % 67 s / 100 % 70 s | 72 % (desgarre) / 100 % |
+| Trucha arcoíris 3.5 kg | 100 % 169 s / 0 % (tiempo) | 100 % 118 s / 0 % (tiempo) | 100 % 78 s / 93 % 207 s | 62 % (desgarre) / 100 % 115 s | 65 % / 8 % (desgarre) |
+| Trucha café 4 kg | 0 % (tiempo) | 98 % 210 s / 0 % (tiempo) | 100 % 98 s / 0 % (tiempo) | 28 % (desgarre) / 100 % 159 s | 23 % / 0 % (desgarre) |
+| Carpa 3 kg | 100 % 171 s / 0 % (tiempo) | 100 % 117 s / 0 % (tiempo) | 100 % 79 s / 92 % 214 s | 100 % 71 s / 100 % 114 s | 100 % 70 s / 100 % 85 s |
+| Carpa 10 kg | 0 % (sedal) | 0 % (sedal) | 0 % (tiempo) | 48 % 224 s (tiempo) | 100 % 95 s |
+
+**Hallazgos:**
+- **La trucha ya no es trivial con el equipo de carpa:** pica de 4 a 6 veces menos (×0.16 con la caña de fondo M,
+  ×0.02–0.25 con la MH) y **ya no sale más rápido**: la pelea dura lo mismo que con su caña, y con la MH el anzuelo se
+  desgarra en una de cada tres si se pelea fuerte. Con su caña (spinning L o ML) sale siempre.
+- **El equipo liviano saca peces grandes, pero tarda y exige buena técnica:** la trucha de 3.5 kg con la telescópica,
+  casi 3 min; con freno flojo y la caña abajo no se cansa nunca. No puede con la carpa de 10 kg (corta el sedal).
+- **La carpa grande pide la caña de fondo MH:** con la M, la mitad de las de 10 kg se pasan de 4 min.
+- **Precios:** el camino normal del lago (spinning L para la trucha, fondo M para la carpa, spinning ML para la
+  trucha café) cuesta $899 más la bodega $350 = **$1,249 (42 % de la banda de $3,000)**; D37 daba 30 %. Todo el
+  catálogo, $1,667 (56 %). Cabe en el 40 % de equipo más el margen.
+- **Carnada:** con ~30 picadas por hora (D74), $2 a $6 por hora, como el combustible. Por eso el equipo inicial trae
+  larvas y lombrices.
+
+### Duración de la pelea y ritmo de las picadas (D73–D75, medido)
+
+**Pelea de al menos 1 minuto (D73).** El aguante del pez pasa de 3.5 × aguante × tamaño^0.35 (P1: 11–25 s con el
+equipo correcto) a **180 s + 4 × aguante × tamaño^0.35** segundos de presión plena. Con su equipo y buen manejo:
+
+| Pez | Equipo | Pequeño | Típico | Grande |
+|---|---|---|---|---|
+| Guapucha, carachi | Flotador UL | 64 s | 64 s | 65 s |
+| Pejerrey | Flotador UL | 64 s | 65 s | 66 s (85 s con cuidado) |
+| Capitán | Flotador L, lombriz | 65 s | 66 s | 68 s |
+| Trucha arcoíris | Spinning L | 65 s | 67 s (90 s con cuidado) | 2.5 min (4 kg) |
+| Trucha café | Spinning ML | 67 s | 69 s (103 s con cuidado) | 3.4 min (6 kg) |
+| Carpa | Fondo M | 67 s | 71 s (117 s con cuidado) | La de 12 kg pide la MH |
+
+Arreglo medido de paso: **levantar la caña solo carga el anzuelo en la medida en que el pez se resiste**. Si no, con
+su propia caña se desgarraban la guapucha de 5 g, la carpa de 0.5 kg y la trucha café de 0.5 kg.
+
+**No toda picada engancha (D74).** La picada sigue con sus fases (espera, toques, la boya se hunde, ventana para
+clavar), pero:
+
+| Momento | Qué pasa | Probabilidad (provisional) |
+|---|---|---|
+| Espera | Más larga: ×3.5 la de hoy (~22 s en un buen spot con el equipo correcto) y dividida por la picada del equipo (D64): con el equipo equivocado se espera mucho más | — |
+| Toques | El pez puede **robar la carnada** sin llegar a hundir la boya: hay que recoger y volver a encarnar (se gasta la carnada). Más con anzuelo grande. Los señuelos no se roban | 15 % |
+| Clavar en un toque (antes de tiempo) | Hoy solo avisa; ahora **espanta al pez** la mayoría de las veces | 60 % lo espanta |
+| Clavar con la boya hundida | Engancha con una probabilidad: más si se clava pronto en la ventana | 75 % al principio, 55 % al final |
+| No clavar | Se lleva la carnada y escapa (como hoy) | — |
+| Spinning | El pez ataca en la recogida: tirón en la punta y una ventana corta para clavar; si no se clava, a veces se engancha solo | Por medir en E1 |
+
+**Ritmo medido** (buen spot, buen jugador, 4 horas simuladas por especie):
+
+| Pez (con su equipo) | Antes: peces/h | Antes: $/h | Ahora: peces/h | Ahora: $/h | Picadas que enganchan | Factor para conservar $/h |
+|---|---|---|---|---|---|---|
+| Pejerrey | 131 | $274 | 31 | $62 | 61 % | ×4.4 |
+| Trucha arcoíris | 128 | $1,187 | 28 | $216 | 55 % | ×5.5 |
+| Carpa | 40 | $283 | 24 | $164 | 56 % | ×1.7 |
+| Trucha café | 102 | $1,814 | 25 | $504 | 52 % | ×3.6 |
+
+"Antes" es optimista (no cuenta caminar ni navegar), igual que `npm run balance`. **Ahora se saca un pez cada 2 a 2.5
+minutos** en vez de cada 30 s, y algo más de la mitad de las picadas terminan en pez.
+
+**La economía se mide por hora (D75).** Con 4 a 5 veces menos peces por hora, el dinero y la XP por hora caerían en la
+misma proporción y el lago duraría unas 20 h en vez de 5 (D32). Por eso **el precio por kg y la XP de cada especie
+suben por su factor**, medido en E1 con `npm run balance` puesto al día (su jugador simulado aún usa la pelea vieja).
+Valores de partida: pejerrey ×4.4, trucha arcoíris ×5.5, carpa ×1.7, trucha café ×3.6; guapucha, carachi y capitán
+se miden en E1. Las licencias, el equipo y el viaje no cambian (ya se calculan por hora o por banda). Cada pez vale
+más y se siente más.
+
+### Lo que cambia en las decisiones
+
+- **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
+  señuelo. **D37** se recalcula: el presupuesto por mapa (40 % de lo ganado para equipo) se reparte entre las piezas,
+  y las carnadas son un gasto recurrente nuevo, como el combustible.
+- **Guardado versión 4:** el aparejo de flotador de cada grado pasa a una caña, carrete y sedal equivalentes, con
+  carnada inicial gratis. Nadie pierde nada.
+- **La pelea (P1) se recalibra** con sedales realistas (2 a 12 kg en el lago en vez de 7 a 50).
+
+### Entregas propuestas (después de decidir)
+
+| Entrega | Qué |
+|---|---|
+| E1 | Datos: catálogo de piezas del lago, preferencias por especie, picada con recelo, anzuelo y cebo; picada que no siempre engancha (D74); valores por hora (D75) con `npm run balance` puesto al día; tests |
+| E2 | Pelea: al menos 1 minuto (D73), fuerza realista del pez, la potencia de la caña amortigua o desgarra, la pieza más débil manda, rotura de caña; tres barras de carga, metros fuera, freno como dial |
+| E3 | Tienda nueva por pestañas con filtro por pez, fichas, paquetes por especie, comprar y equipar, vender al 50 %; guardado versión 4 |
+| E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario |
+| E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa |
+| E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) |
+
+**Respuestas (2026-11-18):** con el equipo de carpa la trucha salía demasiado fácil; piezas separadas (D63); tres
+cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fijar el catálogo del lago con números
+(potencias, sedales, carretes, precios) y medirlo con `fight.mjs` y `npm run balance`. **Hecho** (D72, tabla arriba). Decididos también D67 (sin desgaste), D68 (vender al
+50 %), D69 (paquetes por especie), D70 (misiones de "Primeros pasos") y D71 (pantallas al estilo de FP).
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -1046,3 +1361,31 @@ oficial):
 - **2026-11-18** · **P1 hecha:** la pelea nueva con los controles de Fishing Planet (freno con la rueda, Shift, clic
   derecho para tirar, caña contra la carrera, saltos, enredos en el fondo, cada especie a su manera). Pendiente:
   recalibrar `npm run balance` (su jugador simulado solo mantiene el clic).
+- **2026-11-18** · Jugando se vio que la caña de la carpa sirve igual para la trucha y la vuelve trivial (medido con
+  la pelea P1). Propuesta en 7h: equipo por piezas (caña con potencia, carrete, sedal, anzuelo, cebo), carnadas y
+  señuelos por especie, tienda por pestañas al estilo de Fishing Planet. Por decidir.
+- **2026-11-18** · Decididos D63 (equipo por piezas), D64 (el equipo equivocado se castiga), D65 (tres cañas armadas y
+  tienda por pestañas) y D66 (carnadas y señuelos se gastan). Plan E1 a E5 en 7h.
+- **2026-11-18** · Anotado en 7h cómo es el inventario de Fishing Planet (captura del jugador): soportes de caña
+  arriba, piezas a la izquierda, caña armada al centro, mochila por categorías a la derecha.
+- **2026-11-18** · Anotado en 7h el resto de Fishing Planet (mapa con actividad por hora, guía con cebos preferidos,
+  tienda con paquetes, misiones que enseñan a armar equipo, nevera con el cebo usado). Por aprobar.
+- **2026-11-18** · Anotada en 7h la pantalla de pesca de Fishing Planet: tres barras de carga (sedal, caña, carrete) en
+  vez de una de tensión, metros fuera / en el carrete, caña activa con su cebo. Por aprobar.
+- **2026-11-18** · Decididos D67 (sin desgaste), D68 (vender al 50 %), D69 (paquetes por especie), D70 (misiones de
+  "Primeros pasos"), D71 (pantallas al estilo de FP) y D72 (catálogo del lago). Nuevo `tools/balance/equipo-lago.mjs`:
+  con el equipo de carpa la trucha pica 4 a 6 veces menos y se desgarra si se pelea fuerte; el camino normal del lago
+  cuesta $1,249 con la bodega (42 % de la banda). Plan E1 a E6 en 7h.
+- **2026-11-18** · Decididos D73 (la pelea dura al menos 1 minuto), D74 (no toda picada engancha) y D75 (la economía
+  se conserva por hora: el valor por pez sube por su factor). Medido con `equipo-lago.mjs`: un pez cada 2 a 2.5 min,
+  algo más de la mitad de las picadas enganchan; la trucha con el equipo de carpa ya no sale más rápido.
+- **2026-11-18** · Anotada en 7h la pelea de Fishing Planet (barras por segmentos de azul a rojo; la del carrete se
+  llena cuando el freno suelta hilo; un pez grande seguía peleando a los 3 min 40 s).
+- **2026-11-18** · Anotado en 7h: en Fishing Planet la misma pelea seguía a los 7 min y el pez había ganado hilo
+  (100 → 143 m); el desgaste del equipo corre mientras se pelea.
+- **2026-11-18** · Anotado en 7h: la pelea de referencia de Fishing Planet llegó a ~11 min con el pez a 32 m; el
+  pez sigue tirando cerca del final.
+- **2026-11-18** · Anotada en 7h la tarjeta de captura de Fishing Planet: pez espada único de 448 kg tras ~12.5 min
+  de pelea; barra de nivel que se llena con la XP, desglose de la XP, liberar o llevar, atajo al modo foto.
+- **2026-11-18** · Decidido D76 (los trofeos del mar pelean de 5 a 15 min). Anotado en 7h el perfil de Fishing Planet
+  (récord por especie con el cebo, conteo por clase, retos por técnica).
