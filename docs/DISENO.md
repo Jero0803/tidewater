@@ -135,6 +135,7 @@ hacia arriba (mapas de nivel más alto).
 | D79 | **Pez carnada:** la guapucha y el carachi que se pescan se pueden guardar como carnada viva (cubo aparte, sin ocupar la nevera); son cebo preferido de la trucha café y de la trucha arcoíris grande, y también se compran. En la isla, el pejerrey cabezón y la lisa | Como en Fishing Planet, los peces grandes comen peces; los chicos sirven para algo más que la XP | 2026-11-18 |
 | D80 | **Licencias por varios días, como en Fishing Planet:** se compran por 1 día, 3 días o 1 semana de juego (tiempo jugado, D19), con descuento (3 días ×2.8, semana ×6.3 el precio de un día). La tarjeta muestra qué especies deja guardar y cuáles hay que soltar. Sin licencia ilimitada | Menos visitas al vendedor; el gasto por hora casi no cambia | 2026-11-18 |
 | D81 | **Tienda en rejilla, como en Fishing Planet** (completa D65): tarjetas con imagen, nivel, cantidad del paquete, nombre, precio y Comprar; filtros a la izquierda (técnica, potencia o peso, tipo de cebo o señuelo, "para qué pez", en venta, nuevos); orden por nivel; panel del artículo con imagen grande, **para qué especies sirve**, con qué piezas es compatible, sus números comparados con lo equipado y una descripción | Lo vio el jugador del proyecto en la tienda de FP | 2026-11-18 |
+| D82 | **La licencia básica del mapa de inicio (el lago) es gratis y sin vencimiento**, como en Fishing Planet. Las demás licencias del lago y todas las de los otros mapas se siguen pagando por días (D80) | El inicio del lago era lento ($55–140/h) y además se cobraba la básica desde el segundo día |  2026-11-18 |
 
 ---
 
@@ -1256,7 +1257,7 @@ sin parecerse a los reales ni a los de FP).
 **Lo que sale de la comparación:**
 - **El inicio de FP es más amable:** la básica no cuesta nada en el mapa de inicio y deja guardar casi todo. Nosotros medimos
   que la primera hora del lago es lenta ($55–140/h con la básica) y además cobramos la básica desde el segundo día.
-  **Propuesta D82:** la licencia básica del lago (mapa de inicio) es gratis y sin vencimiento, como en FP.
+  **D82 (aprobada):** la licencia básica del lago (mapa de inicio) es gratis y sin vencimiento, como en FP.
 - **FP restringe por clase, no solo por especie:** la básica obliga a soltar los trofeos de ciertas especies. Es una idea
   para más adelante (por ejemplo, soltar la trucha café trofeo sin la avanzada); por ahora se quedan las tres licencias por
   especie (D11).
@@ -1500,3 +1501,4 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   catálogo; la trucha arcoíris prefiere insectos, huevas y cucharillas giratorias, y acepta larvas.
 - **2026-11-18** · Comparada la caña de trucha de Fishing Planet (L, 1.5–3.4 kg, 7–20 g) con nuestra spinning L: coincide;
   queda como está.
+- **2026-11-18** · Decidido D82 (la básica del lago es gratis y sin vencimiento); entra en E3 con la tienda nueva.
