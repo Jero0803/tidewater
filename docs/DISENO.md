@@ -1296,6 +1296,18 @@ agua (D30, D40), no lugares fijos. **Propuesta D83 (por decidir): viaje rápido 
 hacer clic en un spot de orilla (juncos, muelle, desembocadura, bahía de lodo) el jugador aparece en la orilla más cercana,
 gratis y fuera de una pelea; el centro profundo sigue siendo en bote. Ahorra caminar sin quitar el mundo abierto.
 
+**Medición en Fishing Planet: truchas con caña ligera (capturas 24 a 28, 2026-11-18).** Aparejo: spinning L de 2.3 m,
+carrete 1500, trenzado 0.12 mm de 1.8 kg, cucharilla estrecha de 7 g.
+- **Reloj de FP:** en la pelea del pez espada pasaron 3 min 11 s reales y 13 min del juego: ~4 min del juego por minuto
+  real, **un día dura ~6 h reales** (el nuestro, 2 h, D47).
+- **Primer lance vacío.** Segundo: **se cortó el sedal** con el freno casi al tope (la barra del sedal en rojo y su ícono
+  marcado; caña a media carga, carrete en amarillo). Al cortarse se perdieron 3 m de sedal (125 → 122 m).
+- **Trucha degollada joven de 0.263 kg, 29 cm: ~30–45 s de pelea** (2 min del juego); $56 y 20 XP. **En FP la clase joven
+  se puede guardar y vender;** en nuestro juego el juvenil vale $0 y se suelta. En el chat, otros sacaban truchas de
+  0.31–0.33 kg: lo común ahí son truchas chicas.
+- **Comparación:** nuestra pelea mínima es de 1 minuto para todo pez (D73, pedido del jugador del proyecto); FP saca una
+  trucha joven en menos. Queda a decisión del jugador del proyecto si los juveniles pelean menos de 1 minuto.
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1557,3 +1569,5 @@ armar las tres cañas queda para E4.
   peces grandes. El pedazo que sobra no se guarda por ahora. Corregido también el precio base en `equipo-lago.mjs`.
 - **2026-11-18** · Anotados los spots de Fishing Planet (puntos fijos de orilla a los que se va directo). Propuesta D83:
   viaje rápido a los spots de orilla desde el mapa grande. Por decidir.
+- **2026-11-18** · Medición en Fishing Planet con truchas: su día dura ~6 h reales; una trucha joven de 0.26 kg sale en
+  ~30–45 s; el corte de sedal quita metros; la clase joven se vende allá.
