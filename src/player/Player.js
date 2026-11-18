@@ -1,3 +1,4 @@
+import { loc } from '../i18n.js';
 import * as THREE from '../engine/index.js';
 import { WORLD } from '../world/WorldLayout.js';
 import { HOUSE } from '../world/boat/Wheelhouse.js';
@@ -160,7 +161,7 @@ export class Player {
 		// (not with a line out or a fish in hand: E belongs to the fishing then)
 		if ( this.nearBoat() && ! this.busy ) {
 
-			this.prompt = { key: 'E', text: 'Subir al bote' };
+			this.prompt = { key: 'E', text: loc( 'Board boat', 'Subir al bote' ) };
 			if ( inp.hit( 'KeyE' ) ) {
 
 				this.boardBoat();
@@ -379,7 +380,7 @@ export class Player {
 				if ( b.tag !== 'ladder' ) continue;
 				if ( Math.hypot( b.center.x - p.x, b.center.z - p.z ) < 1.1 ) {
 
-					this.prompt = { key: 'Espacio', text: 'Subir la escalera' };
+					this.prompt = { key: loc( 'Space', 'Espacio' ), text: loc( 'Climb ladder', 'Subir la escalera' ) };
 					if ( inp.down( 'Space' ) || inp.down( 'KeyW' ) ) {
 
 						const top = this.colliders.groundHeightAt( b.center.x, b.center.z, 10 );
@@ -679,7 +680,7 @@ export class Player {
 
 		if ( nearHelm ) {
 
-			this.prompt = { key: 'E', text: 'Tomar el timón' };
+			this.prompt = { key: 'E', text: loc( 'Take the helm', 'Tomar el timón' ) };
 			if ( inp.hit( 'KeyE' ) ) {
 
 				this.takeHelm();
@@ -694,7 +695,7 @@ export class Player {
 			const atRail = b.model.exitPoints.some( ( e ) => Math.hypot( p.x - e.x, p.z - e.z ) < 1.3 );
 			if ( ep && Math.hypot( p.x - ep.x, p.z - ep.z ) < 1.3 ) {
 
-				this.prompt = { key: 'E', text: 'Bajar a tierra' };
+				this.prompt = { key: 'E', text: loc( 'Step ashore', 'Bajar a tierra' ) };
 				if ( inp.hit( 'KeyE' ) ) {
 
 					this.exitBoat( this._ashore );
@@ -704,7 +705,7 @@ export class Player {
 
 			} else if ( atRail ) {
 
-				this.prompt = { key: 'E', text: 'Saltar por la borda' };
+				this.prompt = { key: 'E', text: loc( 'Jump overboard', 'Saltar por la borda' ) };
 				if ( inp.hit( 'KeyE' ) ) {
 
 					this.exitBoat( null, Math.sign( p.x ) || 1 );
@@ -747,7 +748,7 @@ export class Player {
 		if ( inp.down( 'KeyA' ) ) steer += 1;
 		if ( inp.down( 'KeyD' ) ) steer -= 1;
 		b.setInput( throttle, steer, dt );
-		this.prompt = { key: 'E', text: 'Dejar el timón   ·   V  cámara' };
+		this.prompt = { key: 'E', text: loc( 'Leave helm   ·   V  camera', 'Dejar el timón   ·   V  cámara' ) };
 
 		// keep the player attached (for audio / queries)
 		b.toWorld( b.model.helmEye, this.position );

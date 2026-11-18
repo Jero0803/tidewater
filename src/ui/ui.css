@@ -131,6 +131,38 @@ body {
 	pointer-events: none;
 }
 
+/* ES | EN switch, top right (i18n.js wires it; choosing reloads the page in that language) */
+.loader-lang {
+	position: absolute;
+	top: clamp(16px, 3vh, 32px);
+	right: clamp(20px, 6vw, 112px);
+	z-index: 2;
+	display: flex;
+	padding: 3px;
+	border-radius: 999px;
+	background: rgba(8, 14, 22, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.loader-lang button {
+	min-width: 44px;
+	padding: 6px 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: rgba(232, 246, 255, 0.7);
+	font: 600 12px/1 var(--tw-font);
+	letter-spacing: 0.12em;
+	cursor: pointer;
+	transition: background 160ms, color 160ms;
+}
+
+.loader-lang button:hover { color: #fff; }
+.loader-lang button.is-on { background: rgba(255, 255, 255, 0.92); color: #0b1418; }
+.loader-lang button:focus-visible { outline: 2px solid var(--tw-aqua, #5fe3d4); outline-offset: 2px; }
+
 .loader-inner {
 	position: absolute;
 	left: clamp(20px, 6vw, 112px);

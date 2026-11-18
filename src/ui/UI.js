@@ -1,3 +1,4 @@
+import { loc } from '../i18n.js';
 import { icon, brandMark } from './icons.js';
 
 // Tidewater UI: settings panel (tabs → folders → controls), HUD, help,
@@ -123,13 +124,14 @@ function skyAt( hour ) {
 
 }
 
-const PHASES = [ [ 4.8, 'Noche' ], [ 5.6, 'Alba' ], [ 6.4, 'Amanecer' ], [ 7.2, 'Hora dorada' ], [ 10.5, 'Mañana' ],
-	[ 13.5, 'Mediodía' ], [ 16.8, 'Tarde' ], [ 17.6, 'Hora dorada' ], [ 18.4, 'Atardecer' ], [ 19.3, 'Anochecer' ], [ 24, 'Noche' ] ];
+const PHASE_ES = { 'Night': 'Noche', 'Dawn': 'Alba', 'Sunrise': 'Amanecer', 'Golden hour': 'Hora dorada', 'Morning': 'Mañana', 'Midday': 'Mediodía', 'Afternoon': 'Tarde', 'Sunset': 'Atardecer', 'Dusk': 'Anochecer' };
+const PHASES = [ [ 4.8, 'Night' ], [ 5.6, 'Dawn' ], [ 6.4, 'Sunrise' ], [ 7.2, 'Golden hour' ], [ 10.5, 'Morning' ],
+	[ 13.5, 'Midday' ], [ 16.8, 'Afternoon' ], [ 17.6, 'Golden hour' ], [ 18.4, 'Sunset' ], [ 19.3, 'Dusk' ], [ 24, 'Night' ] ].map( ( [ h, n ] ) => [ h, loc( n, PHASE_ES[ n ] ) ] );
 
 const phaseAt = ( hh ) => {
 
 	for ( const [ end, name ] of PHASES ) if ( hh < end ) return name;
-	return 'Noche';
+	return loc( 'Night', 'Noche' );
 
 };
 
@@ -142,7 +144,7 @@ const fmtClock = ( hours ) => {
 
 // ── HUD helpers ─────────────────────────────────────────────────────────────
 
-const CARDINALS = [ 'N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO' ];
+const CARDINALS = loc( [ 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW' ], [ 'N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO' ] );
 
 function modeIcon( label ) {
 
@@ -333,11 +335,11 @@ class Control {
 		if ( tooltip ) {
 
 			txt.dataset.tip = tooltip;
-			txt.dataset.tipHint = 'Doble clic para restablecer';
+			txt.dataset.tipHint = loc( 'Double-click to reset', 'Doble clic para restablecer' );
 
 		}
 
-		const rst = h( 'button', 'tw-reset', { type: 'button', tabindex: '-1', 'aria-label': `Restablecer ${ text }`, 'data-tip': 'Restablecer valor por defecto', html: icon( 'reset' ) } );
+		const rst = h( 'button', 'tw-reset', { type: 'button', tabindex: '-1', 'aria-label': `${ loc( 'Reset', 'Restablecer' ) } ${ text }`, 'data-tip': loc( 'Reset to default', 'Restablecer valor por defecto' ), html: icon( 'reset' ) } );
 		rst.addEventListener( 'click', ( e ) => {
 
 			e.stopPropagation();
@@ -398,7 +400,7 @@ class SliderControl extends Control {
 
 		const head = h( 'div', 'tw-row' );
 		head.append( this._makeLabel( this.label, o.tooltip ) );
-		this.valueEl = h( 'button', 'tw-value', { type: 'button', tabindex: '-1', 'data-tip': 'Clic para escribir un valor' } );
+		this.valueEl = h( 'button', 'tw-value', { type: 'button', tabindex: '-1', 'data-tip': loc( 'Click to type a value', 'Clic para escribir un valor' ) } );
 		head.append( this.valueEl );
 
 		this.track = h( 'div', 'tw-slider', { role: 'slider', tabindex: '0', 'aria-label': this.label, 'aria-valuemin': min, 'aria-valuemax': max } );
@@ -1099,7 +1101,7 @@ class PresetsControl extends Control {
 
 		}
 
-		const grid = h( 'div', 'tw-presets', { role: 'radiogroup', 'aria-label': o.label || 'Preajustes' } );
+		const grid = h( 'div', 'tw-presets', { role: 'radiogroup', 'aria-label': o.label || loc( 'Presets', 'Preajustes' ) } );
 		grid.style.setProperty( '--n', Math.min( 4, Math.max( 1, this.presets.length ) ) );
 		this.chips = this.presets.map( ( p, i ) => {
 
@@ -1360,14 +1362,14 @@ class TimeOfDayControl extends Control {
 
 	constructor( parent, o ) {
 
-		super( parent, Object.assign( {}, o, { label: o.label ?? 'Hora del día' } ), 'time' );
+		super( parent, Object.assign( {}, o, { label: o.label ?? loc( 'Time of day', 'Hora del día' ) } ), 'time' );
 		this._default = Number( this.value ) || 0;
 		this.onFinishChange = o.onFinishChange || null;
 		const id = uid( 'tw-tod' );
 
 		const head = h( 'div', 'tw-row' );
 		head.append( this._makeLabel( this.label, o.tooltip ) );
-		this.valueEl = h( 'button', 'tw-value tw-clock', { type: 'button', tabindex: '-1', 'data-tip': 'Clic para escribir una hora' } );
+		this.valueEl = h( 'button', 'tw-value tw-clock', { type: 'button', tabindex: '-1', 'data-tip': loc( 'Click to type a time', 'Clic para escribir una hora' ) } );
 		head.append( this.valueEl );
 
 		const dial = h( 'div', 'tw-tod' );
@@ -1965,7 +1967,7 @@ export class UI {
 			<span class="tw-depth-mark"></span>
 			<div class="tw-depth-read">
 				<div class="tw-depth-line"><span class="tw-depth-num">0.0</span><span class="tw-unit">m</span></div>
-				<span class="tw-g-lab">Profundidad</span>
+				<span class="tw-g-lab">${ loc( 'Depth', 'Profundidad' ) }</span>
 			</div>`;
 		this.depthCanvas = this.depthEl.querySelector( '.tw-depth-tape' );
 		this.depthNum = this.depthEl.querySelector( '.tw-depth-num' );
@@ -1974,7 +1976,7 @@ export class UI {
 
 		// the one element that survives photo mode
 		this.photoHint = h( 'div', 'tw-photo-hint' );
-		this.photoHint.innerHTML = '<kbd>P</kbd><span>Salir del modo foto</span>';
+		this.photoHint.innerHTML = '<kbd>P</kbd><span>' + loc( 'Exit photo mode', 'Salir del modo foto' ) + '</span>';
 
 		this.root.append( hud, this.photoHint );
 
@@ -2013,7 +2015,7 @@ export class UI {
 
 		}
 
-		for ( const [ t, d ] of [ [ 'N', 0 ], [ 'E', 90 ], [ 'S', 180 ], [ 'O', 270 ] ] ) {
+		for ( const [ t, d ] of [ [ 'N', 0 ], [ 'E', 90 ], [ 'S', 180 ], [ loc( 'W', 'O' ), 270 ] ] ) {
 
 			const [ x, y ] = P( 50, 29, d - 90 );
 			card += `<text class="${ t === 'N' ? 'is-n' : '' }" x="${ x }" y="${ y }" transform="rotate(${ d } ${ x } ${ y })">${ t }</text>`;
@@ -2036,7 +2038,7 @@ export class UI {
 					<circle class="tw-dial-head" r="3" cx="24.64" cy="95.36"/>
 					<text class="tw-dial-rpm" x="60" y="105">rpm 0%</text>
 				</svg>
-				<div class="tw-dial-center"><span class="tw-speed">0.0</span><span class="tw-g-unit">nudos</span></div>
+				<div class="tw-dial-center"><span class="tw-speed">0.0</span><span class="tw-g-unit">${ loc( 'knots', 'nudos' ) }</span></div>
 			</div>
 			<div class="tw-compass">
 				<svg viewBox="0 0 100 100">
@@ -2062,11 +2064,11 @@ export class UI {
 
 	_buildPanel() {
 
-		const panel = this.panel = h( 'aside', 'tw-panel tw-glass tw-interactive', { 'aria-label': 'Ajustes' } );
+		const panel = this.panel = h( 'aside', 'tw-panel tw-glass tw-interactive', { 'aria-label': loc( 'Settings', 'Ajustes' ) } );
 		panel.inert = true;
 
 		const head = h( 'header', 'tw-panel-head' );
-		head.append( h( 'div', 'tw-panel-title', { text: 'Ajustes' } ) );
+		head.append( h( 'div', 'tw-panel-title', { text: loc( 'Settings', 'Ajustes' ) } ) );
 		const actions = h( 'div', 'tw-panel-actions' );
 		const action = ( name, tip, fn ) => {
 
@@ -2076,12 +2078,12 @@ export class UI {
 
 		};
 
-		action( 'viewfinder', 'Modo foto (P)', () => this.setPhotoMode( true ) );
-		action( 'help', 'Controles (F1)', () => this.toggleHelp() );
-		action( 'chevrons-right', 'Contraer (H)', () => this.togglePanel( false ) );
+		action( 'viewfinder', loc( 'Photo mode (P)', 'Modo foto (P)' ), () => this.setPhotoMode( true ) );
+		action( 'help', loc( 'Controls (F1)', 'Controles (F1)' ), () => this.toggleHelp() );
+		action( 'chevrons-right', loc( 'Collapse (H)', 'Contraer (H)' ), () => this.togglePanel( false ) );
 		head.append( actions );
 
-		this.tabBar = h( 'div', 'tw-tabs', { role: 'tablist', 'aria-label': 'Secciones de ajustes' } );
+		this.tabBar = h( 'div', 'tw-tabs', { role: 'tablist', 'aria-label': loc( 'Settings sections', 'Secciones de ajustes' ) } );
 		this.tabBar.addEventListener( 'keydown', ( e ) => {
 
 			const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? - 1 : 0;
@@ -2103,15 +2105,15 @@ export class UI {
 		this.pages = h( 'div', 'tw-pages' );
 
 		const foot = h( 'footer', 'tw-panel-foot' );
-		foot.innerHTML = '<span><kbd>H</kbd>Ocultar</span><span><kbd>F1</kbd>Controles</span><span><kbd>P</kbd>Modo foto</span>';
+		foot.innerHTML = loc( '<span><kbd>H</kbd>Hide</span><span><kbd>F1</kbd>Controls</span><span><kbd>P</kbd>Photo mode</span>', '<span><kbd>H</kbd>Ocultar</span><span><kbd>F1</kbd>Controles</span><span><kbd>P</kbd>Modo foto</span>' );
 		panel.append( head, this.tabBar, this.pages, foot );
 
 		// collapsed state: a slim rail of tab icons
-		const rail = this.rail = h( 'nav', 'tw-rail tw-glass tw-interactive', { 'aria-label': 'Ajustes' } );
-		const open = h( 'button', 'tw-rail-btn tw-rail-open', { type: 'button', 'aria-label': 'Abrir ajustes', 'data-tip': 'Ajustes (H)', 'data-tip-side': 'left', html: icon( 'sliders' ) } );
+		const rail = this.rail = h( 'nav', 'tw-rail tw-glass tw-interactive', { 'aria-label': loc( 'Settings', 'Ajustes' ) } );
+		const open = h( 'button', 'tw-rail-btn tw-rail-open', { type: 'button', 'aria-label': loc( 'Open settings', 'Abrir ajustes' ), 'data-tip': loc( 'Settings (H)', 'Ajustes (H)' ), 'data-tip-side': 'left', html: icon( 'sliders' ) } );
 		open.addEventListener( 'click', () => this.togglePanel( true ) );
 		this.railTabs = h( 'div', 'tw-rail-tabs' );
-		const help = h( 'button', 'tw-rail-btn', { type: 'button', 'aria-label': 'Controles', 'data-tip': 'Controles (F1)', 'data-tip-side': 'left', html: icon( 'help' ) } );
+		const help = h( 'button', 'tw-rail-btn', { type: 'button', 'aria-label': loc( 'Controls', 'Controles' ), 'data-tip': loc( 'Controls (F1)', 'Controles (F1)' ), 'data-tip-side': 'left', html: icon( 'help' ) } );
 		help.addEventListener( 'click', () => this.toggleHelp() );
 		rail.append( open, h( 'span', 'tw-rail-sep' ), this.railTabs, h( 'span', 'tw-rail-sep' ), help );
 
@@ -2131,44 +2133,44 @@ export class UI {
 			<div class="tw-help-card tw-glass">
 				<header class="tw-help-head">
 					<div>
-						<h2 id="tw-help-title">Controles</h2>
-						<p>Haz clic en la vista para capturar el mouse. Esc lo libera.</p>
+						<h2 id="tw-help-title">${ loc( 'Controls', 'Controles' ) }</h2>
+						<p>${ loc( 'Click the view to capture the mouse. Esc releases it.', 'Haz clic en la vista para capturar el mouse. Esc lo libera.' ) }</p>
 					</div>
-					<button type="button" class="tw-icon-btn tw-help-close" aria-label="Cerrar" data-tip="Cerrar (F1)">${ icon( 'close' ) }</button>
+					<button type="button" class="tw-icon-btn tw-help-close" aria-label="${ loc( 'Close', 'Cerrar' ) }" data-tip="${ loc( 'Close (F1)', 'Cerrar (F1)' ) }">${ icon( 'close' ) }</button>
 				</header>
 				<div class="tw-help-grid">
 					<section>
-						<h3>Movimiento</h3>
-						${ row( wasd, 'Moverse' ) }
-						${ row( mouse, 'Mirar alrededor<small>Clic para capturar</small>' ) }
-						${ row( k( 'Shift' ), 'Correr, turbo del bote' ) }
-						${ row( k( 'Space' ), 'Saltar, nadar hacia arriba' ) }
-						${ row( k( 'C' ), 'Agacharse, sumergirse' ) }
+						<h3>${ loc( 'Move', 'Movimiento' ) }</h3>
+						${ row( wasd, loc( 'Move', 'Moverse' ) ) }
+						${ row( mouse, loc( 'Look around<small>Click to capture</small>', 'Mirar alrededor<small>Clic para capturar</small>' ) ) }
+						${ row( k( 'Shift' ), loc( 'Sprint, boat boost', 'Correr, turbo del bote' ) ) }
+						${ row( k( 'Space' ), loc( 'Jump, swim up', 'Saltar, nadar hacia arriba' ) ) }
+						${ row( k( 'C' ), loc( 'Crouch, dive', 'Agacharse, sumergirse' ) ) }
 					</section>
 					<section>
-						<h3>Interacción</h3>
-						${ row( k( 'E' ), 'Interactuar<small>Subir, timón, bajar a tierra, comerciar</small>' ) }
-						${ row( k( 'V' ), 'Cámara del bote<small>1.ª / 3.ª persona</small>' ) }
-						${ row( k( 'R' ), 'Caña de pescar<small>Sacar / guardar</small>' ) }
-						${ row( k( 'Clic izq' ), 'Lanzar, clavar, recoger<small>Mantén para cargar / recoger</small>' ) }
-						${ row( k( 'Clic der' ), 'Recoger el sedal vacío' ) }
-						${ row( k( 'I' ), 'Nevera y registro de pesca' ) }
-						${ row( k( 'F' ), 'Cámara libre' ) }
-						${ row( k( 'T' ), 'Pausar el tiempo' ) }
-						${ row( k( 'L' ), 'Linterna' ) }
-						${ row( k( 'M' ), 'Silenciar' ) }
+						<h3>${ loc( 'Interact', 'Interacción' ) }</h3>
+						${ row( k( 'E' ), loc( 'Interact<small>Board, helm, step ashore, trade</small>', 'Interactuar<small>Subir, timón, bajar a tierra, comerciar</small>' ) ) }
+						${ row( k( 'V' ), loc( 'Boat camera<small>1st / 3rd person</small>', 'Cámara del bote<small>1.ª / 3.ª persona</small>' ) ) }
+						${ row( k( 'R' ), loc( 'Fishing rod<small>Take out / put away</small>', 'Caña de pescar<small>Sacar / guardar</small>' ) ) }
+						${ row( k( loc( 'LMB', 'Clic izq' ) ), loc( 'Cast, strike, reel<small>Hold to wind up / reel</small>', 'Lanzar, clavar, recoger<small>Mantén para cargar / recoger</small>' ) ) }
+						${ row( k( loc( 'RMB', 'Clic der' ) ), loc( 'Reel in an empty line', 'Recoger el sedal vacío' ) ) }
+						${ row( k( 'I' ), loc( 'Cooler and fish log', 'Nevera y registro de pesca' ) ) }
+						${ row( k( 'F' ), loc( 'Free camera', 'Cámara libre' ) ) }
+						${ row( k( 'T' ), loc( 'Pause time', 'Pausar el tiempo' ) ) }
+						${ row( k( 'L' ), loc( 'Flashlight', 'Linterna' ) ) }
+						${ row( k( 'M' ), loc( 'Mute', 'Silenciar' ) ) }
 					</section>
 					<section>
-						<h3>Interfaz</h3>
-						${ row( k( 'H' ), 'Panel de ajustes' ) }
-						${ row( k( 'P' ), 'Modo foto<small>Oculta toda la interfaz</small>' ) }
-						${ row( k( 'F1' ) + k( '?' ), 'Esta hoja' ) }
-						${ row( k( 'Esc' ), 'Liberar el mouse' ) }
+						<h3>${ loc( 'Interface', 'Interfaz' ) }</h3>
+						${ row( k( 'H' ), loc( 'Settings panel', 'Panel de ajustes' ) ) }
+						${ row( k( 'P' ), loc( 'Photo mode<small>Hides all interface</small>', 'Modo foto<small>Oculta toda la interfaz</small>' ) ) }
+						${ row( k( 'F1' ) + k( '?' ), loc( 'This sheet', 'Esta hoja' ) ) }
+						${ row( k( 'Esc' ), loc( 'Release the mouse', 'Liberar el mouse' ) ) }
 					</section>
 				</div>
 				<div class="tw-help-guide">
-					<span><b>Cómo jugar:</b> pesca, véndele los peces a Joe en el puesto de pescado junto al muelle y compra mejoras a Marta en la tienda náutica junto al cobertizo de botes. Los dos están en el mapa (abajo a la derecha).</span>
-					<button type="button" class="gm-btn is-ghost tw-help-replay">Ver la guía otra vez</button>
+					<span>${ loc( '<b>How to play:</b> catch fish, sell them to Joe at the fish stand by the pier, and buy upgrades from Marta at the chandlery by the boathouse. Both are on the map (lower right).', '<b>Cómo jugar:</b> pesca, véndele los peces a Joe en el puesto de pescado junto al muelle y compra mejoras a Marta en la tienda náutica junto al cobertizo de botes. Los dos están en el mapa (abajo a la derecha).' ) }</span>
+					<button type="button" class="gm-btn is-ghost tw-help-replay">${ loc( 'Replay the guide', 'Ver la guía otra vez' ) }</button>
 				</div>
 			</div>`;
 		el.querySelector( '.tw-help-close' ).addEventListener( 'click', () => this.toggleHelp( false ) );
@@ -2189,13 +2191,13 @@ export class UI {
 			<div class="tw-start-inner">
 				${ brandMark( 'tw-start-mark' ) }
 				<div class="tw-start-title">TIDEWATER</div>
-				<button type="button" class="tw-start-cta"><span class="tw-start-pulse" aria-hidden="true"></span>${ icon( 'mouse' ) }<span>Haz clic para explorar</span></button>
+				<button type="button" class="tw-start-cta"><span class="tw-start-pulse" aria-hidden="true"></span>${ icon( 'mouse' ) }<span>${ loc( 'Click to explore', 'Haz clic para explorar' ) }</span></button>
 				<div class="tw-start-keys">
-					<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>Moverse</span>
-					<span><kbd class="tw-kbd-ico">${ icon( 'mouse' ) }</kbd>Mirar</span>
-					<span><kbd>E</kbd>Interactuar</span>
-					<span><kbd>H</kbd>Ajustes</span>
-					<span><kbd>F1</kbd>Todos los controles</span>
+					<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>${ loc( 'Move', 'Moverse' ) }</span>
+					<span><kbd class="tw-kbd-ico">${ icon( 'mouse' ) }</kbd>${ loc( 'Look', 'Mirar' ) }</span>
+					<span><kbd>E</kbd>${ loc( 'Interact', 'Interactuar' ) }</span>
+					<span><kbd>H</kbd>${ loc( 'Settings', 'Ajustes' ) }</span>
+					<span><kbd>F1</kbd>${ loc( 'All controls', 'Todos los controles' ) }</span>
 				</div>
 			</div>`;
 		this.root.append( el );
@@ -3322,7 +3324,7 @@ export class UI {
 		const L = document.getElementById( 'loader' );
 		if ( ! L ) return Promise.resolve();
 		if ( this._loaderGone ) return this._loaderGone;
-		this.setLoading( 1, 'Listo' );
+		this.setLoading( 1, loc( 'Ready', 'Listo' ) );
 		L.classList.remove( 'is-compiling' );
 		L.classList.add( 'tw-hidden' );
 		this._loaderGone = new Promise( ( resolve ) => setTimeout( () => {

@@ -1,3 +1,4 @@
+import { loc } from './i18n.js';
 import { Vector3, Euler, Color, MathUtils, Mesh } from './engine/index.js';
 import { GPU } from './engine/gpu/GPU.js';
 import { SunShadows } from './engine/render/Shadows.js';
@@ -93,7 +94,7 @@ export class App {
 			if ( typeof requestAnimationFrame === 'function' ) await new Promise( ( r ) => requestAnimationFrame( () => setTimeout( r, 0 ) ) );
 
 		};
-		await progress( 0.02, 'Iniciando WebGPU…' );
+		await progress( 0.02, loc( 'Starting WebGPU…', 'Iniciando WebGPU…' ) );
 		const engine = this.engine = new Engine( document.getElementById( 'app' ) );
 		await engine.init();
 		// systems take `renderer` first as in the three.js version: it is the Engine now (GPU access is global)
@@ -111,7 +112,7 @@ export class App {
 		this.fly.setPose( new Vector3( 20, 6, - 20 ), Math.PI * 0.9, - 0.12 );
 
 		// ---------------------------------------------------------------- sky
-		await progress( 0.04, 'Creando la atmósfera…' );
+		await progress( 0.04, loc( 'Building the atmosphere…', 'Creando la atmósfera…' ) );
 		this.atmosphere = new Atmosphere( renderer );
 		this.sky = new Sky( this.atmosphere );
 		if ( ! qs.has( 'noClouds' ) ) {
@@ -133,22 +134,22 @@ export class App {
 		this.environment = new Environment( renderer, scene, this.sky );
 
 		// ---------------------------------------------------------------- island
-		await progress( 0.06, 'Dando forma a la isla…' );
+		await progress( 0.06, loc( 'Shaping the island…', 'Dando forma a la isla…' ) );
 		this.terrainData = new TerrainData();
 		this.colliders = new Colliders();
 		// the village flattens building pads into the heightmap: build it before any terrain
 		// data is derived (shore field, GPU textures, meshes)
-		await progress( 0.12, 'Construyendo el pueblo…' );
+		await progress( 0.12, loc( 'Building the village…', 'Construyendo el pueblo…' ) );
 		this.village = new Village( { scene, terrain: this.terrainData, colliders: this.colliders } );
 		if ( ! qs.has( 'noVeg' ) ) {
 
-			await progress( 0.14, 'Plantando la vegetación…' );
+			await progress( 0.14, loc( 'Planting the island…', 'Plantando la vegetación…' ) );
 			this.vegetation = new Vegetation( { scene, terrain: this.terrainData, village: this.village } );
 			useStaticVelocity( this.vegetation.group );
 
 		}
 
-		await progress( 0.19, 'Trayendo el oleaje…' );
+		await progress( 0.19, loc( 'Rolling in the swell…', 'Trayendo el oleaje…' ) );
 		this.shoreField = computeShoreField( this.terrainData, { res: 512, swellDir: [ WORLD.swellDir.x, WORLD.swellDir.y ] } );
 		this.terrainGPU = new TerrainGPU( this.terrainData, this.shoreField );
 		// terrain and rocks apply the heightfield sun shadow (long hill shadows) in their own lighting
@@ -160,7 +161,7 @@ export class App {
 		this.terrain.mesh.material.appliesHillShadow = true;
 		this.rocks.material.appliesHillShadow = true;
 
-		await progress( 0.23, 'Haciendo crecer el arrecife…' );
+		await progress( 0.23, loc( 'Growing the reef…', 'Haciendo crecer el arrecife…' ) );
 		this.reef = new Reef( { scene, terrain: this.terrainData, shoreField: this.shoreField } );
 
 		this.boat = new BoatModel();
@@ -169,7 +170,7 @@ export class App {
 		this.boat.group.rotation.y = WORLD.boatDock.heading;
 
 		// ---------------------------------------------------------------- ocean
-		await progress( 0.3, 'Simulando el océano…' );
+		await progress( 0.3, loc( 'Simulating the ocean…', 'Simulando el océano…' ) );
 		this.fft = new OceanFFT( renderer );
 		if ( this.reef.setOcean ) this.reef.setOcean( this.fft ); // coral / sea fan sway follows the simulated swell
 		this.foamTexture = createFoamTexture( renderer );
@@ -317,7 +318,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.freeCam = qs.has( 'fly' );
 
 		// ---------------------------------------------------------------- post
-		await progress( 0.34, 'Preparando los shaders…' );
+		await progress( 0.34, loc( 'Preparing the shaders…', 'Preparando los shaders…' ) );
 		this.underwater = new Underwater( {
 			depthTexture: this.sceneRenderer.sceneRT.depthTexture, maskTexture: this.sceneRenderer.waterMaskTexture,
 			query: this.query, caustics: this.caustics, fft: this.fft,
@@ -373,9 +374,9 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		// ---- compile pipelines asynchronously (keeps the page responsive), then prime a few
 		// frames behind the loading screen so any remaining first-use stalls happen there
 		// stage weights: in the browser the pipeline compile below takes far longer than everything before it
-		await progress( 0.36, 'Compilando shaders…', 0.95 );
+		await progress( 0.36, loc( 'Compiling shaders…', 'Compilando shaders…' ), 0.95 );
 		await this.precompile();
-		await progress( 0.96, 'Calentando motores…' );
+		await progress( 0.96, loc( 'Warming up…', 'Calentando motores…' ) );
 		for ( let i = 0; i < 2; i ++ ) {
 
 			this.frame( 1 / 60 );
@@ -495,7 +496,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 			this.ui.s.advance = s.timeSpeed !== 0;
 			this.ui.ui.refresh();
-			this.ui.ui.toast( s.timeSpeed !== 0 ? 'Tiempo en marcha' : 'Tiempo en pausa' );
+			this.ui.ui.toast( s.timeSpeed !== 0 ? loc( 'Time running', 'Tiempo en marcha' ) : loc( 'Time paused', 'Tiempo en pausa' ) );
 
 		}
 
@@ -611,14 +612,14 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		if ( this.input.hit( 'KeyL' ) ) {
 
 			const on = this.localLights.toggleFlashlight();
-			if ( this.ui ) this.ui.ui.toast( on ? 'Linterna encendida' : 'Linterna apagada' );
+			if ( this.ui ) this.ui.ui.toast( on ? loc( 'Flashlight on', 'Linterna encendida' ) : loc( 'Flashlight off', 'Linterna apagada' ) );
 
 		}
 
 		if ( this.input.hit( 'KeyM' ) && this.audio ) {
 
 			this.audio.setMuted( ! this.audio.muted );
-			if ( this.ui ) this.ui.ui.toast( this.audio.muted ? 'Sonido desactivado' : 'Sonido activado' );
+			if ( this.ui ) this.ui.ui.toast( this.audio.muted ? loc( 'Sound off', 'Sonido desactivado' ) : loc( 'Sound on', 'Sonido activado' ) );
 
 		}
 		this.boatCtl.update( dt );

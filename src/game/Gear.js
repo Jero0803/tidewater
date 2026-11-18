@@ -1,3 +1,4 @@
+import { loc } from '../i18n.js';
 // Gear and upgrade data. The upgrade shop (a vendor by the boathouse) is not built yet; everything
 // the game reads goes through gearStats( state.upgrades ), so buying a level is just
 // state.upgrades[ key ]++ and the stats follow.
@@ -5,45 +6,45 @@
 // Each track: levels[ 0 ] is what you start with; cost is the price of that level (0 for the first).
 export const UPGRADES = {
 	// rod and reel
-	line: { name: 'Sedal', levels: [
-		{ cost: 0, label: 'Monofilamento de 8 lb', lineKg: 7 },
-		{ cost: 60, label: 'Monofilamento de 15 lb', lineKg: 13 },
-		{ cost: 180, label: 'Trenzado de 30 lb', lineKg: 26 },
-		{ cost: 450, label: 'Trenzado de 60 lb', lineKg: 50 },
+	line: { name: loc( 'Fishing line', 'Sedal' ), levels: [
+		{ cost: 0, label: loc( '8 lb mono', 'Monofilamento de 8 lb' ), lineKg: 7 },
+		{ cost: 60, label: loc( '15 lb mono', 'Monofilamento de 15 lb' ), lineKg: 13 },
+		{ cost: 180, label: loc( '30 lb braid', 'Trenzado de 30 lb' ), lineKg: 26 },
+		{ cost: 450, label: loc( '60 lb braid', 'Trenzado de 60 lb' ), lineKg: 50 },
 	] },
-	reel: { name: 'Carrete', levels: [
-		{ cost: 0, label: 'Carrete de spinning viejo', reelSpeed: 1.1 },
-		{ cost: 90, label: 'Carrete de spinning suave', reelSpeed: 1.6 },
-		{ cost: 320, label: 'Carrete convencional', reelSpeed: 2.2 },
+	reel: { name: loc( 'Reel', 'Carrete' ), levels: [
+		{ cost: 0, label: loc( 'Old spinning reel', 'Carrete de spinning viejo' ), reelSpeed: 1.1 },
+		{ cost: 90, label: loc( 'Smooth spinning reel', 'Carrete de spinning suave' ), reelSpeed: 1.6 },
+		{ cost: 320, label: loc( 'Conventional reel', 'Carrete convencional' ), reelSpeed: 2.2 },
 	] },
-	rod: { name: 'Caña', levels: [
-		{ cost: 0, label: 'Caña heredada', castM: 22 },
-		{ cost: 75, label: 'Caña de grafito de 7 pies', castM: 32 },
-		{ cost: 260, label: 'Caña de surfcasting de 9 pies', castM: 45 },
+	rod: { name: loc( 'Rod', 'Caña' ), levels: [
+		{ cost: 0, label: loc( 'Hand-me-down rod', 'Caña heredada' ), castM: 22 },
+		{ cost: 75, label: loc( '7 ft graphite rod', 'Caña de grafito de 7 pies' ), castM: 32 },
+		{ cost: 260, label: loc( '9 ft surf rod', 'Caña de surfcasting de 9 pies' ), castM: 45 },
 	] },
 	// boat
-	hold: { name: 'Bodega', levels: [
-		{ cost: 0, label: 'Nevera', holdKg: 30 },
-		{ cost: 120, label: 'Cajón de hielo', holdKg: 70 },
-		{ cost: 400, label: 'Bodega aislada', holdKg: 160 },
+	hold: { name: loc( 'Fish hold', 'Bodega' ), levels: [
+		{ cost: 0, label: loc( 'Cooler', 'Nevera' ), holdKg: 30 },
+		{ cost: 120, label: loc( 'Ice chest', 'Cajón de hielo' ), holdKg: 70 },
+		{ cost: 400, label: loc( 'Insulated fish hold', 'Bodega aislada' ), holdKg: 160 },
 	] },
-	fuel: { name: 'Tanque de combustible', levels: [
-		{ cost: 0, label: 'Tanque de 40 L', fuelL: 40 },
-		{ cost: 150, label: 'Tanque de 80 L', fuelL: 80 },
-		{ cost: 380, label: 'Tanque de 150 L', fuelL: 150 },
+	fuel: { name: loc( 'Fuel tank', 'Tanque de combustible' ), levels: [
+		{ cost: 0, label: loc( '40 L tank', 'Tanque de 40 L' ), fuelL: 40 },
+		{ cost: 150, label: loc( '80 L tank', 'Tanque de 80 L' ), fuelL: 80 },
+		{ cost: 380, label: loc( '150 L tank', 'Tanque de 150 L' ), fuelL: 150 },
 	] },
-	engine: { name: 'Motor', levels: [
-		{ cost: 0, label: 'Diésel cansado', speedMul: 1 },
-		{ cost: 300, label: 'Diésel reconstruido', speedMul: 1.15 },
-		{ cost: 700, label: 'Turbodiésel', speedMul: 1.3 },
+	engine: { name: loc( 'Engine', 'Motor' ), levels: [
+		{ cost: 0, label: loc( 'Tired diesel', 'Diésel cansado' ), speedMul: 1 },
+		{ cost: 300, label: loc( 'Rebuilt diesel', 'Diésel reconstruido' ), speedMul: 1.15 },
+		{ cost: 700, label: loc( 'Turbo diesel', 'Turbodiésel' ), speedMul: 1.3 },
 	] },
-	fishFinder: { name: 'Sonda de pesca', levels: [
-		{ cost: 0, label: 'Ninguna', finder: false },
-		{ cost: 250, label: 'Sonda de pesca (profundidad y peces en pantalla)', finder: true },
+	fishFinder: { name: loc( 'Fish finder', 'Sonda de pesca' ), levels: [
+		{ cost: 0, label: loc( 'None', 'Ninguna' ), finder: false },
+		{ cost: 250, label: loc( 'Fish finder (depth and fish on the HUD)', 'Sonda de pesca (profundidad y peces en pantalla)' ), finder: true },
 	] },
-	lights: { name: 'Luces del bote', levels: [
-		{ cost: 0, label: 'Solo luces de navegación', deckLights: false },
-		{ cost: 140, label: 'Focos de cubierta para pescar de noche', deckLights: true },
+	lights: { name: loc( 'Boat lights', 'Luces del bote' ), levels: [
+		{ cost: 0, label: loc( 'Nav lights only', 'Solo luces de navegación' ), deckLights: false },
+		{ cost: 140, label: loc( 'Deck floodlights for night fishing', 'Focos de cubierta para pescar de noche' ), deckLights: true },
 	] },
 };
 

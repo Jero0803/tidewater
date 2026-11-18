@@ -1,3 +1,4 @@
+import { loc } from '../i18n.js';
 import { Group, Mesh, Vector3, Matrix4 } from '../engine/index.js';
 import { prepare, mergePrepared, box, cylinder, sphere, rod, torus, mat4 } from '../world/boat/GeoKit.js';
 import { createPropMaterial, PAT } from './GameMaterials.js';
@@ -40,12 +41,12 @@ export class Chandlery {
 		const local = new Vector3( 0, 0, - 0.75 ).applyAxisAngle( new Vector3( 0, 1, 0 ), CHANDLERY.yaw );
 		const vx = CHANDLERY.x + local.x, vz = CHANDLERY.z + local.z;
 		this.vendor = new Vendor( {
-			name: 'Marta · Tienda náutica',
+			name: loc( 'Marta · Chandlery', 'Marta · Tienda náutica' ),
 			kind: 'shop',
 			position: new Vector3( vx, terrain.heightAt( vx, vz ), vz ),
 			yaw: CHANDLERY.yaw,
 			radius: 3.0,
-			greeting: 'Sedal, carretes, una bodega más grande, diésel. ¿Qué necesitas?',
+			greeting: loc( 'Line, reels, a bigger hold, diesel. What do you need?', 'Sedal, carretes, una bodega más grande, diésel. ¿Qué necesitas?' ),
 			material: this.material,
 			// realistic character (Rocketbox, MIT): the stand-in shows until it has loaded
 			character: { url: ( ( import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/characters/marta.glb', idle: 'idle_neutral_01', talk: 'gestic_talk_neutral_01', greet: 'wave_01' },

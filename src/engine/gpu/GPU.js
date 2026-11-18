@@ -1,3 +1,4 @@
+import { loc } from '../../i18n.js';
 // The WebGPU device and the per-frame command encoder.
 //
 // Everything GPU-side goes through this singleton: `GPU.device`, `GPU.queue`, the shared samplers
@@ -27,9 +28,9 @@ export const GPU = {
 
 	async init( { canvas = null, requiredLimits = {}, headless = false } = {} ) {
 
-		if ( ! navigator.gpu ) throw new Error( 'WebGPU no está disponible en este navegador.' );
+		if ( ! navigator.gpu ) throw new Error( loc( 'WebGPU is not available in this browser.', 'WebGPU no está disponible en este navegador.' ) );
 		const adapter = await navigator.gpu.requestAdapter( { powerPreference: 'high-performance' } );
-		if ( ! adapter ) throw new Error( 'No se encontró un adaptador WebGPU.' );
+		if ( ! adapter ) throw new Error( loc( 'No WebGPU adapter found.', 'No se encontró un adaptador WebGPU.' ) );
 		this.adapter = adapter;
 
 		const L = adapter.limits;

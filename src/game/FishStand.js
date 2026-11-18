@@ -1,3 +1,4 @@
+import { loc } from '../i18n.js';
 import { Group, Mesh, Vector3, BoxGeometry, Matrix4, Quaternion } from '../engine/index.js';
 import { mergeGeometries } from '../engine/geometry/BufferGeometryUtils.js';
 import { prepare, mergePrepared, box, cylinder, sphere, rod, mat4 } from '../world/boat/GeoKit.js';
@@ -48,13 +49,13 @@ export class FishStand {
 		// (local z 0.12: clear of the shelf at -0.78..-0.48 and the counter top from 0.58)
 		const local = new Vector3( 0.2, 0, 0.12 ).applyAxisAngle( new Vector3( 0, 1, 0 ), STAND.yaw );
 		this.vendor = new Vendor( {
-			name: 'Joe · Comprador de pescado',
+			name: loc( 'Joe · Fish buyer', 'Joe · Comprador de pescado' ),
 			kind: 'buyer',
 			position: new Vector3( STAND.x + local.x, y + STALL_FLOOR, STAND.z + local.z ),
 			yaw: STAND.yaw,
 			radius: 3.2,
-			greeting: 'A ver qué pescaste. Precios justos, en efectivo.',
-			idle: '¿Nada que vender? Los roncos están picando en el muelle.',
+			greeting: loc( 'Let\'s see what you caught. Fair prices, cash.', 'A ver qué pescaste. Precios justos, en efectivo.' ),
+			idle: loc( 'Nothing to sell? The grunts are biting off the pier.', '¿Nada que vender? Los roncos están picando en el muelle.' ),
 			material: this.material,
 			// realistic character (Rocketbox, MIT): the stand-in shows until it has loaded
 			character: { url: ( ( import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/characters/joe.glb', idle: 'idle_neutral_01', talk: 'gestic_talk_relaxed_01', greet: 'wave_01' },

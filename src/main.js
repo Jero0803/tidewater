@@ -1,4 +1,5 @@
 import './core/BenchSeed.js';
+import { loc, localizeLoader } from './i18n.js';
 import { App } from './App.js';
 import { UI } from './ui/UI.js';
 import { AppUI } from './ui/AppUI.js';
@@ -12,6 +13,7 @@ if ( /[?&]bench\b/.test( location.search ) ) {
 
 }
 
+localizeLoader();
 const ui = new UI();
 const app = new App();
 window.__ui = ui;
@@ -19,7 +21,7 @@ window.__ui = ui;
 app.init( ( p, text, until ) => ui.setLoading( p, text, until ) ).then( async () => {
 
 	app.ui = new AppUI( app, ui );
-	ui.setLoading( 1, 'Listo' );
+	ui.setLoading( 1, loc( 'Ready', 'Listo' ) );
 	await ui.hideLoader();
 	// frame-time benchmark and reference shots (see core/Bench.js): it drives the frames itself
 	if ( app.qs.has( 'bench' ) ) {
@@ -42,6 +44,6 @@ app.init( ( p, text, until ) => ui.setLoading( p, text, until ) ).then( async ()
 } ).catch( ( e ) => {
 
 	console.error( e );
-	ui.setLoadingError( 'Algo salió mal: ' + e.message );
+	ui.setLoadingError( loc( 'Something went wrong: ', 'Algo salió mal: ' ) + e.message );
 
 } );
