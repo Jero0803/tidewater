@@ -71,6 +71,7 @@ Más adelante, **varios escenarios o mapas** que se desbloquean con la progresi�
 | D19 | **El tiempo de las licencias es tiempo jugado:** solo corre con el juego abierto | Quien juega poco no pierde sus licencias por no entrar | 2026-11-17 |
 | D20 | **Viaje entre mapas aprobado** como se propuso: desde el amarre del bote (E), destinos por nivel, con costo; viajan dinero, nivel, XP y equipo; licencias, registro, récords y vendedores son de cada mapa; los peces de la nevera se venden o sueltan antes de viajar | Separa datos globales y por mapa desde el principio | 2026-11-17 |
 | D21 | **Una licencia dura 1 día del juego jugado** (lo que dure un día simulado mientras se juega) | Se renueva seguido: gasto recurrente sin sentirse corto | 2026-11-17 |
+| D22 | **Un día del juego dura 24 minutos reales** (1 hora del juego = 1 minuto real). Por tanto una licencia dura 24 minutos de juego | Fácil de entender; se vive el ciclo completo del día | 2026-11-17 |
 
 ---
 
@@ -226,6 +227,41 @@ Aprobado (D20):
 - [ ] XP por pez (por clase, especie, especie nueva)
 - [ ] Qué desbloquea cada nivel (mejoras de Marta, licencias, más adelante mapas)
 
+### Mediciones de la propuesta (2026-11-17)
+
+Script: `node --no-warnings tools/balance/fase1-propuesta.mjs` (semilla 1; jugador humano; nevera de 30 kg con
+viajes a vender: orilla y muelle 1 min, bahía 2, arrecife 2.5, profundo 5).
+
+**Clases de tamaño:** la frecuencia medida coincide con la propuesta: juvenil 42 %, común 43 %, trofeo 11 %,
+único 4 %. El valor medio por especie casi no cambia: lo que se pierde con los juveniles lo compensan los únicos ×3.
+
+**XP:** con XP solo por clase y dificultad, el profundo era el spot que menos XP daba (382 XP/h frente a ~900),
+porque premia la cantidad de peces. Sumando **3 XP por kilo**, todos los spots quedan parejos (~1,100–1,600 XP/h
+con equipo inicial) y mejorar el equipo da más XP (~2,200 XP/h con equipo medio en bahía y profundo).
+
+**Dinero por día del juego (24 min), equipo inicial:**
+
+| Licencia | Mejor spot | $/día | Spot más rentable con equipo medio |
+|---|---|---|---|
+| Básica | Orilla | ~$200 | Muelle ~$125 |
+| Intermedia | Bahía | ~$565 | Bahía ~$813 |
+| Avanzada | Profundo | ~$1,170 | Profundo ~$2,640 |
+
+**Propuesta de números (pendiente de aprobar):**
+
+| Tema | Propuesta | Efecto medido |
+|---|---|---|
+| XP por pez | clase (juvenil 1, común 3, trofeo 10, único 40) × dificultad (1 + 2 × fuerza, de 1 a 3) + **3 por kilo** + 20 por especie nueva | XP pareja entre spots |
+| Curva de niveles | XP total para el nivel N = **100 × (N − 1)²** (nivel 3 = 400, nivel 6 = 2,500, nivel 10 = 8,100, nivel 20 = 36,100) | Nivel 3 ≈ 17 min, nivel 6 ≈ 1.7 h, nivel 10 ≈ 4.5 h (estimado) |
+| Licencia básica | Regalada el primer día; después **$20** por día | ~10–15 % de lo que se gana con ella |
+| Licencia intermedia | **Nivel 3**, **$100** por día | Neto ~$300–465/día, mejor que la básica |
+| Licencia avanzada | **Nivel 6**, **$300** por día | Neto ~$870/día en profundo: ~1.9× la intermedia |
+| Mapa 2 | **Nivel 10** | |
+
+**Consecuencia a resolver en el siguiente bloque:** con licencia intermedia se ganan ~$1,000–2,000 por hora, y
+todas las mejoras actuales de Marta suman $3,875. Hay que reajustar los precios de la tienda y decidir qué
+mejora se desbloquea en cada nivel.
+
 **Compatibilidad**
 - [ ] Partidas guardadas existentes: ¿con qué nivel empiezan? (propuesta: calcularlo desde el registro de pesca)
 
@@ -256,3 +292,6 @@ Aprobado (D20):
   y D17 (viajar entre mapas, diseñado desde la Fase 1). Agregada la propuesta de viaje entre mapas.
 - **2026-11-17** · Decididos D18 (acumulativas, básica regalada, nivel mínimo), D19 (tiempo jugado), D20 (viaje
   aprobado) y D21 (licencia de 1 día del juego jugado). Licencias cerradas salvo precios y niveles.
+- **2026-11-17** · Decidido D22 (día = 24 min). Medidas las clases de tamaño, la XP y las licencias
+  (`tools/balance/fase1-propuesta.mjs`). Propuestos: XP con 3 por kilo, curva 100 × (N − 1)², licencias
+  $20 / $100 (nivel 3) / $300 (nivel 6), mapa 2 en el nivel 10. Detectado que la tienda necesita nuevos precios.
