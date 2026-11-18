@@ -3,7 +3,7 @@
 Documento vivo: recoge qué queremos hacer con el juego, qué se decidió y por qué, antes de escribir código.
 Se actualiza en cada conversación de trabajo. La bitácora al final registra los cambios.
 
-**Estado:** programando la Fase 1. Entregas 1 a 4 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias) y reloj (día de 120 minutos, D47).
+**Estado:** programando la Fase 1. Entregas 1 a 5 de 6 hechas: progresión en el juego (clases, XP, niveles, licencias), reloj (día de 120 minutos, D47) y cinco spots con nombre.
 
 ---
 
@@ -422,7 +422,7 @@ Estas son las bases que hay que fijar. Cuando se decidan, pasan a la sección 3 
 **Spots (D9, D40)**
 - [x] ~~Lista de spots de la isla~~ Cinco spots (D40, tabla abajo).
 - [x] ~~¿Qué pasa entre spots?~~ Se usa el spot más cercano (D40).
-- [ ] Probabilidades exactas de cada especie por spot (se calibran con el simulador al implementar, para conservar el reparto de dinero medido)
+- [x] ~~Probabilidades exactas de cada especie por spot~~ En la Fase 1 son las mismas que ya tenía cada tipo de agua (entrega 5): el equilibrio medido no cambia. Se ajustan cuando lleguen los spots futuros.
 
 | Spot | Equivale a (tipo de agua actual) | Profundidad medida | Cómo se llega | Especies (frecuente → rara) |
 |---|---|---|---|---|
@@ -547,7 +547,7 @@ Entregas pequeñas; cada una se prueba y se sube por separado y el juego queda j
 | 2 | Guardado versión 2 | XP, licencias, tiempo jugado; conversión de partidas viejas (D44); tests | **Hecha** (2026-11-18) |
 | 3 | Interfaz y conexión | Conectar las reglas al juego; nivel y XP en el HUD; clase en la tarjeta de captura; motivo al soltar; licencias en la tienda | **Hecha** (2026-11-18) |
 | 4 | Reloj | Día que avanza solo (120 min, D47); hora del panel bloqueada salvo en el modo foto (D16, D41, D42) | **Hecha** (2026-11-18) |
-| 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | Pendiente |
+| 5 | Spots | Cinco zonas con nombre en la isla; nombre al caer la boya; minimapa (D40) | **Hecha** (2026-11-18) |
 | 6 | Tienda nueva | Aparejo de flotador por grados, bodega y bote (D37, D39, D43) | Pendiente |
 
 **Medición de la entrega 1** (`npm run balance -- --solo=fase1`, reglas reales, isla como inicio): básica ~$220 por
@@ -602,6 +602,17 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 - La hora se guarda con la partida (campo `hour` del guardado v2, agregado sin cambiar de versión) y el día sigue
   donde quedó al volver. Con `?bench` el reloj sigue detenido para las capturas de referencia.
 - 5 tests nuevos. Probado en el navegador: velocidad, bloqueo, modo foto, pausa con T, hora guardada.
+
+**Entrega 5, cómo quedaron los spots** (`src/game/Spots.js`):
+
+- Cada spot es uno de los cinco tipos de agua que ya calculaba el juego; el spot bajo la boya es el tipo de agua que
+  más pesa ahí (entre spots gana el más cercano, D40). Las picadas y las especies no cambian, así que el equilibrio
+  medido se conserva.
+- **Al caer la boya** en un spot distinto al del lance anterior aparece su nombre y la profundidad ("Arrecife de la
+  bahía · 5.5 m"); lanzar otra vez al mismo spot no repite el aviso.
+- **Minimapa:** el nombre de cada spot sobre el mapa (solo los que caben en la ventana) y, encima del minimapa, el
+  spot que se está pescando (el de la boya) o sobre el que se está (bote, nadando, vadeando, muelle), en dorado.
+- 4 tests nuevos. Probado en el navegador: muelle, playa, arrecife al lanzar.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -681,3 +692,6 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
   reales). La licencia sigue durando un día y su precio sube ×5 (básica $175, intermedia $500, avanzada $1,000).
   Medido con `npm run balance -- --solo=fase1`: mismas proporciones (básica ~$1,100 por día en la orilla, avanzada
   ~$4,900 netos en el profundo); los niveles no cambian (se miden en horas de juego).
+- **2026-11-18** · **Entrega 5 hecha:** cinco spots con nombre (playa de la bahía, muelle, arrecife de la bahía,
+  centro de la bahía, mar abierto); nombre al caer la boya y en el minimapa. Mismas picadas que antes. 4 tests
+  nuevos (todos pasan).

@@ -3,6 +3,7 @@ import { FISH, FISH_IDS, fishValue, fishLengthCm } from '../src/game/FishTable.j
 import { habitatAt, pickSpecies, rollWeight, biteDelay } from '../src/game/Bites.js';
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
 import { GameState, xpFromLog } from '../src/game/GameState.js';
+import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
 import { gearStats, defaultUpgrades, UPGRADES } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
 	LICENSES, LICENSE_SECONDS, CLOCK_HOURS_PER_SECOND, dayPhase, licenseTierOf, activeLicenseTier, licenseSecondsLeft, withLicense, starterLicences, canKeep, releaseReason } from '../src/game/Progression.js';
@@ -366,6 +367,16 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	m.set( 'tidewater.save.v2', JSON.stringify( { ...JSON.parse( m.get( 'tidewater.save.v2' ) ), hour: 25.5 } ) );
 	const c = new GameState( sto );
 	ok( c.load() && c.hour === 1.5, 'clock: a saved hour is wrapped to 0..24' );
+
+}
+// ---- named spots (delivery 5: D9, D40): the dominant water type under the bobber
+{
+
+	const at = ( depth, reefDist = 200, pierDist = 200 ) => spotOf( habitatAt( { depth, reefDist, pierDist } ) );
+	ok( ISLAND_SPOTS.length === 5 && ISLAND_SPOTS.every( ( s ) => s.name && Number.isFinite( s.label.x ) ), 'spots: five, named, with a place on the map' );
+	ok( at( 0.1 ) === null, 'spots: none on the sand' );
+	ok( at( 1.5, 200, 80 ).id === 'shallows' && at( 4, 150, 1 ).id === 'pier' && at( 5, - 10, 150 ).id === 'reef', 'spots: beach, pier and reef' );
+	ok( at( 10 ).id === 'bay' && at( 40 ).id === 'deep' && spotById( 'deep' ) === at( 60 ), 'spots: mid-bay and open sea' );
 
 }
 console.log( `value check ${ value }` );

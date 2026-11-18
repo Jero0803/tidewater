@@ -12,6 +12,7 @@ import { CatchDisplay } from './CatchDisplay.js';
 import { UPGRADES, fuelBurn } from './Gear.js';
 import { GameHUD, releaseText, licenseName } from './GameHUD.js';
 import { LICENSES, LICENSE_WARN_SECONDS } from './Progression.js';
+import { spotOf } from './Spots.js';
 import { Minimap } from './Minimap.js';
 import { Guide } from './Guide.js';
 
@@ -496,7 +497,25 @@ export class Game {
 
 		}
 
-		this.bite = { phase: 'wait', t: biteDelay( this.habitat(), this.hour ) };
+		const hab = this.habitat();
+		this.bite = { phase: 'wait', t: biteDelay( hab, this.hour ) };
+		// the spot's name when the bobber lands somewhere new (D40); the minimap always shows it
+		const spot = spotOf( hab );
+		if ( spot && spot !== this._castSpot ) this.toast( `${ spot.name } · ${ this.rod.depth.toFixed( 1 ) } m`, 2200 );
+		this._castSpot = spot;
+
+	}
+
+	// the spot being fished (the bobber's, while the line is in the water) or the one the player is on / over
+	// (boat, swimming, wading); null on land
+	currentSpot() {
+
+		const rod = this.rod;
+		if ( rod.lineInWater && rod.state !== 'flying' ) return spotOf( this.habitat() );
+		const p = this.app.player, T = this.app.terrainData;
+		const q = p.mode === 'boat' || p.mode === 'deck' ? this.app.boatCtl.position : p.position;
+		const depth = T ? - T.heightAt( q.x, q.z ) : 0;
+		return depth > 0.25 ? spotOf( this.habitatAtPoint( q.x, q.z, depth ) ) : null;
 
 	}
 

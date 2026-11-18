@@ -1,6 +1,7 @@
 import { WORLD } from '../world/WorldLayout.js';
 import { STAND } from './FishStand.js';
 import { CHANDLERY } from './Chandlery.js';
+import { ISLAND_SPOTS } from './Spots.js';
 
 // Minimap, lower right: the island baked once from the terrain data into a 2D canvas (depth-tinted
 // sea, reef and seagrass, sand, grass and forest by height, rock, paths, village pads, the pier,
@@ -62,6 +63,15 @@ const CSS = /* css */`
 @media (max-height: 860px) { .gm-map { right: calc(var(--tw-edge) + 58 * var(--tw-u)); } }
 @media (max-width: 640px) { .gm-map { width: calc(128 * var(--tw-u)); height: calc(128 * var(--tw-u)); } }
 @media (prefers-reduced-motion: reduce) { .gm-mk.is-hot > i, .gm-map-fish > i { animation: none; } }
+/* named spots (D40): their names on the map, and the one being fished under the window */
+.gm-spot { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.gm-spot > span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap; font: 600 calc(9 * var(--tw-u)) var(--tw-font);
+	letter-spacing: 0.04em; color: rgba(236, 246, 250, 0.82); text-shadow: 0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.5); }
+.gm-spot.is-here > span { color: var(--tw-sun); }
+.gm-map-label.is-on { display: block; }
+.gm-map-label { top: calc(-6 * var(--tw-u)); bottom: auto; transform: translate(-50%, -100%); padding: calc(2 * var(--tw-u)) calc(9 * var(--tw-u));
+	border-radius: 999px; background: rgba(8, 18, 28, 0.62); font-family: var(--tw-font); }
+.gm-map-label b { color: var(--tw-ink); font-weight: 600; }
 `;
 
 const ICON = {
@@ -137,6 +147,17 @@ export class Minimap {
 
 			} },
 		];
+		this.spots = ISLAND_SPOTS.map( ( s ) => {
+
+			const el = h( 'div', 'gm-spot', `<span>${ s.name }</span>` );
+			this.marks.prepend( el );
+			return { spot: s, el };
+
+		} );
+		this.here = h( 'div', 'gm-map-label' );
+		this.el.append( this.here );
+		this._hereT = 0;
+		this._hereSpot = undefined;
 		this.north = h( 'div', 'gm-map-n', 'N' );
 		this.marks.append( this.north );
 		this.fish = [ h( 'div', 'gm-map-fish', '<i></i><i></i>' ), h( 'div', 'gm-map-fish', '<i></i><i></i>' ) ];
@@ -368,6 +389,30 @@ export class Minimap {
 			if ( hide ) continue;
 			const edge = place( m.el, q.x - x, q.z - z, 12, m.arrow );
 			this._toggle( m.el, 'is-edge', edge );
+
+		}
+
+		// spot names: only inside the window (no rim clamping); the one being fished is highlighted and named below
+		this._hereT -= dt;
+		if ( this._hereT <= 0 ) {
+
+			this._hereT = 0.3;
+			const spot = this.game.currentSpot ? this.game.currentSpot() : null;
+			if ( spot !== this._hereSpot ) {
+
+				this._hereSpot = spot;
+				this.here.innerHTML = spot ? `<b>${ spot.name }</b>` : '';
+				this._toggle( this.here, 'is-on', !! spot );
+
+			}
+
+		}
+
+		for ( const s of this.spots ) {
+
+			const edge = place( s.el, s.spot.label.x - x, s.spot.label.z - z, 30 );
+			this._setStyle( s.el, 'display', edge ? 'none' : '' );
+			this._toggle( s.el, 'is-here', s.spot === this._hereSpot );
 
 		}
 
