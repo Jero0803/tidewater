@@ -1419,4 +1419,4 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   pesca con la pelea nueva (al menos 1 minuto, la caña amortigua o desgarra, freno tope del carrete, caña rota), las
   tres barras de carga, metros fuera / capacidad y el dial del freno; no toda picada engancha; valores por hora por
   especie. Provisional hasta E3: cada grado del aparejo equivale a una caña del catálogo y la picada por cebo está
-  apagada. La isla sigue igual (solo compensa D78). Probado en el navegador; 16 tests nuevos.
+  apagada. La isla sigue igual (solo compensa D78). Probado en el navegador; 12 tests nuevos.
