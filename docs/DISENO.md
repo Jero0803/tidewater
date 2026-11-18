@@ -1362,7 +1362,7 @@ hora con su equipo: chicos ~30–36, trucha arcoíris ~20, trucha café ~16, car
 | E1 | Datos y reglas, sin cambiar el juego: `src/game/Tackle.js` (catálogo del lago, preferencias por especie, caña armada, problemas de armado, multiplicador de picada) y el enganche de D74 en `Bites.js`; `equipo-lago.mjs` lee de ahí; 28 tests | **Hecha** (2026-11-18) |
 | E2 | Pelea con equipo en el lago (`map.tackle`): fuerza realista, aguante de D73, freno tope del carrete, desgarre según la rigidez, caña rota; tres barras de carga por segmentos, metros fuera / capacidad, dial del freno; espera ×3.5, robo de carnada, clavar antes espanta, enganche 75 / 55 %; `hourMul` y `xpMul` por especie (D75) y clases de D78. Provisional hasta E3: cada grado del aparejo de flotador equivale a una caña del catálogo (`GRADE_RIGS`), el multiplicador de picada por cebo está apagado y la caña rota no se pierde. La isla sigue con la pelea P1 | **Hecha** (2026-11-18) |
 | E3 | Tienda nueva en rejilla (D81) con filtros, panel del artículo, paquetes por especie, comprar y equipar, vender al 50 %; licencias por varios días (D80); pez carnada (D79); el multiplicador de picada por cebo se enciende; guardado versión 4 | **Hecha** (2026-11-18) |
-| E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | Pendiente |
+| E4 | Cañas armadas (1, 2, 3) y pestaña de equipo en el inventario | **Hecha** (2026-11-18) |
 | E5 | Misiones de "Primeros pasos"; guía con cebos preferidos; nevera con el cebo usado; actividad por hora en el mapa; viaje rápido a los spots (D83); avanzar el tiempo (D77) | Pendiente |
 | E6 | Se ven distintas: caña según la potencia, boya, cucharilla en el agua (une con A1) | Pendiente |
 
@@ -1619,3 +1619,7 @@ armar las tres cañas queda para E4.
   pellet pasa a preferido.
 - **2026-11-18** · Comprobado en FP: carpas de 10 kg o más pelean ~4 min; la nuestra de 10 kg (caña de fondo MH), ~4.5 min. Coinciden.
 - **2026-11-18** · Decidido D83 (viaje rápido a los spots de orilla); entra en E5 junto con avanzar el tiempo (D77).
+- **2026-11-18** · **E4 hecha:** las teclas 1, 2 y 3 cambian de caña al pescar (recoge el sedal si está en el agua y avisa
+  si a la nueva le falta algo); la caña activa con su cebo y cuántos quedan arriba a la derecha (en rojo si no está lista);
+  pestaña Equipo en el inventario (I) con las tres cañas armables desde la mochila, la caña activa y la mochila con vender
+  al 50 % (`EquipPanel.js`). El paquete de carpa lleva plomo de 20 g. 8 tests nuevos.

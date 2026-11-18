@@ -93,7 +93,7 @@ const CSS = /* css */`
 `;
 
 let styled = false;
-function ensureStyle() {
+export function ensureStyle() {
 
 	if ( styled || typeof document === 'undefined' ) return;
 	const st = document.createElement( 'style' );

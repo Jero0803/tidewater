@@ -226,7 +226,7 @@ export const canSell = ( tackle, kind, id ) => DURABLE.has( kind ) && free( tack
 export const PACK_DISCOUNT = 0.15;
 export const PACKS = {
 	trout: { species: [ 'rainbowTrout' ], rig: { rod: 'spinL', reel: 'r2500', line: 'f18', hook: null, float: null, sinker: null, bait: 'spin2' }, extra: [ [ 'lure', 'spin1' ], [ 'bait', 'eggs' ] ] },
-	carp: { species: [ 'carp' ], rig: { rod: 'bottomM', reel: 'r4000', line: 'm30', hook: 4, float: null, sinker: 40, bait: 'corn' }, extra: [ [ 'bait', 'bread' ] ] },
+	carp: { species: [ 'carp' ], rig: { rod: 'bottomM', reel: 'r4000', line: 'm30', hook: 4, float: null, sinker: 20, bait: 'corn' }, extra: [ [ 'bait', 'bread' ] ] },
 	brownTrout: { species: [ 'brownTrout' ], rig: { rod: 'spinML', reel: 'r3000', line: 'f22', hook: null, float: null, sinker: null, bait: 'minnow' }, extra: [ [ 'lure', 'spoon' ] ] },
 	capitan: { species: [ 'capitan' ], rig: { rod: 'floatL', reel: 'r2000', line: 'm20', hook: 6, float: 3, sinker: null, bait: 'worm' }, extra: [] },
 };

@@ -7,6 +7,7 @@ import { activeMap, MAPS } from '../maps/registry.js';
 import { travelOptions } from './Travel.js';
 import { BAITFISH } from './GameState.js';
 import { renderTackleShop } from './ShopPanel.js';
+import { ensureEquipStyle, renderEquipment, bindEquipment, rigChipText } from './EquipPanel.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -291,6 +292,11 @@ export class GameHUD {
 		this.levelN = this.purse.querySelector( '.gm-level-n' );
 		this.xpBar = this.purse.querySelector( '.gm-xp-bar > span' );
 		this.licEl = this.purse.querySelector( '.gm-lic' );
+		// the active rod and its bait (E4, as in Fishing Planet), on maps with tackle by pieces
+		ensureEquipStyle();
+		this.rigChip = h( 'div', 'gm-rigchip tw-glass' );
+		this.rigChip.title = loc( 'Active rod · 1, 2, 3 switch rods', 'Caña activa · 1, 2, 3 cambian de caña' );
+		this.invTab = 'cooler';
 		// the game clock, next to the mode chip (top left): hour, part of the day, paused
 		this.clockEl = h( 'div', 'tw-mode gm-clock', `<b>16:12</b><span class="gm-phase"></span>` );
 		this.clockEl.title = loc( 'Game clock · one game hour every 5 real minutes · T pauses it', 'Reloj del juego · una hora del juego cada 5 minutos reales · T lo pausa' );
@@ -333,7 +339,7 @@ export class GameHUD {
 		this.catchCard = h( 'div', 'gm-catch tw-glass' );
 		this.catchOpen = false;
 		const hud = ui.hud || ui.root;
-		hud.append( this.catchScrim, this.purse, this.fight, this.bite, this.cast, this.dot, this.catchCard );
+		hud.append( this.catchScrim, this.purse, this.rigChip, this.fight, this.bite, this.cast, this.dot, this.catchCard );
 
 		// panels (interactive)
 		this.inv = h( 'div', 'gm-panel tw-glass tw-interactive' );
@@ -417,6 +423,16 @@ export class GameHUD {
 
 		// the licence and its time left (changes every second of play)
 		const s = this.game.state, tier = s.licenseTier, left = s.licenseSecondsLeft;
+		// the rig chip (only when its text changes)
+		const chip = activeMap().tackle ? rigChipText( s ) : '';
+		if ( chip !== this._last.chip ) {
+
+			this._last.chip = chip;
+			this.rigChip.innerHTML = chip;
+			this.rigChip.style.display = chip ? '' : 'none';
+
+		}
+
 		const lic = tier ? `${ licenseName( tier ) } · ${ minutes( left ) }` : loc( 'No licence', 'Sin licencia' );
 		if ( lic !== this._last.lic ) {
 
@@ -588,6 +604,9 @@ export class GameHUD {
 
 	renderInventory() {
 
+		// maps with tackle by pieces: a Gear tab next to the cooler (E4)
+		if ( activeMap().tackle && this.invTab === 'gear' ) return this.renderGearTab();
+		this.inv.classList.remove( 'eq-wide' );
 		const s = this.game.state;
 		const tag = ( f ) => ( f.cls === 'trophy' || f.cls === 'unique' ? `<small class="cls-${ f.cls }">${ className( f.cls ).toLowerCase() }</small>` : '' );
 		const rows = s.inventory.map( ( f ) => `<div class="gm-row has-cm"><span>${ FISH[ f.species ].name }${ tag( f ) }${ f.record ? '<small>' + loc( 'record', 'récord' ) + '</small>' : '' }</span><span class="gm-cm">${ f.cm ?? Math.round( fishLengthCm( f.species, f.kg ) ) } cm</span><span class="gm-kg">${ f.kg.toFixed( 2 ) } kg</span><span class="gm-val">$${ f.value }</span>${ activeMap().tackle && BAITFISH.has( f.species ) ? `<button class="gm-mini" data-bucket="${ f.id }" title="${ loc( 'Keep it alive as bait', 'Guárdalo vivo como carnada' ) }">${ loc( 'To the bucket', 'Al cubo' ) }</button>` : '' }<button class="gm-mini" data-release="${ f.id }">${ loc( 'Release', 'Soltar' ) }</button></div>` ).join( '' );
@@ -600,12 +619,37 @@ export class GameHUD {
 			${ logged ? `<div class="gm-log"><b>${ loc( 'Fish log', 'Registro de pesca' ) }</b><br>${ logged }</div>` : '' }
 			<div class="gm-foot"><span class="gm-sub">${ loc( 'Sell at the fish stand by the pier', 'Vende en el puesto de pescado junto al muelle' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Close (I)', 'Cerrar (I)' ) }</button></div>`;
 		this.inv.querySelector( '[data-close]' ).onclick = () => this.toggleInventory( false );
+		this.addInvTabs();
 		for ( const b of this.inv.querySelectorAll( '[data-release]' ) ) b.onclick = () => s.release( Number( b.dataset.release ) );
 		for ( const b of this.inv.querySelectorAll( '[data-bucket]' ) ) b.onclick = () => s.toBucket( Number( b.dataset.bucket ) );
 
 	}
 
 	// level, XP and licence, one line (inventory and shop)
+	// the Cooler | Gear tabs on top of the inventory (maps with tackle by pieces)
+	addInvTabs() {
+
+		if ( ! activeMap().tackle ) return;
+		const bar = document.createElement( 'div' );
+		bar.className = 'eq-tabs';
+		bar.innerHTML = [ [ 'cooler', loc( 'Cooler', 'Nevera' ) ], [ 'gear', loc( 'Gear', 'Equipo' ) ] ].map( ( [ id, n ] ) => `<button class="sh-tab${ this.invTab === id ? ' is-on' : '' }" data-invtab="${ id }">${ n }</button>` ).join( '' );
+		this.inv.prepend( bar );
+		for ( const b of bar.querySelectorAll( '[data-invtab]' ) ) b.onclick = () => { this.invTab = b.dataset.invtab; this.renderInventory(); };
+
+	}
+
+	renderGearTab() {
+
+		const s = this.game.state;
+		this.inv.classList.add( 'eq-wide' );
+		this.inv.innerHTML = `<h2>${ loc( 'Gear', 'Equipo' ) }</h2>${ renderEquipment( s ) }
+			<div class="gm-foot"><span class="gm-sub">${ loc( 'Changes apply at once', 'Los cambios se aplican al instante' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Close (I)', 'Cerrar (I)' ) }</button></div>`;
+		this.inv.querySelector( '[data-close]' ).onclick = () => this.toggleInventory( false );
+		bindEquipment( this.inv, s, () => this.renderInventory() );
+		this.addInvTabs();
+
+	}
+
 	progressLine() {
 
 		const s = this.game.state, lv = levelFromXp( s.xp ), tier = s.licenseTier;

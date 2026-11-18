@@ -384,6 +384,14 @@ export class Game {
 
 		}
 
+		// switch rods with 1, 2, 3 (E4, D65): not during a fight; a line in the water is reeled in first
+		if ( this.map.tackle && ! this.fight && ! panelOpen ) {
+
+			const slot = inp.hit( 'Digit1' ) ? 0 : inp.hit( 'Digit2' ) ? 1 : inp.hit( 'Digit3' ) ? 2 : - 1;
+			if ( slot >= 0 ) this.switchRig( slot );
+
+		}
+
 		if ( rod.equipped && ! panelOpen ) {
 
 			if ( rod.state === 'idle' && lDown ) {
@@ -655,6 +663,20 @@ export class Game {
 		const q = p.mode === 'boat' || p.mode === 'deck' ? this.app.boatCtl.position : p.position;
 		const depth = T ? - T.heightAt( q.x, q.z ) : 0;
 		return depth > 0.25 ? spotOf( this.habitatAtPoint( q.x, q.z, depth ) ) : null;
+
+	}
+
+	// switch to rod 1, 2 or 3 (E4): reels in a line in the water, says what the new rod carries
+	switchRig( slot ) {
+
+		const s = this.state;
+		if ( slot === s.tackle.active ) return;
+		if ( this.rod.lineInWater || this.bite ) this.cancelLine( true );
+		s.setActiveRig( slot );
+		const r = s.rig;
+		const why = this.castBlock();
+		const name = r && r.rod ? TABLES.rod[ r.rod ].name : loc( 'empty', 'vacía' );
+		this.toast( `${ loc( 'Rod', 'Caña' ) } ${ slot + 1 } · ${ name }${ why ? ' · ' + why : '' }`, why ? 3000 : 1800 );
 
 	}
 

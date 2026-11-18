@@ -3,6 +3,7 @@ import { FISH, FISH_IDS, fishValue, fishLengthCm } from '../src/game/FishTable.j
 import { habitatAt, pickSpecies, rollWeight, biteDelay, biteDelayFor, nibbleOutcome, strikeOutcome, lureHitOutcome, HOOKING, biteMulHere } from '../src/game/Bites.js';
 import { starterTackle, tackleFromGrade, cleanTackle, count as tbCount, rigCastable, rigIssues, PACKS, packCost, packFullPrice, goodFor } from '../src/game/TackleBag.js';
 import { licensePrice, withLicense as withLicenseDays } from '../src/game/Progression.js';
+import { renderEquipment, rigChipText } from '../src/game/EquipPanel.js';
 import { POWERS, RODS, REELS, LINES, HOOKS, BAITS, LURES, PREFS, STARTER_RIG, rigStats, rigProblems, rigReady, biteMul, hookTooSmall, fightTackle, gradeRig, GRADE_RIGS } from '../src/game/Tackle.js';
 import { catalogEntry } from '../src/maps/catalog.js';
 import { CatchMinigame } from '../src/game/CatchMinigame.js';
@@ -770,6 +771,26 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	const habAny = {};
 	for ( const sid of activeMap().species ) for ( const k in FISH[ sid ].habitat ) habAny[ k ] = 1;
 	ok( Math.abs( biteMulHere( habAny, 12, () => 1 ) - 1 ) < 1e-9 && Math.abs( biteMulHere( habAny, 12, () => 0.5 ) - 0.5 ) < 1e-9, 'bite: the wait multiplier is the rig\'s average over what lives here' );
+
+}
+// ---- the three rods and the gear tab (E4: D65)
+{
+
+	const mem = () => { const m = new Map(); return { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) }; };
+	const st = new GameState( mem() );
+	st.money = 2000; st.xp = totalXpForLevel( 8 );
+	st.buyPack( 'trout' );
+	ok( st.tackle.rigs[ 0 ].rod === 'spinL' && tbCount( st.tackle.bag, 'rod', 'floatUL' ) === 1, 'rods: a pack goes on the active rod; the starter rod goes back to the bag' );
+	ok( st.setActiveRig( 1 ) && st.tackle.active === 1 && ! st.setActiveRig( 1 ), 'rods: switching the active rod (1, 2, 3)' );
+	ok( st.equipPiece( 'rod', 'floatUL' ) && st.equipPiece( 'reel', 'r1000' ) && st.equipPiece( 'line', 'm16' ) && ! st.equipPiece( 'line', 'f18' ), 'rods: the starter rod, reel and line go on rod 2; the spool on rod 1 is not free' );
+	ok( st.equipPiece( 'hook', 12 ) && st.equipPiece( 'float', 3 ) && st.equipPiece( 'bait', 'worm' ) && rigCastable( st.tackle, 1 ), 'rods: rod 2 assembled from the bag and ready' );
+	ok( rigChipText( st ).includes( '<b>2</b>' ) && rigChipText( st ).includes( 'Lombrices' ) || rigChipText( st ).includes( 'Worms' ), 'rods: the HUD chip shows the active rod and its bait' );
+	const html = renderEquipment( st );
+	ok( ( html.match( /class="eq-rig[ "]/g ) || [] ).length === 3 && html.includes( 'data-slot="2"' ), 'rods: the gear tab shows three rods with their slots' );
+	ok( ! renderEquipment( st ).match( /data-slot="2" data-key="rod">[^]*?value="rod:spinL"/ ), 'rods: a rod on another rig is not offered for rod 3' );
+	const round = new GameState( mem() );
+	round.fromJSON( JSON.parse( JSON.stringify( st.toJSON() ) ) );
+	ok( round.tackle.active === 1 && round.tackle.rigs[ 1 ].bait === 'worm', 'rods: the active rod and the three rigs are saved' );
 
 }
 console.log( `value check ${ value }` );
