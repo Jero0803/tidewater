@@ -1288,6 +1288,14 @@ con sedal 2–5 kg y cebo 3–12 g, y la armamos con fluorocarbono de 3 kg: cae 
 tira ~2.1 kg en una carrera. **Queda como está.** Ideas para más adelante: la descripción del mapa dice qué técnica
 llevar (en el panel del destino y la guía) y cada caña en dos o tres largos.
 
+**Referencia: los spots de un mapa de Fishing Planet (captura 23, 2026-11-18):** el lago de truchas de nivel 5 se ve
+desde el aire con **dos puntos de pesca** marcados en la orilla (por ejemplo "Pesca en las malezas de helecho"). Se elige
+uno y "Vamos a pescar" lleva directo ahí; cada punto es una zona chica de orilla para caminar. El día empieza a las 05:00.
+**Nuestro lago es distinto:** un mundo abierto donde se camina o se va en bote, con cinco spots con nombre que son tipos de
+agua (D30, D40), no lugares fijos. **Propuesta D83 (por decidir): viaje rápido a los spots** desde el mapa grande (N): al
+hacer clic en un spot de orilla (juncos, muelle, desembocadura, bahía de lodo) el jugador aparece en la orilla más cercana,
+gratis y fuera de una pelea; el centro profundo sigue siendo en bote. Ahorra caminar sin quitar el mundo abierto.
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1547,3 +1555,5 @@ armar las tres cañas queda para E4.
   menos (como en Fishing Planet, donde un carrete 1500 solo admite 125 m de una bobina de 150 y el resto queda aparte).
   Antes el carrete inicial daba 293 m. Con el equipo correcto las peleas no cambian; el liviano se queda sin hilo con
   peces grandes. El pedazo que sobra no se guarda por ahora. Corregido también el precio base en `equipo-lago.mjs`.
+- **2026-11-18** · Anotados los spots de Fishing Planet (puntos fijos de orilla a los que se va directo). Propuesta D83:
+  viaje rápido a los spots de orilla desde el mapa grande. Por decidir.
