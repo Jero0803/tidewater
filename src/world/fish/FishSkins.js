@@ -23,6 +23,8 @@ export const SKIN_ART = {
 	brownTrout: { file: 'brownTrout.webp' },
 	carp: { file: 'carp.webp' },
 	guapucha: { file: 'guapucha.webp', tint: true },
+	rainbowTrout: { file: 'rainbowTrout.webp' },
+	carachi: { file: 'carachi.webp' },
 };
 
 // layer of each illustrated species (the shader reads it from the skin table; -1: procedural skin)

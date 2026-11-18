@@ -19,6 +19,10 @@ SPEC = {
     'carp': dict(src='carp_rot.png', flip=False, body=0.80,
                  topSkip=[(0.34, 0.76)], botSkip=[(0.20, 0.33), (0.40, 0.57), (0.67, 0.78)]),
     # tint: a black and white drawing (only its shading is used); outside the silhouette it is paper white
+    'rainbowTrout': dict(src='rainbow2.jpg', flip=True, body=0.86,
+                         topSkip=[(0.37, 0.60), (0.72, 0.80)], botSkip=[(0.18, 0.30), (0.43, 0.53), (0.63, 0.77)]),
+    'carachi': dict(src='orpent.jpg', flip=True, body=0.87,
+                    topSkip=[(0.50, 0.68)], botSkip=[(0.53, 0.72)]),
     'guapucha': dict(src='guap1915.jpg', flip=True, body=0.84, tint=True,
                      topSkip=[(0.47, 0.59)], botSkip=[(0.18, 0.37), (0.40, 0.70)]),
 }

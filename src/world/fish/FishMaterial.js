@@ -382,7 +382,7 @@ function surface( prop, lodFade ) {
 	}
 
 	// ---- species markings (body; some on fins)
-	if ( pat == ${ PT( 'silverside' ) } ) {
+	if ( pat == ${ PT( 'silverside' ) } || pat == ${ PT( 'pejerrey' ) } ) {
 		// silver lateral band with a dark upper edge; translucent green back
 		let bandK = fishBand( h, 0.02, 0.1, fwH + 0.05 ) * bodyK;
 		c = mix( c, vec3f( 0.78, 0.82, 0.84 ), bandK * 0.8 );
