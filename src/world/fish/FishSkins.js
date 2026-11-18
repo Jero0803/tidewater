@@ -27,6 +27,15 @@ export const SKIN_ART = {
 	carachi: { file: 'carachi.webp' },
 };
 
+// 3D models (GLB, skinned and animated) for a few species, tried on the catch card against the illustrated
+// skin (D59). nose: the model axis the snout points along once the GLB's own node transforms are applied.
+// Off with ?fishglb=0 in the address.
+export const FISH_GLB = {
+	rainbowTrout: { file: 'rainbowTrout.glb', clip: 'Casual_Swim', nose: '-z', credit: 'Rainbow Trout - Redband, eb78 (Sketchfab, CC-BY)' },
+};
+export const fishGlbOn = () => ! ( typeof location !== 'undefined' && new URLSearchParams( location.search ).get( 'fishglb' ) === '0' );
+export const FISH_GLB_BASE = ( ( typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/fish/';
+
 // layer of each illustrated species (the shader reads it from the skin table; -1: procedural skin)
 export const SKIN_LAYER = Object.fromEntries( Object.keys( SKIN_ART ).map( ( k, i ) => [ k, i ] ) );
 // 1 for the black and white drawings (tint), 0 for the colour illustrations

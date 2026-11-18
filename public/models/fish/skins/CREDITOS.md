@@ -10,3 +10,9 @@ Se recortaron, se enderezaron y se pasaron al marco de la piel del juego con `to
 | Guapucha (*Grundulus bogotensis*) | guapucha.webp (dibujo en blanco y negro: solo da el sombreado y las líneas; los colores son los del juego) | [Grundulus bogotensis illustration (1915).jpg](https://commons.wikimedia.org/wiki/File:Grundulus_bogotensis_illustration_(1915).jpg) | Carl H. Eigenmann (1915) | Dominio público |
 | Trucha arcoíris (*Oncorhynchus mykiss*) | rainbowTrout.webp | [Oncorhynchus mykiss mid res 150dpi.jpg](https://commons.wikimedia.org/wiki/File:Oncorhynchus_mykiss_mid_res_150dpi.jpg) | Duane Raver, U.S. Fish and Wildlife Service | Dominio público |
 | Carachi (*Orestias*; lámina de *Orestias pentlandii*) | carachi.webp | [Orestias pentlandii.jpg](https://commons.wikimedia.org/wiki/File:Orestias_pentlandii.jpg) | François-Louis Laporte, conde de Castelnau | Dominio público |
+
+## Modelos 3D
+
+| Especie | Archivo | Fuente | Autor | Licencia |
+|---|---|---|---|---|
+| Trucha arcoíris | ../rainbowTrout.glb (reducido: texturas en WebP, sin la trucha joven) | [Rainbow Trout - Redband](https://sketchfab.com/3d-models/rainbow-trout-redband-442ab10476d0486e8eb689941bc4ad6e) | eb78 | CC-BY 4.0 |

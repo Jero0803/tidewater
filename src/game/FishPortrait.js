@@ -3,6 +3,10 @@ import { GPU, Texture, MeshRenderer, FullscreenPass, createViewUniforms, setFram
 import { FishProps } from '../world/fish/FishProps.js';
 import { ACES_WGSL } from '../post/PostFX.js';
 import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
+import { Group } from '../engine/index.js';
+import { loadGLB } from '../engine/loaders/GLTF.js';
+import { SkinnedModel } from '../engine/render/Skinning.js';
+import { FISH_GLB, FISH_GLB_BASE, fishGlbOn } from '../world/fish/FishSkins.js';
 
 // Studio portraits of the catchable fish: the real game models (world/fish, through FishProps) in a
 // neutral photo studio, side-on and horizontal (nose left, as in a field guide).
@@ -54,6 +58,10 @@ export class FishPortrait {
 		this.mesh.frustumCulled = false;
 		this.scene = new Scene();
 		this.scene.add( this.mesh );
+		// species with a 3D model (FishSkins.js FISH_GLB): loaded in the background, drawn instead of the
+		// procedural fish once ready
+		this.glb = {};
+		if ( hasDOM && fishGlbOn() ) for ( const id in FISH_GLB ) if ( FISH[ id ] ) this._loadGlb( id );
 		this.scene.updateMatrixWorld( true );
 		this.renderer = new MeshRenderer();
 		this.camera = new PerspectiveCamera( VFOV, 2, 0.05, 200 );
@@ -161,6 +169,17 @@ fn fragment( in: FSIn ) -> vec4f {
 		_q2.setFromAxisAngle( _a.set( 1, 0, 0 ), roll );
 		_q.multiply( _q2 );
 		_f.makeRotationFromQuaternion( _q ).setPosition( STUDIO.x + x * L, STUDIO.y + y * L, STUDIO.z );
+		const g = this.glb[ species ];
+		if ( g && g.model ) {
+
+			// the 3D model instead of the procedural fish (which stays parked)
+			g.holder.matrix.multiplyMatrices( _f, PORTRAIT ).scale( _s.set( L, L, L ) );
+			g.holder.updateMatrixWorld( true );
+			this._write( this.slot[ species ], _f.makeTranslation( PARK.x, PARK.y, PARK.z ), 0.3, 0, 0 );
+			return L;
+
+		}
+
 		this._write( this.slot[ species ], _f, L, curl, jaw );
 		return L;
 
@@ -170,6 +189,67 @@ fn fragment( in: FSIn ) -> vec4f {
 
 		_f.makeTranslation( PARK.x, PARK.y, PARK.z );
 		this._write( this.slot[ species ], _f, 0.3, 0, 0 );
+		const g = this.glb[ species ];
+		if ( g && g.model ) {
+
+			g.holder.matrix.makeTranslation( PARK.x, PARK.y, PARK.z ).scale( _s.set( 1e-3, 1e-3, 1e-3 ) );
+			g.holder.updateMatrixWorld( true );
+
+		}
+
+	}
+
+	// ---- 3D models (GLB): normalized to the fish model frame (nose +z, back +y, total length 1)
+	async _loadGlb( id ) {
+
+		const spec = FISH_GLB[ id ];
+		const g = this.glb[ id ] = { model: null, holder: null };
+		try {
+
+			const model = await SkinnedModel.create( await loadGLB( FISH_GLB_BASE + spec.file ) );
+			if ( spec.clip ) model.play( spec.clip, { fade: 0.01 } );
+			model.update( 0 );
+			// bind-pose bounds in the model's frame (mesh node transform applied to the vertices)
+			const gl = model.gltf;
+			const mi = gl.nodes.findIndex( ( n ) => n.mesh !== undefined && n.skin !== undefined );
+			const W = new Matrix4().fromArray( model.world, mi * 16 );
+			const pos = model.meshes[ 0 ].geometry.attributes.position.array;
+			const lo = [ Infinity, Infinity, Infinity ], hi = [ - Infinity, - Infinity, - Infinity ];
+			for ( let i = 0; i < pos.length; i += 3 ) {
+
+				_p.set( pos[ i ], pos[ i + 1 ], pos[ i + 2 ] ).applyMatrix4( W );
+				lo[ 0 ] = Math.min( lo[ 0 ], _p.x ); lo[ 1 ] = Math.min( lo[ 1 ], _p.y ); lo[ 2 ] = Math.min( lo[ 2 ], _p.z );
+				hi[ 0 ] = Math.max( hi[ 0 ], _p.x ); hi[ 1 ] = Math.max( hi[ 1 ], _p.y ); hi[ 2 ] = Math.max( hi[ 2 ], _p.z );
+
+			}
+
+			const axis = spec.nose[ 1 ], sign = spec.nose[ 0 ] === '-' ? - 1 : 1;
+			const k = { x: 0, y: 1, z: 2 }[ axis ];
+			const len = hi[ k ] - lo[ k ];
+			// rotate the nose onto +z (about y), centre, scale to length 1
+			const fix = new Matrix4();
+			if ( axis === 'z' && sign < 0 ) fix.makeRotationY( Math.PI );
+			else if ( axis === 'x' ) fix.makeRotationY( sign > 0 ? - Math.PI / 2 : Math.PI / 2 );
+			const c = new Vector3( ( lo[ 0 ] + hi[ 0 ] ) / 2, ( lo[ 1 ] + hi[ 1 ] ) / 2, ( lo[ 2 ] + hi[ 2 ] ) / 2 );
+			fix.multiply( new Matrix4().makeScale( 1 / len, 1 / len, 1 / len ) ).multiply( new Matrix4().makeTranslation( - c.x, - c.y, - c.z ) );
+			const inner = new Group();
+			inner.matrixAutoUpdate = false;
+			inner.matrix.copy( fix );
+			inner.add( model.group );
+			const holder = new Group();
+			holder.matrixAutoUpdate = false;
+			holder.add( inner );
+			this.scene.add( holder );
+			g.model = model;
+			g.holder = holder;
+			this._park( id );
+			if ( this.shown === id ) this.shown = null;
+
+		} catch ( e ) {
+
+			console.warn( 'fish model ' + id + ':', e.message );
+
+		}
 
 	}
 
@@ -362,6 +442,8 @@ fn fragment( in: FSIn ) -> vec4f {
 		if ( lv && this.context ) {
 
 			lv.t += dt;
+			const gm = this.glb[ lv.species ];
+			if ( gm && gm.model ) gm.model.update( dt );
 			const c = this.canvas;
 			const dpr = Math.min( 2, globalThis.devicePixelRatio || 1 );
 			const cw = Math.max( 2, Math.min( 1600, Math.round( c.clientWidth * dpr ) ) ), ch = Math.max( 2, Math.round( cw * ( c.clientHeight / Math.max( 1, c.clientWidth ) ) ) );

@@ -846,6 +846,7 @@ Blender.
 | G1 | Guía de peces: pestaña "Peces" en el inventario y sección en Progreso de la portada, con una imagen por especie sacada del juego (con los modelos de hoy; se renuevan al llegar los GLB) | Pendiente |
 | M1 | Prototipo con piel ilustrada: trucha café y carpa (ilustraciones del USFWS), anatomía ajustada a cada ilustración | **Hecha** (2026-11-18) |
 | M2 | Si M1 convence: ilustraciones para las demás especies del lago (trucha arcoíris, pejerrey; guapucha, capitán y carachi si hay fuente), luego las de la isla | Pendiente |
+| M3 | Prueba de modelo 3D: la trucha arcoíris "Rainbow Trout - Redband" (eb78, Sketchfab, CC-BY) en la tarjeta de captura, reducida de 22 MB a 3,4 MB (`tools/fish/glb_slim.py`); se apaga con `?fishglb=0` para comparar. Comparación en `docs/comparacion-trucha.png` | **Prueba** (2026-11-18), por decidir |
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -963,3 +964,6 @@ Blender.
 - **2026-11-18** · D59 revisado: Sketchfab no deja crear cuenta, así que los peces llevan **ilustraciones de dominio
   público del USFWS** proyectadas sobre el modelo. **M1 hecha:** la trucha café y la carpa ya se ven con su
   ilustración en la tarjeta de captura (los del agua usan el mismo material), con la anatomía ajustada a cada dibujo.
+- **2026-11-18** · M2 avanzada: trucha arcoíris (Raver), carachi (*Orestias pentlandii*) y guapucha (Eigenmann, en
+  modo tinte) con piel ilustrada; el pejerrey tiene modelo propio (para no pintar al pejerrey cabezón de la isla).
+  M3: prueba del modelo 3D de la trucha arcoíris en la tarjeta de captura, para comparar con la ilustración.
