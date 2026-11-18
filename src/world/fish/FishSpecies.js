@@ -367,22 +367,35 @@ SPECIES.rainbowTrout = {
 	caudal: { shape: 'truncate', len: 0.17, span: 0.14, fork: 0.88, rays: 19 },
 	iris: 0xb8a060, irid: 0.35, metal: 0.35,
 };
-// brown trout: the same build, a little heavier at the head
-SPECIES.brownTrout = { ...SPECIES.rainbowTrout, pattern: PATTERN.brownTrout, mouth: { corner: 0.13, y: - 0.006, tip: - 0.002, protrude: 0.002 }, iris: 0xc89040, metal: 0.2, irid: 0.15 };
+// brown trout: fitted to its illustration (FishSkins.js, D59): profile, eye, mouth and fins measured on it
+SPECIES.brownTrout = {
+	...SPECIES.rainbowTrout, pattern: PATTERN.brownTrout, body: 0.86,
+	top: [ [ 0, 0.008 ], [ 0.03, 0.03 ], [ 0.08, 0.054 ], [ 0.16, 0.072 ], [ 0.28, 0.1 ], [ 0.42, 0.117 ], [ 0.56, 0.108 ], [ 0.7, 0.09 ], [ 0.84, 0.078 ], [ 0.93, 0.06 ], [ 1, 0.064 ] ],
+	bot: [ [ 0, 0.008 ], [ 0.03, 0.036 ], [ 0.08, 0.054 ], [ 0.16, 0.066 ], [ 0.28, 0.082 ], [ 0.42, 0.091 ], [ 0.56, 0.088 ], [ 0.7, 0.081 ], [ 0.84, 0.075 ], [ 0.93, 0.045 ], [ 1, 0.056 ] ],
+	mouth: { corner: 0.13, y: - 0.02, tip: 0.002, protrude: 0.002 },
+	eye: { u: 0.091, y: 0.027, r: 0.016 }, opercle: 0.24,
+	dorsal: [ soft( 0.48, 0.65, 12, [ [ 0, 0.12 ], [ 0.3, 0.11 ], [ 1, 0.04 ] ], [ 0.85, 1.1 ] ) ],
+	anal: [ soft( 0.79, 0.95, 10, [ [ 0, 0.1 ], [ 1, 0.045 ] ], [ 0.8, 1.1 ] ) ],
+	pectoral: { u: 0.243, y: - 0.014, len: 0.12, base: 0.022, rays: 13, shape: 'rounded', spread: 0.45 },
+	pelvic: { u: 0.56, len: 0.08, rays: 9 },
+	caudal: { shape: 'truncate', len: 0.14, span: 0.108, fork: 0.8, rays: 19 },
+	iris: 0xc89040, metal: 0.2, irid: 0.15,
+};
 // common carp: deep, humped back, one long dorsal with a serrated first ray, big scales, small mouth
+// (fitted to its illustration, FishSkins.js, D59: profile, eye, mouth and fins measured on it)
 SPECIES.carp = {
-	pattern: PATTERN.carp, body: 0.82, sec: 2.25,
-	top: [ [ 0, 0.006 ], [ 0.03, 0.03 ], [ 0.08, 0.062 ], [ 0.16, 0.1 ], [ 0.28, 0.135 ], [ 0.42, 0.146 ], [ 0.56, 0.136 ], [ 0.7, 0.105 ], [ 0.84, 0.068 ], [ 1, 0.05 ] ],
-	bot: [ [ 0, 0.006 ], [ 0.03, 0.024 ], [ 0.08, 0.048 ], [ 0.16, 0.076 ], [ 0.28, 0.098 ], [ 0.42, 0.104 ], [ 0.56, 0.096 ], [ 0.7, 0.078 ], [ 0.84, 0.056 ], [ 1, 0.046 ] ],
+	pattern: PATTERN.carp, body: 0.815, sec: 2.25,
+	top: [ [ 0, 0.006 ], [ 0.03, 0.028 ], [ 0.08, 0.049 ], [ 0.16, 0.089 ], [ 0.28, 0.14 ], [ 0.42, 0.16 ], [ 0.56, 0.137 ], [ 0.7, 0.11 ], [ 0.84, 0.082 ], [ 0.93, 0.058 ], [ 1, 0.061 ] ],
+	bot: [ [ 0, 0.006 ], [ 0.03, 0.029 ], [ 0.08, 0.037 ], [ 0.16, 0.052 ], [ 0.28, 0.072 ], [ 0.42, 0.083 ], [ 0.56, 0.086 ], [ 0.7, 0.085 ], [ 0.84, 0.072 ], [ 0.93, 0.047 ], [ 1, 0.051 ] ],
 	wid: [ [ 0, 0.006 ], [ 0.05, 0.034 ], [ 0.15, 0.06 ], [ 0.3, 0.074 ], [ 0.5, 0.07 ], [ 0.7, 0.052 ], [ 0.9, 0.03 ], [ 1, 0.022 ] ],
-	mouth: { corner: 0.06, y: - 0.008, tip: - 0.004, protrude: 0.004 },
-	eye: { u: 0.12, y: 0.034, r: 0.017 }, opercle: 0.25,
+	mouth: { corner: 0.049, y: - 0.016, tip: 0.003, protrude: 0.004 },
+	eye: { u: 0.095, y: 0.028, r: 0.0145 }, opercle: 0.264,
 	scales: 0.05, scaleVis: 0.95, lateral: 0.4, arch: 0.1,
-	dorsal: [ soft( 0.36, 0.73, 20, [ [ 0, 0.09 ], [ 0.15, 0.075 ], [ 1, 0.035 ] ], [ 0.5, 0.85 ] ) ],
-	anal: [ soft( 0.69, 0.78, 7, [ [ 0, 0.075 ], [ 1, 0.03 ] ], [ 0.55, 0.9 ] ) ],
-	pectoral: { u: 0.27, y: - 0.05, len: 0.13, base: 0.026, rays: 16, shape: 'rounded', spread: 0.45 },
-	pelvic: { u: 0.42, len: 0.1, rays: 9 },
-	caudal: { shape: 'forked', len: 0.2, span: 0.15, fork: 0.6, rays: 19 },
+	dorsal: [ soft( 0.46, 0.9, 20, [ [ 0, 0.15 ], [ 0.12, 0.11 ], [ 1, 0.035 ] ], [ 0.6, 0.95 ] ) ],
+	anal: [ soft( 0.83, 0.9, 7, [ [ 0, 0.125 ], [ 1, 0.04 ] ], [ 0.7, 1.0 ] ) ],
+	pectoral: { u: 0.28, y: - 0.028, len: 0.13, base: 0.026, rays: 16, shape: 'rounded', spread: 0.45 },
+	pelvic: { u: 0.525, len: 0.1, rays: 9 },
+	caudal: { shape: 'forked', len: 0.185, span: 0.131, fork: 0.5, rays: 19 },
 	iris: 0xc8a040, irid: 0.1, metal: 0.3,
 };
 // capitán de la sabana (Eremophilus mutisii): a scaleless Andean catfish, flat broad head, small dorsal, rounded tail

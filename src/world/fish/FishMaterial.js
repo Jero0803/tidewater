@@ -5,6 +5,7 @@ import { commonModule } from '../../engine/render/wgsl/common.js';
 import { lodFadeModule } from '../../materials/LODFade.js';
 import { SPECIES, SKIN, PATTERN } from './FishSpecies.js';
 import { PART } from './FishGeometry.js';
+import { SKIN_LAYER, skinTexture } from './FishSkins.js';
 
 // The fish material (WGSL, ported from TSL), shared by the swimming fish (FishSchools) and the
 // fish on the market stall, drying racks and cleaning tables (FishProps).
@@ -32,7 +33,7 @@ import { PART } from './FishGeometry.js';
 // WGSL (module `fishModule()`): fishRotateQ, fishRow( pattern, k ), fishHash, fishVnoise,
 // fishOpercleEdge, fishOpercleMask, fishBand, fishPartOf, fishJawOf, fishSwimOffset, fishEyeCol.
 
-const ROWS = 8; // vec4 rows per species in the table
+const ROWS = 9; // vec4 rows per species in the table
 
 // see the note at s.specularIntensity in surface()
 export const FISH_SPECULAR = 'intended';
@@ -60,6 +61,8 @@ function buildTable() {
 			new Vector4( ir.r, ir.g, ir.b, S.scaleVis ),
 			new Vector4( 0.5 - S.eye.u * L, S.eye.y, S.eye.r, 0.5 - S.opercle * L ),
 			new Vector4( S.lateral, S.arch, 0.5 - S.mouth.corner * L, S.mouth.y ),
+			// illustrated skin: its layer in the skins texture (FishSkins.js), -1 for the procedural skin
+			new Vector4( SKIN_LAYER[ name ] ?? - 1, 0, 0, 0 ),
 		);
 
 	}
@@ -334,6 +337,12 @@ function surface( prop, lodFade ) {
 	let n1 = fishVnoise( vec2f( z, y ) * 38.0 + seed * 17.0 );
 	let n2 = fishVnoise( vec2f( z, sd ) * 11.0 + seed * 5.0 );
 	let fwW = fwidth( w ); let fwH = fwidth( h );
+	// illustrated skin (D59): the side-view illustration at the rest-pose position (both flanks); alpha 0
+	// until the image has loaded
+	let skinL = fishRow( pat, 8 ).x;
+	let skinS = textureSample( fishSkinTex, smpAnisoClamp, vec2f( z + 0.5, 0.5 - y * 2.0 ), i32( max( skinL, 0.0 ) ) );
+	let skinK = select( 0.0, skinS.a, skinL >= 0.0 && ( isBody || isFin ) );
+	let skinN = 1.0 - skinK;
 
 	// ---- counter-shading
 	let tBack = smoothstep( 0.2, 0.75, h );
@@ -540,19 +549,25 @@ function surface( prop, lodFade ) {
 		c = mix( c, vec3f( 0.07, 0.07, 0.05 ), m * 0.6 );
 	}
 
+	// ---- illustrated skin: its colours and markings replace the procedural ones on body and fins (the
+	// relief of the scales still shades it a little)
+	c = mix( c, skinS.rgb * mix( 1.0, 0.97 + scaleShade * 0.05, bodyK ), skinK );
+	// (fins: less light through them near the body, where the painted fin is still thick)
+	transl *= mix( 1.0, smoothstep( 0.0, 0.3, t ) * 0.7 + 0.1, skinK * select( 0.0, 1.0, isFin ) );
+
 	// ---- lateral line (a row of pores along a dark line)
 	let hl = lat.x + lat.y * ( 1.0 - smoothstep( 0.12, 0.55, u ) );
 	let lineK = fishBand( h, hl, fwH * 0.5 + 0.012, fwH + 0.008 ) * bodyK * smoothstep( 0.18, 0.25, u ) * smoothstep( 0.9, 0.8, u );
-	c *= 1.0 - lineK * 0.3;
+	c *= 1.0 - lineK * 0.3 * skinN;
 
 	// ---- gill cover edge and the preopercle (dark creases); gills show red on dead fish
 	let zE = fishOpercleEdge( eye.w, h );
 	let dOp = z - zE;
 	let onOp = fishOpercleMask( h ) * bodyK;
 	let crease = ( 1.0 - smoothstep( 0.0015, 0.004, abs( dOp ) ) ) * onOp;
-	c *= 1.0 - crease * 0.45;
+	c *= 1.0 - crease * 0.45 * skinN;
 	let pre = ( 1.0 - smoothstep( 0.001, 0.003, abs( dOp - 0.04 ) ) ) * onOp * smoothstep( 0.6, 0.2, h );
-	c *= 1.0 - pre * 0.2;
+	c *= 1.0 - pre * 0.2 * skinN;
 	let gill = smoothstep( 0.0, -0.0015, dOp ) * smoothstep( -0.007, -0.003, dOp ) * onOp * smoothstep( 0.0, -0.5, h ) * flags.w;
 	c = mix( c, vec3f( 0.3, 0.03, 0.035 ), gill * 0.8 );
 
@@ -562,12 +577,12 @@ function surface( prop, lodFade ) {
 	let mt = clamp( ( z - hz ) / ( 0.5 - hz ), 0.0, 1.0 );
 	let yLip = mix( hy, tipY, mt );
 	let lips = ( 1.0 - smoothstep( 0.0015, 0.0035, abs( y - yLip ) ) ) * step( hz - 0.004, z ) * bodyK;
-	c *= 1.0 - lips * 0.55;
+	c *= 1.0 - lips * 0.55 * skinN;
 	let maxZ = hz + 0.006 - ( y - hy ) * 0.35;
 	let maxilla = ( 1.0 - smoothstep( 0.001, 0.0025, abs( z - maxZ ) ) ) * smoothstep( hy - 0.002, hy + 0.002, y ) * smoothstep( hy + 0.04, hy + 0.025, y ) * bodyK;
-	c *= 1.0 - maxilla * 0.3;
+	c *= 1.0 - maxilla * 0.3 * skinN;
 	let nostril = ( 1.0 - smoothstep( 0.1, 0.2, length( vec2f( z - eye.x - eye.z * 1.7, y - eye.y - eye.z * 0.25 ) ) / eye.z ) ) * bodyK;
-	c *= 1.0 - nostril * 0.6;
+	c *= 1.0 - nostril * 0.6 * skinN;
 
 	// ---- painted eye (under the dome where there is one)
 	let er = length( vec2f( z - eye.x, y - eye.y ) ) / eye.z;
@@ -750,6 +765,7 @@ function baseMaterial( batch, name, extra ) {
 		modules: [ fishModule(), batch.module ],
 		attributes: { aData: 'vec4f', aKind: 'f32' },
 		varyings: VARYINGS,
+		textures: { fishSkinTex: skinTexture() },
 		...extra,
 	} );
 

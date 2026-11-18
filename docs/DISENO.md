@@ -112,7 +112,7 @@ hacia arriba (mapas de nivel más alto).
 | D56 | **Multiplicador de XP con dos mapas:** el lago y la isla quedan los dos en ×1.0 mientras falten los mapas 2 a 5 (D45, D52). El lago ya da menos XP y dinero por pez que la isla (especies más fáciles); el ×3.05 de la isla (D32) se aplica cuando exista la cadena completa | Con la isla libre, ×3.05 haría saltarse el lago | 2026-11-18 |
 | D57 | **Viaje entre mapas desde el amarre (confirma D54):** junto al bote amarrado (en la punta del muelle o a bordo) aparece "B · Viajar en bote". Solo se puede ir a mapas **abiertos y desbloqueados por nivel**; entre los desbloqueados se va y viene libremente. **Reemplaza la "isla libre" de D52:** mientras falten los mapas 2 a 5, la isla se abre en el **nivel 10** (después volverá al 51). La nevera tiene que estar vacía (D20) | El nivel ordena la progresión sin cerrar los mapas ya ganados | 2026-11-18 |
 | D58 | **Costo del viaje = un día de la licencia básica del mapa de destino:** al lago $50, a la isla $175. Bajar a un mapa fácil sale barato; subir a uno difícil, más caro | El costo sigue la escala de cada mapa | 2026-11-18 |
-| D59 | **Peces con modelos 3D de verdad (GLB con textura), sin cambiar de motor:** el motor ya carga GLB (`engine/loaders/GLTF.js`, con esqueleto). Los peces dejan de armarse solo con código y pasan a modelos con textura, de fuentes **gratuitas con licencia libre** (CC0 o CC-BY, con el autor citado en `public/fish/CREDITOS.md`). Nadan doblando el cuerpo con una onda (no hace falta esqueleto). El pez hecho con código queda de respaldo para las especies sin modelo. Cada pez pesa entre 0,5 y 2 MB. **Prototipo:** la trucha arcoíris "Rainbow Trout - Redband" de E.A.Cornell (Sketchfab, CC-BY, 18 mil caras, 6 animaciones) | Los peces hechos con código se ven de baja calidad; cambiar de motor obligaría a rehacer todo para tener los mismos peces | 2026-11-18 |
+| D59 | **Peces con piel ilustrada, sin cambiar de motor (revisada el 2026-11-18):** cada especie lleva una **ilustración de perfil de dominio público** (U.S. Fish and Wildlife Service, muchas de Duane Raver, en Wikimedia Commons) proyectada de lado sobre el cuerpo y las aletas de nuestro modelo, en los dos costados. La anatomía de la especie (perfil, ojo, boca, aletas, cola) se ajusta a la ilustración para que encajen. El pez hecho con código queda de respaldo para las especies sin ilustración. Créditos en `public/models/fish/skins/CREDITOS.md`. **Antes se pensó en modelos GLB de Sketchfab** (la trucha Redband de E.A.Cornell, CC-BY), pero Sketchfab no deja crear cuenta por edad; se pueden añadir más adelante si alguien con cuenta los baja | Los peces hechos con código se ven de baja calidad; las ilustraciones cubren casi todas las especies de EE. UU. y el Caribe, se bajan sin cuenta y no tienen restricciones | 2026-11-18 |
 | D60 | **Guía de peces de cada mapa, en el juego y en la portada:** una ficha por especie con su imagen, nombre común y científico, dónde pica (spots), a qué hora, licencia que pide, rango de tamaño y tu récord. En el juego es una pestaña del inventario; en la portada va dentro de Progreso. Las imágenes se sacan del propio juego (una por especie), así se ven igual en los dos lados y la portada sigue sin motor. **Todo visible desde el inicio**, también los peces que aún no pescaste | Hoy no hay forma de saber qué peces tiene un mapa ni cómo son | 2026-11-18 |
 
 ---
@@ -826,23 +826,26 @@ arranque).
 calidad: sin escamas reales, sin radios en las aletas, sin la textura de una foto. El motor ya sabe cargar modelos
 GLB, así que no hace falta cambiar de motor.
 
-**Fuentes de modelos** (licencia libre, revisada modelo por modelo):
-- Sketchfab, filtro "descargable" + CC0 / CC-BY. Bajar un modelo pide una cuenta gratuita.
-- Candidatos para la trucha arcoíris (CC-BY): "Rainbow Trout - Redband" de E.A.Cornell (18 mil caras, elegida),
-  "Rainbow Trout" de UC Davis TERC (4 mil caras, de reserva), un escaneo de MTSU Ichthyology (280 mil caras, muy
-  pesado).
-- Si una especie no tiene modelo libre: generarlo con IA desde una foto (Meshy, Tripo, Hunyuan3D) o hacerlo en
-  Blender.
+**Cómo se hace (D59, revisado):** cada especie usa una ilustración de perfil de dominio público (USFWS, Wikimedia
+Commons) sobre fondo blanco. `tools/fish/skin_prep.py` la recorta, la endereza y la pasa a un marco fijo de 1024 × 512
+(u = z + 0,5, con el hocico a la derecha; v = 0,5 − 2y); fuera de la silueta rellena con el color más cercano. El
+shader la proyecta de lado sobre el cuerpo y las aletas (`src/world/fish/FishSkins.js`, una capa por especie en una
+textura de varias capas) y reemplaza los colores y marcas hechos con código; el relieve de las escamas, la luz que
+atraviesa las aletas y el ojo siguen siendo del motor. La anatomía de la especie en `FishSpecies.js` se mide sobre la
+ilustración (perfil del cuerpo, ojo, boca, aletas y cola) para que todo encaje.
 
-**Cómo se usa un modelo:** se orienta y escala a la medida del pez (largo desde FishTable) y nada doblando el cuerpo
-a lo largo con una onda en el shader. Sirve en el agua, en la tarjeta de captura, en la mano y en la guía. Créditos
-en `public/fish/CREDITOS.md`.
+**Límites:** visto de frente o desde arriba la ilustración se estira (de lado, que es como más se ve, queda muy bien).
+Las especies andinas (guapucha, capitán, carachi) probablemente no tengan ilustración del USFWS: hay que buscar otra
+fuente libre o se quedan con el pez hecho con código.
+
+**Otras fuentes:** modelos GLB de Sketchfab (CC0 / CC-BY; piden cuenta), generados con IA desde una foto o hechos en
+Blender.
 
 | Entrega | Qué | Estado |
 |---|---|---|
 | G1 | Guía de peces: pestaña "Peces" en el inventario y sección en Progreso de la portada, con una imagen por especie sacada del juego (con los modelos de hoy; se renuevan al llegar los GLB) | Pendiente |
-| M1 | Prototipo: la trucha arcoíris Redband como GLB (cargar, orientar, escalar, nadar), al lado de la versión de hoy para comparar | Pendiente |
-| M2 | Si M1 convence: buscar o generar modelos para las demás especies del lago, luego las de la isla | Pendiente |
+| M1 | Prototipo con piel ilustrada: trucha café y carpa (ilustraciones del USFWS), anatomía ajustada a cada ilustración | **Hecha** (2026-11-18) |
+| M2 | Si M1 convence: ilustraciones para las demás especies del lago (trucha arcoíris, pejerrey; guapucha, capitán y carachi si hay fuente), luego las de la isla | Pendiente |
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -957,3 +960,6 @@ en `public/fish/CREDITOS.md`.
   partidas nuevas en el lago. El Mapa 1 queda integrado.
 - **2026-11-18** · Decididos D59 (peces con modelos GLB gratuitos de licencia libre, sin cambiar de motor; prototipo
   con la trucha Redband de E.A.Cornell) y D60 (guía de peces en el juego y en la portada, todo visible). Plan en 7f.
+- **2026-11-18** · D59 revisado: Sketchfab no deja crear cuenta, así que los peces llevan **ilustraciones de dominio
+  público del USFWS** proyectadas sobre el modelo. **M1 hecha:** la trucha café y la carpa ya se ven con su
+  ilustración en la tarjeta de captura (los del agua usan el mismo material), con la anatomía ajustada a cada dibujo.
