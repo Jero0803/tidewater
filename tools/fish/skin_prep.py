@@ -18,6 +18,9 @@ SPEC = {
                        topSkip=[(0.38, 0.57), (0.72, 0.81)], botSkip=[(0.15, 0.30), (0.48, 0.59), (0.64, 0.83)]),
     'carp': dict(src='carp_rot.png', flip=False, body=0.80,
                  topSkip=[(0.34, 0.76)], botSkip=[(0.20, 0.33), (0.40, 0.57), (0.67, 0.78)]),
+    # tint: a black and white drawing (only its shading is used); outside the silhouette it is paper white
+    'guapucha': dict(src='guap1915.jpg', flip=True, body=0.84, tint=True,
+                     topSkip=[(0.47, 0.59)], botSkip=[(0.18, 0.37), (0.40, 0.70)]),
 }
 W, H = 1024, 512
 
@@ -63,6 +66,13 @@ def run(name, out):
     core = ndimage.binary_erosion(m, iterations=2)
     _, (iy, ix) = ndimage.distance_transform_edt(~core, return_indices=True)
     bled = im[iy, ix]
+    if S.get('tint'):
+        # grey, paper white = 255, and white outside the silhouette (no darkening there)
+        g = im.mean(axis=2)
+        paper = np.percentile(g[m], 97)
+        g = np.clip(g / paper * 255, 0, 255)
+        g[~ndimage.binary_dilation(m, iterations=2)] = 255
+        bled = np.repeat(g[:, :, None], 3, axis=2)
     rgb = np.stack([ndimage.map_coordinates(bled[:, :, c], [ys, xs], order=1, mode='nearest') for c in range(3)], -1)
     a = ndimage.map_coordinates(m.astype(float), [ys, xs], order=1, mode='constant', cval=0)
     img = np.clip(rgb, 0, 255).astype(np.uint8)

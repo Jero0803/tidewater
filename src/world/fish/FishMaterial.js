@@ -5,7 +5,7 @@ import { commonModule } from '../../engine/render/wgsl/common.js';
 import { lodFadeModule } from '../../materials/LODFade.js';
 import { SPECIES, SKIN, PATTERN } from './FishSpecies.js';
 import { PART } from './FishGeometry.js';
-import { SKIN_LAYER, skinTexture } from './FishSkins.js';
+import { SKIN_LAYER, SKIN_TINT, skinTexture } from './FishSkins.js';
 
 // The fish material (WGSL, ported from TSL), shared by the swimming fish (FishSchools) and the
 // fish on the market stall, drying racks and cleaning tables (FishProps).
@@ -61,8 +61,9 @@ function buildTable() {
 			new Vector4( ir.r, ir.g, ir.b, S.scaleVis ),
 			new Vector4( 0.5 - S.eye.u * L, S.eye.y, S.eye.r, 0.5 - S.opercle * L ),
 			new Vector4( S.lateral, S.arch, 0.5 - S.mouth.corner * L, S.mouth.y ),
-			// illustrated skin: its layer in the skins texture (FishSkins.js), -1 for the procedural skin
-			new Vector4( SKIN_LAYER[ name ] ?? - 1, 0, 0, 0 ),
+			// illustrated skin: its layer in the skins texture (FishSkins.js), -1 for the procedural skin; 1 for a
+			// black and white drawing that only shades the procedural colours
+			new Vector4( SKIN_LAYER[ name ] ?? - 1, SKIN_TINT[ name ] ?? 0, 0, 0 ),
 		);
 
 	}
@@ -550,8 +551,12 @@ function surface( prop, lodFade ) {
 	}
 
 	// ---- illustrated skin: its colours and markings replace the procedural ones on body and fins (the
-	// relief of the scales still shades it a little)
-	c = mix( c, skinS.rgb * mix( 1.0, 0.97 + scaleShade * 0.05, bodyK ), skinK );
+	// relief of the scales still shades it a little); a black and white drawing only shades the procedural
+	// colours with its lines (paper white = the colour as it is)
+	let skinLum = dot( skinS.rgb, vec3f( 0.2126, 0.7152, 0.0722 ) );
+	let skinTint = fishRow( pat, 8 ).y > 0.5;
+	let skinCol = select( skinS.rgb * mix( 1.0, 0.97 + scaleShade * 0.05, bodyK ), c * clamp( pow( skinLum, 0.8 ) * 1.08, 0.0, 1.1 ), skinTint );
+	c = mix( c, skinCol, skinK );
 	// (fins: less light through them near the body, where the painted fin is still thick)
 	transl *= mix( 1.0, smoothstep( 0.0, 0.3, t ) * 0.7 + 0.1, skinK * select( 0.0, 1.0, isFin ) );
 

@@ -12,15 +12,23 @@ import { generateMipmaps } from '../../engine/gpu/Mipmaps.js';
 // are bled outward (alpha keeps the silhouette). The species anatomy (FishSpecies.js) is fitted to the
 // illustration, so eye, fins and tail meet their painted counterparts.
 //
+// Two kinds of illustration:
+//   colour   the illustration's colours replace the procedural ones (USFWS paintings)
+//   tint     a black and white drawing (old engravings): its shading and lines darken the species' own
+//            procedural colours (FishSpecies.js SKIN), so the fish keeps its colours with the drawing's detail
+//
 // The texture starts empty (alpha 0: the procedural skin shows) and fills in as the images load.
 
 export const SKIN_ART = {
-	brownTrout: 'brownTrout.webp',
-	carp: 'carp.webp',
+	brownTrout: { file: 'brownTrout.webp' },
+	carp: { file: 'carp.webp' },
+	guapucha: { file: 'guapucha.webp', tint: true },
 };
 
 // layer of each illustrated species (the shader reads it from the skin table; -1: procedural skin)
 export const SKIN_LAYER = Object.fromEntries( Object.keys( SKIN_ART ).map( ( k, i ) => [ k, i ] ) );
+// 1 for the black and white drawings (tint), 0 for the colour illustrations
+export const SKIN_TINT = Object.fromEntries( Object.keys( SKIN_ART ).map( ( k ) => [ k, SKIN_ART[ k ].tint ? 1 : 0 ] ) );
 
 const W = 1024, H = 512;
 const BASE = ( ( typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/fish/skins/';
@@ -29,9 +37,9 @@ let _tex = null;
 
 async function loadLayer( tex, name, layer ) {
 
-	const blob = await fetch( BASE + SKIN_ART[ name ] ).then( ( r ) => {
+	const blob = await fetch( BASE + SKIN_ART[ name ].file ).then( ( r ) => {
 
-		if ( ! r.ok ) throw new Error( r.status + ' ' + SKIN_ART[ name ] );
+		if ( ! r.ok ) throw new Error( r.status + ' ' + SKIN_ART[ name ].file );
 		return r.blob();
 
 	} );

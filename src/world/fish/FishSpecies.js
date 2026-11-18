@@ -415,7 +415,22 @@ SPECIES.capitan = {
 	iris: 0x4a4430, irid: 0, metal: 0.04,
 };
 // guapucha (Grundulus bogotensis) and carachi: small drab fishes of the shore, the build of a small perch-like fish
-SPECIES.guapucha = { ...SPECIES.grunt, pattern: PATTERN.guapucha, scales: 0.03, scaleVis: 0.55, iris: 0xb8b090, metal: 0.4, irid: 0.3 };
+// guapucha: a small deep-bodied characid, big eye, one soft dorsal mid-back; fitted to its 1915 drawing (FishSkins.js)
+SPECIES.guapucha = {
+	pattern: PATTERN.guapucha, body: 0.84, sec: 2.2,
+	top: [ [ 0, 0.012 ], [ 0.03, 0.043 ], [ 0.08, 0.072 ], [ 0.16, 0.106 ], [ 0.28, 0.139 ], [ 0.42, 0.162 ], [ 0.56, 0.166 ], [ 0.7, 0.125 ], [ 0.84, 0.08 ], [ 1, 0.068 ] ],
+	bot: [ [ 0, 0.006 ], [ 0.03, 0.043 ], [ 0.08, 0.068 ], [ 0.16, 0.093 ], [ 0.28, 0.111 ], [ 0.42, 0.123 ], [ 0.56, 0.125 ], [ 0.7, 0.105 ], [ 0.84, 0.062 ], [ 1, 0.042 ] ],
+	wid: SPECIES.grunt.wid,
+	mouth: { corner: 0.063, y: - 0.02, tip: 0, protrude: 0.003 },
+	eye: { u: 0.102, y: 0.031, r: 0.022 }, opercle: 0.29,
+	scales: 0.03, scaleVis: 0.3, lateral: 0.45, arch: 0.15,
+	dorsal: [ soft( 0.59, 0.67, 10, [ [ 0, 0.137 ], [ 0.3, 0.12 ], [ 1, 0.05 ] ], [ 0.5, 0.9 ] ) ],
+	anal: [ soft( 0.69, 0.79, 12, [ [ 0, 0.106 ], [ 1, 0.05 ] ], [ 0.6, 0.9 ] ) ],
+	pectoral: { u: 0.3, y: - 0.077, len: 0.13, base: 0.025, rays: 12, shape: 'rounded', spread: 0.4 },
+	pelvic: { u: 0.53, len: 0.117, rays: 8 },
+	caudal: { shape: 'forked', len: 0.16, span: 0.133, fork: 0.69, rays: 19 },
+	iris: 0xb8b090, metal: 0.4, irid: 0.3,
+};
 SPECIES.carachi = { ...SPECIES.grunt, pattern: PATTERN.carachi, scales: 0.025, scaleVis: 0.45, iris: 0x9c9470, metal: 0.15, irid: 0.1 };
 
 export const SKIN = {
