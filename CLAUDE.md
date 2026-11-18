@@ -19,7 +19,7 @@ abiertas. Mantenerlo al día: cada decisión nueva va a su sección 3 y a la bit
 ## Reglas del código
 
 - Textos visibles: `loc( 'inglés', 'español' )` de `src/i18n.js`. El inglés queda idéntico al original.
-- Mapas en `src/maps/` (`registry.js` con `activeMap()`; cada mapa define distribución, terreno, especies, spots, licencias y vendedores). Lógica del juego en `src/game/` (`FishTable`, `Bites`, `CatchMinigame`, `Gear`, `GameState`, `Progression`, `Spots`, `Profiles`); se puede importar en Node.
+- Dos páginas: la portada `index.html` (`src/portada/`, sin motor: partidas, mapas, progreso, ajustes) y el juego `juego.html` (`src/main.js`). Mapas en `src/maps/` (`registry.js` con `activeMap()`; cada mapa define distribución, terreno, especies, spots, licencias y vendedores). Lógica del juego en `src/game/` (`FishTable`, `Bites`, `CatchMinigame`, `Gear`, `GameState`, `Progression`, `Spots`, `Profiles`); se puede importar en Node.
 - Guardado por perfil (índice `tidewater.profiles`; la Partida 1 usa `tidewater.save.v3`, las demás `tidewater.save.v3.pN`; solo la Partida 1 lee y convierte v1 y v2, cuyas claves no se tocan): solo agregar campos y niveles al final; no reordenar ni quitar. Si cambia el formato, subir la versión y convertir.
 - Saltos de línea CRLF en los archivos del repo.
 - Git: `origin` = Jero0803/tidewater (subir a `main` publica en GitHub Pages); `upstream` = original.

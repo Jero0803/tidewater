@@ -46,35 +46,8 @@ export function catchXp( species, kg, { newSpecies = false, mapIndex = 0 } = {} 
 
 }
 
-// ---- levels (D32): going from level N to N + 1 takes 600 × 1.03^(N − 1) XP. No level cap (D8).
-export const LEVEL_BASE_XP = 600;
-export const LEVEL_GROWTH = 1.03;
-
-export const xpToNext = ( level ) => Math.round( LEVEL_BASE_XP * LEVEL_GROWTH ** ( level - 1 ) );
-
-export function totalXpForLevel( level ) {
-
-	let xp = 0;
-	for ( let n = 1; n < level; n ++ ) xp += xpToNext( n );
-	return xp;
-
-}
-
-// level reached with `xp` total experience, the XP already earned into it and what the next level needs
-export function levelFromXp( xp ) {
-
-	let level = 1, rest = Math.max( 0, Math.floor( xp ) ), need = xpToNext( 1 );
-	while ( rest >= need ) {
-
-		rest -= need;
-		level ++;
-		need = xpToNext( level );
-
-	}
-
-	return { level, into: rest, need };
-
-}
+// ---- levels (D32): the curve lives in Levels.js (no imports, the landing page reads it too)
+export { LEVEL_BASE_XP, LEVEL_GROWTH, xpToNext, totalXpForLevel, levelFromXp } from './Levels.js';
 
 // ---- licences (D10–D14, D18–D21, D37, D41, D43, D47). Tier 1 basic, 2 intermediate, 3 advanced; cumulative (a
 // tier covers the ones below it). Each lasts one game day of played time: 120 real minutes (D47), counted in played

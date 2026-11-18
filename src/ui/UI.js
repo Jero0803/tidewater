@@ -1900,7 +1900,7 @@ export class UI {
 		// Opening the panel exits pointer lock so the cursor can reach it.
 		this.releasePointerOnPanel = true;
 
-		// index.html ships a temporary FPS counter; the HUD replaces it.
+		// juego.html ships a temporary FPS counter; the HUD replaces it.
 		document.getElementById( 'fps' )?.remove();
 
 		this.root = h( 'div', 'tw-root', { 'data-panel': 'closed' } );
@@ -3215,7 +3215,7 @@ export class UI {
 
 	}
 
-	// ── loader (static markup in index.html) ────────────────────────────────
+	// ── loader (static markup in juego.html) ────────────────────────────────
 	//
 	// setLoading( p, status, until ): a stage starts at progress p (0..1). While it runs the bar creeps
 	// towards `until` (default p + 0.05) without reaching it, so a long stage never looks frozen while

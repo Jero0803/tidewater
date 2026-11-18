@@ -8,10 +8,10 @@
 	<link rel="stylesheet" href="/src/ui/ui.css" />
 </head>
 <body>
-	<!-- Dev page: the real #loader markup from index.html in a given state.
+	<!-- Dev page: the real #loader markup from juego.html in a given state.
 	     ?p=0.5&s=Compiling%20shaders…&until=0.95&done=120&total=380&hide=1&err=msg -->
 	<script type="module">
-		const html = await ( await fetch( '/index.html' ) ).text();
+		const html = await ( await fetch( '/juego.html' ) ).text();
 		const doc = new DOMParser().parseFromString( html, 'text/html' );
 		const L = doc.getElementById( 'loader' );
 		const img = L.querySelector( '.loader-art' );

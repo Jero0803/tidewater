@@ -53,7 +53,7 @@ export function setLang( lang ) {
 
 }
 
-// The loading screen is static HTML (index.html, in English): translate it and wire its ES | EN switch.
+// The loading screen is static HTML (juego.html, in English): translate it and wire its ES | EN switch.
 const LOADER_ES = {
 	kicker: 'Un juego de pesca en una isla',
 	tagline: 'Saca el bote, recorre el arrecife y las aguas profundas, y véndele tu pesca a Joe antes de que oscurezca.',

@@ -708,9 +708,26 @@ navegador, así que las partidas son las mismas.
 
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
-| P1 | Portada y juego separados | Portada con "Continuar" (partida activa · mapa · nivel) y Partidas (crear, borrar, elegir; lo de D49 se muda aquí); selector de idioma; el juego en `juego.html`; "Salir al menú" en el juego; la pantalla de inicio del juego queda solo con "Haz clic para explorar". Vite y GitHub Pages con las dos páginas | Pendiente |
+| P1 | Portada y juego separados | Portada con "Continuar" (partida activa · mapa · nivel) y Partidas (crear, borrar, elegir; lo de D49 se muda aquí); selector de idioma; el juego en `juego.html`; "Salir al menú" en el juego; la pantalla de inicio del juego queda solo con "Haz clic para explorar". Vite y GitHub Pages con las dos páginas | **Hecha** (2026-11-18) |
 | P2 | Mapas y progreso | La cadena de mapas (lago → … → isla) con abierto / por llegar y dónde está la partida; progreso de la partida: nivel y XP, dinero, tiempo, licencias y especies capturadas por mapa con sus récords | Pendiente |
 | P3 | Ajustes generales | Idioma, calidad gráfica y volumen guardados desde la portada y leídos por el juego al cargar | Pendiente |
+
+**Entrega P1, cómo quedó:**
+
+- **Fondo:** una toma del propio juego, la punta del muelle al atardecer con el bote amarrado, las cañas apoyadas
+  en la baranda y una gaviota (`public/ui/portada.jpg` y `portada-720.jpg`, sacada en el modo foto).
+- **Portada** (`index.html`, `src/portada/`): marca y ES | EN arriba; "Un juego de pesca", el título y una frase;
+  tarjeta **Continuar / Empezar** con la partida elegida (mapa, nivel, dinero, tiempo, última vez) y el botón
+  **Jugar**; a la derecha **Partidas**: elegir (clic en el nombre), Jugar, Borrar (con confirmación), Nueva partida.
+  En el teléfono todo va en una columna. Pesa ~13 KB de código: no carga el motor.
+- **Piezas compartidas sin el motor:** `src/maps/catalog.js` (los 6 mapas de la cadena con su estado: la isla
+  abierta, el lago en construcción, los demás planeados) y `src/game/Levels.js` (la curva de niveles).
+- **Juego** (`juego.html`): la pantalla de inicio muestra la partida y **Menú**; el panel (H → Juego → Partida)
+  muestra la partida y **Salir al menú**. Las partidas ya no se administran dentro del juego (D53 reemplaza esa
+  parte de D49).
+- Vite compila las dos páginas para GitHub Pages.
+- Probado en el navegador: portada en escritorio y teléfono, Jugar → juego con la partida, Menú → portada, crear y
+  borrar desde la portada, compilación.
 
 **Orden propuesto:** P1 → P2 → P3, y después el lago (L3 terreno → L4 peces y spots → L2 viaje → L5 pueblo y
 arranque).
@@ -811,3 +828,5 @@ arranque).
 - **2026-11-18** · Decididos D53 (portada global: partidas, mapas, progreso, ajustes), D54 (se continúa donde
   quedó; el mapa se cambia viajando) y D55 (portada como página ligera aparte, el juego en otra página). Plan de 3
   entregas (P1–P3) antes de seguir con el lago.
+- **2026-11-18** · **P1 hecha:** portada propia (`index.html`) con fondo de pesca sacado del juego, Continuar y
+  Partidas; el juego pasa a `juego.html` con "Menú" / "Salir al menú".

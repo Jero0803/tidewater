@@ -1,12 +1,13 @@
 import * as THREE from '../engine/index.js';
 import { loc } from '../i18n.js';
+import { mapName } from './catalog.js';
 
 // The island (the tropical map, highest of the chain, D25 / D29; the starting map until the lake exists, D45).
 // Everything that is particular to this map lives here; the rest of the game reads it through the registry
 // (maps/registry.js -> activeMap()). See docs/DISENO.md section 7d.
 export const ISLAND = {
 	id: 'island',
-	name: loc( 'The island', 'La isla' ),
+	name: mapName( 'island' ),
 	// XP multiplier index (Progression.mapXpMultiplier): ×1.0 while the island is the starting map (D45)
 	xpIndex: 0,
 

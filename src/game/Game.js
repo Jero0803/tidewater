@@ -171,6 +171,16 @@ export class Game {
 
 	}
 
+	// back to the landing page (index.html, D55); keeps ?lang= when it came from the address
+	exitToMenu() {
+
+		this.state.save();
+		if ( typeof location === 'undefined' ) return;
+		const q = new URLSearchParams( location.search );
+		location.href = `./${ q.has( 'lang' ) ? `?lang=${ q.get( 'lang' ) }` : '' }`;
+
+	}
+
 	// buy or extend a licence of this map (the shop)
 	buyLicense( tier ) {
 

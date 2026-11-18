@@ -270,8 +270,8 @@ export class AppUI {
 		const language = gameTab.addFolder( loc( 'Language', 'Idioma' ), { icon: 'compass' } );
 		s.lang = LANG;
 		language.addSelect( { label: 'Idioma / Language', object: s, key: 'lang', tooltip: loc( 'Changing the language reloads the page. Your progress is kept.', 'Cambiar el idioma recarga la página. Tu progreso se conserva.' ), options: [ { label: 'Español', value: 'es' }, { label: 'English', value: 'en' } ], onChange: ( v ) => setLang( v ) } );
-		// save profiles: up to five named games (also on the start screen)
-		if ( app.game ) this.profilesUI = new ProfilesUI( app.game, ui, gameTab.addFolder( loc( 'Saved games', 'Partidas' ), { icon: 'layers' } ) );
+		// the game being played and the way back to the menu (saved games are managed on the landing page, D53)
+		if ( app.game ) this.profilesUI = new ProfilesUI( app.game, ui, gameTab.addFolder( loc( 'Saved game', 'Partida' ), { icon: 'layers' } ) );
 
 		this._t = 0;
 
