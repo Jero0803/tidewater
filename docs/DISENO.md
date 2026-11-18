@@ -86,6 +86,10 @@ hacia arriba (mapas de nivel más alto).
 | D30 | **Mapa 1 · Lago de montaña aprobado:** 7 especies (guapucha, carachi, pejerrey en la básica; trucha arcoíris y carpa en la intermedia; trucha café en la avanzada; capitán de la sabana protegido) y 5 spots (orilla de juncos, muelle del pueblo, desembocadura, bahía de lodo, centro profundo). Tamaños y precios aproximados, a validar | Medido contra la isla: el dinero escala al 20–40 % de la isla; todo se saca con el equipo inicial | 2026-11-17 |
 | D31 | **Especies protegidas:** algunas especies (por ahora el capitán de la sabana) solo se pescan y se sueltan: dan XP y cuentan en el registro, nunca dinero | Refleja especies amenazadas reales y da variedad sin romper la economía | 2026-11-17 |
 | D32 | **Modelo de bandas:** la XP de cada pez se multiplica por **1.25 por cada mapa** (lago ×1.0 … isla ×3.05) y pasar del nivel N al N+1 pide **600 × 1.03^(N − 1) XP**. Meta: **~5 horas de juego por mapa** (~30 horas hasta la isla) | La XP casi no crecía entre mapas; con la curva cuadrática la isla habría tardado ~50 h frente a ~6 h del lago | 2026-11-17 |
+| D33 | **La técnica depende del pez, no del mapa.** Cada especie tiene una técnica principal y técnicas secundarias; en un mismo mapa conviven varias técnicas (en el lago, la trucha va con spinning o casting y la carpa con flotador) | Realista; elegir la técnica correcta para el pez que se busca es parte del juego | 2026-11-18 |
+| D34 | **Con la técnica equivocada el pez pica mucho menos:** con la principal pica normal, con una secundaria menos, con una incompatible casi nunca (propuesta de pesos: 1 / 0.4 / 0.05, por medir) | Realista y deja margen para experimentar | 2026-11-18 |
+| D35 | **Técnicas del diseño: flotador, spinning, casting, fondo y curricán.** La mosca queda como opcional futura | Cubren todas las especies de la cadena sin un catálogo enorme | 2026-11-18 |
+| D36 | **Por ahora, cada técnica es un aparejo completo (caña + carrete + sedal) que sube de nivel** ("Aparejo de spinning nivel 3"). La bodega y el bote siguen siendo globales. Más adelante se evaluará separar piezas (caña, carrete, sedal, gramos del señuelo) | Pocas compras y fácil de entender para empezar; se puede refinar después | 2026-11-18 |
 
 ---
 
@@ -159,7 +163,7 @@ la progresión y después se construyen hacia abajo los mapas de inicio, empezan
 | 5 | **M4. Lago cálido o represa** (mapa 2) | Agua dulce quieta (el océano sin viento ni oleaje, rodeado de tierra; por verificar); juncos y cipreses; lobina, mojarras, crappie, bagre | Alto | Medio | Pendiente |
 | 6 | **M5. Río tropical** (mapa 3) | Agua con corriente (tecnología nueva); bosque de galería y sabana; pavón, payara, bagre rayado | Muy alto | Alto | Pendiente |
 | 7 | **M6. Lago de montaña** (mapa 1, inicio) | Agua fría y clara; vegetación fría nueva (pinos, eucaliptos, páramo); trucha, carpa, capitán | Alto | Medio | Pendiente |
-| — | Fase 2. Consecuencias | Carnadas que se gastan y preferencias por especie; desgaste y reparación | Medio | Medio | Pendiente, se puede intercalar |
+| — | Fase 2. Técnicas, carnadas y consecuencias | Técnicas (D33–D35): spinning y casting, fondo y curricán, cada una con su aparejo por niveles (D36); carnadas y señuelos que se gastan; desgaste y reparación. **El spinning hace falta antes del lago de montaña** (su pez estrella es la trucha) | Alto | Medio | Pendiente; spinning antes de M6 |
 | — | Fase 3. Pelea profunda | Freno ajustable (rueda del mouse); equipo equilibrado | Alto | Medio | Pendiente, se puede intercalar |
 | — | Fase 4. Objetivos | Encargos de los vendedores; torneo de los 10 más pesados | Medio | Bajo | Pendiente, se puede intercalar |
 | — | Mapas por encima de la isla | Mar abierto, otras islas o atolones de nivel más alto (D24) | Alto | Bajo | Futuro |
@@ -230,7 +234,7 @@ a ~6 horas de la banda del lago. Propuesta para que cada mapa dure parecido:
 | **XP para pasar del nivel N al N+1** | 600 × 1.03^(N − 1): nivel 10 ≈ 6,100 XP acumulados; nivel 50 ≈ 65,100; nivel 60 ≈ 94,400 |
 | **Resultado estimado** | ~5 horas de juego por mapa (lago: ~6,100 XP a ~1,200 XP/h; isla: ~30,000 XP a ~5,500 XP/h) y ~30 horas hasta la isla. Mejorar el equipo dentro de cada mapa lo acorta |
 
-### Tienda calculada desde las bandas (propuesta, 2026-11-17)
+### Tienda calculada desde las bandas (propuesta, 2026-11-17; **a recalcular por técnicas, D36**)
 
 Script: `node --no-warnings tools/balance/tienda-propuesta.mjs`. El equipo viaja entre mapas (D20), así que la
 tienda es **una progresión de equipo para toda la cadena**: cada mapa trae un nuevo nivel de cada mejora.
@@ -276,6 +280,38 @@ Equipo inicial: sedal 7 kg, nevera 30 kg, caña 22 m, carrete 1.1 m/s (igual que
   número guardado. Habrá que subir la versión del guardado y convertir los niveles viejos por su valor
   (por ejemplo, el sedal de 26 kg pasa al nivel de 26 kg).
 - **Mientras la isla sea el inicio (D25)** hay que decidir cómo se reparten estos niveles en sus niveles 1–10.
+
+### Técnica por especie (propuesta, 2026-11-18)
+
+**Lago de montaña**
+
+| Especie | Técnica principal | También pica con |
+|---|---|---|
+| Guapucha, carachi | Flotador (carnada pequeña) | — |
+| Pejerrey | Flotador | Spinning |
+| Capitán de la sabana | Fondo (de noche) | — |
+| Trucha arcoíris | Spinning | Casting, flotador |
+| Carpa común | Flotador | Fondo |
+| Trucha café | Spinning | Casting |
+
+**La isla**
+
+| Especie | Técnica principal | También pica con |
+|---|---|---|
+| Pequeños de orilla y muelle (pejerrey cabezón, lisa, agujón, sargento, ronco, cromis, cirujano) | Flotador | Fondo |
+| Arrecife (rabirrubia, pez perro, loro, ángel, mero) | Fondo | Flotador |
+| Barracuda, jurel | Spinning | Casting |
+| Sábalo | Casting | Spinning |
+| Atún aleta negra, dorado | Curricán | Spinning |
+| Pargo colorado | Fondo (aguas profundas) | — |
+
+| Técnica | Cómo se juega | Estado en el código |
+|---|---|---|
+| Flotador | Lanzar, esperar, la boya se hunde, clavar | Ya existe |
+| Spinning | Lanzar un señuelo y recogerlo; el pez ataca durante la recogida | Nueva; la más cercana (la caña actual ya es de spinning) |
+| Casting | Como el spinning, con señuelos y peces más pesados y otro carrete | Variante del spinning |
+| Fondo | Plomo sin boya; la picada se ve en la punta de la caña | Nueva, moderada |
+| Curricán | Señuelo arrastrado detrás del bote en marcha | Nueva, la más compleja |
 
 ### Investigación: biomas acuáticos del Caribe, de la montaña al mar (2026-11-17)
 
@@ -503,3 +539,7 @@ mejora se desbloquea en cada nivel.
 - **2026-11-17** · Calculada la tienda desde las bandas (`tools/balance/tienda-propuesta.mjs`): 4 mejoras con un
   nivel por mapa más mejoras del bote; licencias por mapa. Hallazgos: el sedal casi no importa hasta la Fase 3,
   la licencia avanzada del lago no se paga sola, el guardado necesitará conversión.
+- **2026-11-18** · Rediseño del equipo: decididos D33 (técnica por especie), D34 (con la técnica equivocada pica
+  mucho menos), D35 (flotador, spinning, casting, fondo, curricán) y D36 (aparejo completo por niveles por técnica).
+  Propuesta de técnica por especie para el lago y la isla. La tienda queda por recalcular por técnicas; la Fase 2
+  pasa a ser "técnicas, carnadas y consecuencias".
