@@ -1238,6 +1238,39 @@ el mar (sardina, pez volador). En la isla el pejerrey cabezón y la lisa harían
 textos y aspecto visual son nuestros** (el estilo de Tidewater, sus colores y tipografía; artículos y marcas inventados,
 sin parecerse a los reales ni a los de FP).
 
+### Comparación: el mapa de nivel 1 de Fishing Planet y nuestro lago (capturas 15 a 18, 2026-11-18)
+
+| | Fishing Planet, nivel 1 (un lago de Texas) | Nuestro lago (mapa 1) |
+|---|---|---|
+| Especies | **22** (el jugador lleva 12/22), con clases joven / común / trofeo / único | **7** (la Laguna de Tota real tiene pocas especies) |
+| Licencia básica | **Gratis e ilimitada** en el mapa de inicio | Regalada el primer día, luego se paga por día (D37, D47) |
+| Qué deja la básica | Se guarda cualquier pez **salvo una lista**: los trofeos de algunas especies y ciertas clases de otras (hay que soltarlos). **Pesca nocturna prohibida** | Por especie: la básica deja guardar 3 especies (D11, D30) |
+| Licencia avanzada | Nivel 2. Sin restricciones, noche y bote permitidos. 1 día 200, 3 días 570, semana 1,260, mes 4,800 | Dos licencias más (intermedia nivel 4, avanzada nivel 7), por día |
+| Romper las reglas | Multa (100) si se guarda un pez que había que soltar | No se puede: sin licencia el pez se suelta solo (D13) |
+| Embarcaciones | Kayak desde el nivel 1; lancha, bote de lobina y yate más adelante | Bote desde el inicio |
+| Viaje | 0 (es la casa del jugador, con sala de trofeos) | Costo de un día de la básica (D58) |
+| Guía | Cebos preferidos: peces chicos; señuelos preferidos: una lista larga (12) | Por hacer (E5) |
+| Pronóstico | Clima de hoy y de los próximos 6 días | Sin clima |
+
+**Lo que sale de la comparación:**
+- **El inicio de FP es más amable:** la básica no cuesta nada en el mapa de inicio y deja guardar casi todo. Nosotros medimos
+  que la primera hora del lago es lenta ($55–140/h con la básica) y además cobramos la básica desde el segundo día.
+  **Propuesta D82:** la licencia básica del lago (mapa de inicio) es gratis y sin vencimiento, como en FP.
+- **FP restringe por clase, no solo por especie:** la básica obliga a soltar los trofeos de ciertas especies. Es una idea
+  para más adelante (por ejemplo, soltar la trucha café trofeo sin la avanzada); por ahora se quedan las tres licencias por
+  especie (D11).
+- **El lago se queda corto de especies** (7 contra 22). La Laguna de Tota real tiene pocas; se pueden sumar especies
+  plausibles de los lagos andinos y los ríos que les caen (por investigar), o aceptar que el lago es corto y el mapa 2
+  (lago cálido) trae la variedad.
+- **FP no sirve de referencia para la fuerza del equipo ni para la economía** (observación del jugador del proyecto,
+  captura 19): es gratuito con pagos, y su equipo de inicio está recortado para empujar a comprar (la telescópica de nivel 1
+  aguanta sedal de 1 a 1.82 kg). Nosotros no tenemos pagos (D5): el equipo inicial se calcula con peces reales y con
+  nuestras bandas (D32, D37). Nuestra telescópica UL aguanta sedal de 1 a 3 kg y viene con 2.5 kg, y saca una trucha de
+  3.5 kg en ~3 min con buen manejo. **De FP se toman mecánicas, ritmo y pantallas; no números de equipo ni precios.**
+- **Medición pendiente en FP:** el jugador del proyecto puede pescar una sesión en ese mapa de nivel 1 para tomar los
+  números del inicio (espera hasta la picada, picadas que enganchan, duración de las peleas con peces chicos, dinero y
+  XP por hora) y compararlos con D73–D75.
+
 ### Lo que cambia en las decisiones
 
 - **D36** (aparejo completo por técnica) pasa a piezas. **D34** (pesos por técnica) pasa a pesos por carnada o
@@ -1443,3 +1476,7 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
 - **2026-11-18** · Decididos D79 (pez carnada), D80 (licencias por varios días) y D81 (tienda en rejilla con filtros y
   panel del artículo), con las capturas del globo, la tienda de cebos y las licencias de Fishing Planet. Anotado
   cómo se toma de FP: mecánicas y organización, con nombres, arte y aspecto propios.
+- **2026-11-18** · Comparado el mapa de nivel 1 de Fishing Planet con el lago (22 especies contra 7, básica gratis e
+  ilimitada, restricciones por clase, multa). Propuesta D82 (básica del lago gratis y sin vencimiento). Por decidir.
+- **2026-11-18** · Anotado: FP no sirve de referencia para la fuerza del equipo inicial ni para la economía (es gratuito
+  con pagos y recorta el equipo de inicio); de FP se toman mecánicas, ritmo y pantallas.
