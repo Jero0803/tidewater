@@ -115,6 +115,7 @@ hacia arriba (mapas de nivel más alto).
 | D59 | **Peces con piel ilustrada, sin cambiar de motor (revisada el 2026-11-18):** cada especie lleva una **ilustración de perfil de dominio público** (U.S. Fish and Wildlife Service, muchas de Duane Raver, en Wikimedia Commons) proyectada de lado sobre el cuerpo y las aletas de nuestro modelo, en los dos costados. La anatomía de la especie (perfil, ojo, boca, aletas, cola) se ajusta a la ilustración para que encajen. El pez hecho con código queda de respaldo para las especies sin ilustración. Créditos en `public/models/fish/skins/CREDITOS.md`. **Antes se pensó en modelos GLB de Sketchfab** (la trucha Redband de E.A.Cornell, CC-BY), pero Sketchfab no deja crear cuenta por edad; se pueden añadir más adelante si alguien con cuenta los baja | Los peces hechos con código se ven de baja calidad; las ilustraciones cubren casi todas las especies de EE. UU. y el Caribe, se bajan sin cuenta y no tienen restricciones | 2026-11-18 |
 | D60 | **Guía de peces de cada mapa, en el juego y en la portada:** una ficha por especie con su imagen, nombre común y científico, dónde pica (spots), a qué hora, licencia que pide, rango de tamaño y tu récord. En el juego es una pestaña del inventario; en la portada va dentro de Progreso. Las imágenes se sacan del propio juego (una por especie), así se ven igual en los dos lados y la portada sigue sin motor. **Todo visible desde el inicio**, también los peces que aún no pescaste | Hoy no hay forma de saber qué peces tiene un mapa ni cómo son | 2026-11-18 |
 | D61 | **Los peces pasan a modelos 3D (GLB) como camino principal (completa D59):** la prueba con la trucha arcoíris de eb78 se ve muy superior a la ilustración (volumen real, nado animado). Cada especie usa un modelo 3D libre (CC0 / CC-BY de Sketchfab; los baja el jugador del proyecto y yo los reduzco con `tools/fish/glb_slim.py`). Un modelo sin esqueleto o sin animación también sirve: el motor lo hace nadar con la misma onda que hoy dobla a los peces. Los escaneos pesados se simplifican. **Las especies sin modelo libre conservan su piel ilustrada** (guapucha, carachi, capitán por ahora). Presupuesto: 2 a 4 MB por especie, y cada mapa carga solo sus especies, cuando se necesitan | La calidad del modelo 3D es muy superior; la ilustración queda de respaldo | 2026-11-18 |
+| D62 | **La pelea profunda se adelanta y va antes que las técnicas (cambia D38):** freno del carrete con la rueda del mouse, mover la caña contra la carrera del pez, el pez 3D visible en el agua con sus saltos y la red al final, y cada especie con su manera de pelear. Las técnicas (spinning, fondo, curricán) siguen en la Fase 2 y usarán esta pelea | Probando el juego, la pelea de hoy (mantener el clic y vigilar una barra) se siente muy básica; con los peces en 3D la pelea es lo que más se nota | 2026-11-18 |
 
 ---
 
@@ -870,6 +871,35 @@ Blender.
 Se descartó el Brook Silverside (MTSU): es un ejemplar de museo conservado, café y con las aletas maltratadas.
 Los escaneos pesados se simplifican con gltf-transform (dependencia de desarrollo; pasos en `tools/fish/glb_slim.py`). Total del lago: ~17 MB.
 
+## 7g. Pelea nueva (D62)
+
+**Hoy:** se mantiene el clic para recoger; una barra de tensión con una zona verde; el pez da tirones cada pocos
+segundos; si la tensión pasa del límite medio segundo, se corta; si queda flojo mucho rato, se suelta. El pez no se ve.
+
+**La pelea nueva** (lo físico en `CatchMinigame.js`, se puede probar sin el navegador):
+
+- **Freno del carrete (rueda del mouse, 10 posiciones):** si el pez tira más fuerte que el freno, el carrete suelta
+  hilo, con su clic, en vez de romperse. Freno muy apretado: se corta en la carrera. Muy flojo: el pez se lleva el
+  hilo del carrete (hay un largo máximo, según el aparejo) o se suelta. El hilo se rompe por encima de su resistencia
+  (la del aparejo de la tienda: 7 a 50 kg), así que **el grado del aparejo por fin importa**.
+- **Recoger (clic mantenido):** acerca el pez solo cuando el pez no está corriendo más fuerte que el freno.
+- **Mover la caña (A / D):** el pez corre hacia un lado (se ve en el agua y en un indicador). Con la caña hacia el
+  lado contrario se cansa mucho más rápido; hacia el mismo lado casi no se cansa y gana hilo.
+- **Saltos (S para bajar la caña):** las especies que saltan (truchas) salen del agua; con la caña baja durante el
+  salto, bien; con la caña arriba y el hilo tenso, el anzuelo puede soltarse.
+- **Cada especie pelea distinto** (datos en `FishTable.js`): fuerza, aguante, rapidez de las carreras, si salta, si
+  busca el fondo o la vegetación (la carpa: si llega, el hilo se enreda y se corta), si casi no pelea (guapucha).
+- **El pez se ve** al final del hilo: su modelo 3D nada bajo la superficie, hace olas y espuma en las carreras,
+  salta; al final se acerca y **se saca con la red** (la red es un paso corto: cuando el pez está cansado y cerca).
+- **Pantalla:** tensión del hilo con la marca del freno, hilo que queda en el carrete, posición del freno, un
+  indicador de hacia dónde corre el pez. Sonidos del freno y del carrete.
+
+| Entrega | Qué | Estado |
+|---|---|---|
+| P1 | Motor de la pelea: freno, recoger, mover la caña, saltos, comportamiento por especie; pantalla nueva; tests | Pendiente |
+| P2 | El pez 3D visible en el agua durante la pelea: carreras, olas y espuma, saltos | Pendiente |
+| P3 | La red para sacarlo y los sonidos (clic del freno, carrete); ajuste fino de cada especie | Pendiente |
+
 ## 8. Reglas para trabajar sin romper nada
 
 1. Antes de cambiar números del juego: `npm run balance > antes.md`; después, otra vez y comparar.
@@ -999,3 +1029,5 @@ Los escaneos pesados se simplifican con gltf-transform (dependencia de desarroll
 - **2026-11-18** · Instalado gltf-transform (solo desarrollo) para simplificar mallas: carpa de 4,7 a 2,7 MB, lisa de 6,2 a 3,0 MB.
 - **2026-11-18** · **M5 hecha:** los peces del lago nadan en 3D (sus modelos en el lote de peces, con la onda del
   motor y 4 niveles de detalle); el lago ya no tiene peces tropicales. Anotado A1 (aparejos distintos por grado).
+- **2026-11-18** · Decidido D62: la pelea profunda se adelanta (freno con la rueda, mover la caña, pez visible con
+  saltos y red, cada especie distinta). Plan P1 a P3 en 7g.
