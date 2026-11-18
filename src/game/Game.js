@@ -6,7 +6,8 @@ import { habitatAt, pickSpecies, rollWeight, biteDelay } from './Bites.js';
 import { CatchMinigame } from './CatchMinigame.js';
 import { GameState } from './GameState.js';
 import { Profiles } from './Profiles.js';
-import { activeMap, mapOverride } from '../maps/registry.js';
+import { activeMap, mapOverride, MAPS } from '../maps/registry.js';
+import { travel } from './Travel.js';
 import { FishingRod } from './FishingRod.js';
 import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
@@ -172,6 +173,34 @@ export class Game {
 
 	}
 
+	// ---- travel by boat (D20, D57): from the mooring, B opens the trip menu
+	// near the moored boat: on the pier deck by the mooring, or aboard with the boat at the mooring
+	get canTravel() {
+
+		const app = this.app, p = app.player, dock = WORLD.boatDock.position;
+		const aboard = p.mode === 'boat' || p.mode === 'deck';
+		const q = aboard ? app.boatCtl.position : p.position;
+		if ( Math.hypot( q.x - dock.x, q.z - dock.z ) > ( aboard ? 30 : 14 ) ) return false;
+		return aboard || ( p.mode === 'walk' && p.position.y > 1.2 );
+
+	}
+
+	travelTo( id ) {
+
+		if ( ! travel( this.state, id, MAPS ) ) return false;
+		this.toast( loc( 'Setting off…', 'Zarpando…' ), 3000 );
+		if ( typeof location !== 'undefined' ) {
+
+			// (the new map loads from the save; a ?map= test address is dropped)
+			const q = new URLSearchParams( location.search );
+			location.href = `juego.html${ q.has( 'lang' ) ? `?lang=${ q.get( 'lang' ) }` : '' }`;
+
+		}
+
+		return true;
+
+	}
+
 	// back to the landing page (index.html, D55); keeps ?lang= when it came from the address
 	exitToMenu() {
 
@@ -292,6 +321,15 @@ export class Game {
 		this.updateLicence( dt );
 		// N: the big map of the whole map
 		if ( this.minimap && inp.hit( 'KeyN' ) && ! ( app.ui && app.ui.ui && app.ui.ui.photoMode ) ) this.minimap.toggleBig();
+		// B by the mooring: travel to another map
+		const travelHere = this.canTravel && ! this.fight;
+		if ( this.hud ) {
+
+			if ( travelHere && inp.hit( 'KeyB' ) ) this.hud.toggleTravel();
+			else if ( ! travelHere && this.hud.travelOpen ) this.hud.toggleTravel( false );
+			this.hud.setTravelHint( travelHere && ! this.hud.travelOpen );
+
+		}
 		if ( this._gearNote && this.hud ) {
 
 			const g = this._gearNote;

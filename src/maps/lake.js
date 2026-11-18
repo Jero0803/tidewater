@@ -4,7 +4,7 @@ import { ISLAND } from './island.js';
 
 // Map 1 · the mountain lake (docs/DISENO.md D30, D50–D52, section 7d), inspired by Lake Tota. A prototype (L3): its
 // own terrain and calm water; the village, the pier, the traders and the boat stand where they stand on the island
-// (the lake's north shore reuses the island's beach). L4: its 7 species and its 5 spots.
+// (the lake's north shore reuses the island's beach). L4: its 7 species and its 5 spots. New games start here (D52).
 export const LAKE = {
 	id: 'lake',
 	name: mapName( 'lake' ),

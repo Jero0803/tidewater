@@ -1,6 +1,10 @@
 import { loc } from '../i18n.js';
 import { STAND } from './FishStand.js';
 import { CHANDLERY } from './Chandlery.js';
+import { activeMap } from '../maps/registry.js';
+
+// the welcome card names the map it opens on (the lake for new games, D52)
+const LAKE = activeMap().id === 'lake';
 
 // First-play guide:
 //  - an intro (3 cards) the first time the game starts, after the start overlay: the goal, the fishing
@@ -69,8 +73,8 @@ const row = ( keys, text ) => `<div class="gm-guide-row"><span class="k">${ keys
 const CARDS_EN = [
 	{
 		eyebrow: 'Welcome to Tidewater',
-		title: 'Fish the island, sell your catch',
-		body: `<p>Catch fish from the <b>beach</b>, the <b>pier</b> or your <b>boat</b>. Different fish bite in the shallows, around the pier, over the reef and out in deep water, and they change with the time of day.</p>
+		title: LAKE ? 'Fish the mountain lake, sell your catch' : 'Fish the island, sell your catch',
+		body: `<p>Catch fish from the <b>beach</b>, the <b>pier</b> or your <b>boat</b>. ${ LAKE ? 'Different fish bite by the reeds, around the pier, at the river mouth, in the mud bay and out in the deep centre' : 'Different fish bite in the shallows, around the pier, over the reef and out in deep water' }, and they change with the time of day. <kbd>N</kbd> shows the map.</p>
 			<p>Sell your catch to <b>Joe</b> at the fish stand by the pier, then spend the money on upgrades from <b>Marta</b> at the chandlery by the boathouse: a better float rig (line, reel and rod in one, grade by grade), a bigger hold, a bigger tank, a faster engine, a fish finder and lights for fishing at night. Marta also sells the <b>fishing licences</b>: the basic one is free for your first day, and bigger fish need a better one.</p>`,
 	},
 	{
@@ -115,8 +119,8 @@ const TIPS_EN = {
 const CARDS_ES = [
 	{
 		eyebrow: 'Bienvenido a Tidewater',
-		title: 'Pesca en la isla, vende tu captura',
-		body: `<p>Pesca desde la <b>playa</b>, el <b>muelle</b> o tu <b>bote</b>. En los bajos, alrededor del muelle, sobre el arrecife y en aguas profundas pican peces distintos, y cambian según la hora del día.</p>
+		title: LAKE ? 'Pesca en el lago, vende tu captura' : 'Pesca en la isla, vende tu captura',
+		body: `<p>Pesca desde la <b>playa</b>, el <b>muelle</b> o tu <b>bote</b>. ${ LAKE ? 'En la orilla de juncos, alrededor del muelle, en la desembocadura del río, en la bahía de lodo y en el centro profundo' : 'En los bajos, alrededor del muelle, sobre el arrecife y en aguas profundas' } pican peces distintos, y cambian según la hora del día. <kbd>N</kbd> muestra el mapa.</p>
 			<p>Véndele tu pesca a <b>Joe</b> en el puesto de pescado junto al muelle, y gasta el dinero en mejoras de <b>Marta</b> en la tienda náutica junto al cobertizo de botes: un aparejo de flotador mejor (sedal, carrete y caña en uno, grado a grado), bodega más grande, tanque más grande, motor más rápido, una sonda de pesca y luces para pescar de noche. Marta también vende las <b>licencias de pesca</b>: la básica te la regalan el primer día, y los peces más grandes piden una mejor.</p>`,
 	},
 	{

@@ -2158,6 +2158,7 @@ export class UI {
 						${ row( k( 'F' ), loc( 'Free camera', 'Cámara libre' ) ) }
 						${ row( k( 'T' ), loc( 'Pause time', 'Pausar el tiempo' ) ) }
 						${ row( k( 'N' ), loc( 'Map', 'Mapa' ) ) }
+						${ row( k( 'B' ), loc( 'Travel by boat (at the mooring)', 'Viajar en bote (en el amarre)' ) ) }
 						${ row( k( 'L' ), loc( 'Flashlight', 'Linterna' ) ) }
 						${ row( k( 'M' ), loc( 'Mute', 'Silenciar' ) ) }
 					</section>

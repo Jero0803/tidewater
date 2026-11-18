@@ -6,6 +6,7 @@ import { GameState, xpFromLog } from '../src/game/GameState.js';
 import { ISLAND_SPOTS, spotOf, spotById } from '../src/game/Spots.js';
 import { Profiles, MAX_PROFILES, INDEX_KEY } from '../src/game/Profiles.js';
 import { MAPS, DEFAULT_MAP, activeMap, mapById, currentMapId } from '../src/maps/registry.js';
+import { travelOptions, travelBlock, travel, travelCost } from '../src/game/Travel.js';
 import { WORLD } from '../src/world/WorldLayout.js';
 import { gearStats, defaultUpgrades, UPGRADES, convertLegacyUpgrades } from '../src/game/Gear.js';
 import { SIZE_CLASSES, sizeClass, classValue, catchXp, difficulty, mapXpMultiplier, xpToNext, totalXpForLevel, levelFromXp,
@@ -441,7 +442,7 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 {
 
 	const m = activeMap();
-	ok( DEFAULT_MAP === 'island' && currentMapId() === 'island' && m === MAPS.island && mapById( 'nope' ) === null, 'maps: the island is the default and active map (in Node)' );
+	ok( DEFAULT_MAP === 'lake' && currentMapId() === 'island' && m === MAPS.island && mapById( 'nope' ) === null, 'maps: new games start on the lake; in Node the island is active (tests and tools measure it)' );
 	ok( WORLD === m.layout && WORLD.pier.x === 55 && WORLD.reef.radius === 58, 'maps: the world layout is the one of the active map' );
 	ok( m.species.length === 18 && m.species.every( ( id ) => FISH[ id ] ), 'maps: the island lists its 18 species' );
 	ok( LICENSES === m.licenses && LICENSES[ 2 ].price === 500 && ISLAND_SPOTS === m.spots, 'maps: licences and spots come from the map' );
@@ -489,6 +490,31 @@ ok( Object.keys( defaultUpgrades() ).length === Object.keys( UPGRADES ).length &
 	}
 
 	ok( lw, 'lake: plausible lengths (a 4 kg rainbow trout is ' + Math.round( fishLengthCm( 'rainbowTrout', 4 ) ) + ' cm)' );
+
+}
+// ---- travel by boat (L2: D20, D57)
+{
+
+	const m = new Map(), sto = { getItem: ( k ) => m.get( k ) ?? null, setItem: ( k, v ) => m.set( k, v ) };
+	const st = new GameState( sto );
+	st.mapId = 'lake';
+	ok( travelCost( MAPS, 'lake' ) === 50 && travelCost( MAPS, 'island' ) === 175, 'travel: costs a day of the basic licence of the destination' );
+	ok( travelBlock( st, 'lake', MAPS ) === 'here' && travelBlock( st, 'river', MAPS ) === 'planned' && travelBlock( st, 'island', MAPS ) === 'level', 'travel: here, planned maps, and the island locked below level 10' );
+	st.addXp( totalXpForLevel( 10 ) );
+	st.money = 100;
+	ok( travelBlock( st, 'island', MAPS ) === 'money', 'travel: needs the money' );
+	st.money = 400;
+	st.licences = { 3: 1e9 };
+	st.addFish( 'rainbowTrout', 1.5 );
+	ok( travelBlock( st, 'island', MAPS ) === 'cooler' && ! travel( st, 'island', MAPS ), 'travel: the cooler has to be empty' );
+	st.sell();
+	const money = st.money;
+	ok( travel( st, 'island', MAPS ) && st.mapId === 'island' && st.money === money - 175 && JSON.parse( m.get( 'tidewater.save.v3' ) ).map === 'island', 'travel: pays and moves the game (saved)' );
+	ok( st.licenseTier === 1 && st.maps.lake.log.rainbowTrout.count === 1 && ! st.log.rainbowTrout, 'travel: a first visit gets the free basic licence; logs stay with each map' );
+	ok( travelBlock( st, 'lake', MAPS ) === null && travelOptions( st, MAPS ).length === 6, 'travel: back to an unlocked map any time; all six maps listed' );
+	st.homeMap = 'lake';
+	travel( st, 'lake', MAPS );
+	ok( st.homeMap === null && st.toJSON().map === 'lake', 'travel: a real trip ends a test visit (?map=)' );
 
 }
 console.log( `value check ${ value }` );

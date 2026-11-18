@@ -111,7 +111,8 @@ function gamesTab( active ) {
 // ---- side panel: the chain of maps
 function mapsTab( active ) {
 
-	const save = readSave( active ), here = save ? save.map : null;
+	const save = readSave( active ), here = save ? save.map : 'lake';
+	const level = summary( active )?.level || 1;
 	return `<div class="pt-maps">${ MAP_CATALOG.map( ( m ) => {
 
 		const log = save && save.maps && save.maps[ m.id ] ? save.maps[ m.id ].log || {} : null;
@@ -123,11 +124,11 @@ function mapsTab( active ) {
 				<small>${ esc( m.place ) } · <span class="pt-nowrap">${ loc( 'levels', 'niveles' ) } ${ m.levels }</span></small>
 				${ m.species && log ? `<small>${ caught } ${ loc( 'of', 'de' ) } ${ m.species.length } ${ loc( 'species caught', 'especies capturadas' ) }</small>` : '' }
 			</div>
-			<span class="pt-badge is-${ m.status }">${ STATUS[ m.status ] }</span>
+			${ m.status === 'open' && level < ( m.unlock || 1 ) ? `<span class="pt-badge">${ loc( 'Level', 'Nivel' ) } ${ m.unlock }</span>` : `<span class="pt-badge is-${ m.status }">${ STATUS[ m.status ] }</span>` }
 		</div>`;
 
 	} ).join( '' ) }</div>
-	<div class="pt-note">${ loc( 'You play on the map where your game is; you move to another map by boat, from the mooring (coming soon). While only the lake and the island exist, the island is open to everyone.', 'Juegas en el mapa donde está tu partida; a otro mapa se viaja en bote, desde el amarre (próximamente). Mientras solo existan el lago y la isla, la isla está abierta para todos.' ) }</div>`;
+	<div class="pt-note">${ loc( 'You play on the map where your game is. To change map, travel by boat from the mooring (B): to every map your level has opened. While only the lake and the island exist, the island opens at level 10.', 'Juegas en el mapa donde está tu partida. Para cambiar de mapa, viaja en bote desde el amarre (B): a todos los mapas que tu nivel ya abrió. Mientras solo existan el lago y la isla, la isla se abre en el nivel 10.' ) }</div>`;
 
 }
 
@@ -203,7 +204,7 @@ function render() {
 				<div class="pt-card">
 					<div class="pt-card-head"><span>${ sum ? loc( 'Continue', 'Continuar' ) : loc( 'Start', 'Empezar' ) }</span><span>${ sum ? when( active.lastPlayed ) : '' }</span></div>
 					<div class="pt-card-name">${ esc( active.name ) }</div>
-					<div class="pt-card-meta">${ sum ? `${ map ? esc( map.name ) : '' } · ${ loc( 'Level', 'Nivel' ) } <b>${ sum.level }</b> · <b>${ money( sum.money ) }</b> · ${ played( sum.played ) }` : loc( 'A new game: you start with the basic licence free for your first day.', 'Partida nueva: empiezas con la licencia básica regalada el primer día.' ) }</div>
+					<div class="pt-card-meta">${ sum ? `${ map ? esc( map.name ) : '' } · ${ loc( 'Level', 'Nivel' ) } <b>${ sum.level }</b> · <b>${ money( sum.money ) }</b> · ${ played( sum.played ) }` : loc( 'A new game: you start on the mountain lake with the basic licence free for your first day.', 'Partida nueva: empiezas en el lago de montaña con la licencia básica regalada el primer día.' ) }</div>
 					<div class="pt-card-row">
 						<button type="button" class="pt-play" data-play>${ PLAY }<span>${ sum ? loc( 'Play', 'Jugar' ) : loc( 'Start fishing', 'Empezar a pescar' ) }</span></button>
 						<span class="pt-hint">${ loc( 'The game loads in a few seconds', 'El juego carga en unos segundos' ) }</span>
@@ -216,7 +217,7 @@ function render() {
 				<div class="pt-side-body">${ tab === 'maps' ? mapsTab( active ) : tab === 'progress' ? progressTab( active ) : gamesTab( active ) }</div>
 			</aside>
 		</section>
-		<footer class="pt-foot"><span>${ loc( `${ MAP_CATALOG.length } maps planned · the island is open, the mountain lake is being built`, `${ MAP_CATALOG.length } mapas planeados · la isla está abierta, el lago de montaña está en construcción` ) }</span><span>Tidewater</span></footer>`;
+		<footer class="pt-foot"><span>${ loc( `${ MAP_CATALOG.length } maps planned · the mountain lake and the island are open`, `${ MAP_CATALOG.length } mapas planeados · el lago de montaña y la isla están abiertos` ) }</span><span>Tidewater</span></footer>`;
 
 	// wiring
 	for ( const b of root.querySelectorAll( '[data-lang]' ) ) b.onclick = () => setLang( b.dataset.lang );

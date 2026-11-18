@@ -3,7 +3,8 @@ import { FISH, FISH_IDS, fishLengthCm } from './FishTable.js';
 import { UPGRADES, nextLevel, FUEL_PRICE } from './Gear.js';
 import { FishPortrait } from './FishPortrait.js';
 import { levelFromXp, LICENSES, LICENSE_WARN_SECONDS, DAY_SECONDS, licenseTierOf, dayPhase } from './Progression.js';
-import { activeMap } from '../maps/registry.js';
+import { activeMap, MAPS } from '../maps/registry.js';
+import { travelOptions } from './Travel.js';
 
 // DOM for the fishing game, in the look of the rest of the HUD (ui/ui.css tokens, .tw-glass):
 //   top right     purse and cooler / hold load
@@ -103,6 +104,15 @@ const CSS = /* css */`
 .gm-clock b { font-family: var(--tw-mono); font-weight: 600; color: var(--tw-ink); }
 .gm-clock .gm-phase { color: var(--tw-ink-3); }
 .gm-clock.is-paused b { color: var(--tw-coral); }
+.gm-travel-hint { position: absolute; left: 50%; bottom: calc(max(calc(72 * var(--tw-u)), 13vh) + calc(58 * var(--tw-u))); transform: translateX(-50%);
+	display: none; align-items: center; gap: var(--tw-2); padding: var(--tw-2) var(--tw-4); border-radius: 999px; font: 500 var(--tw-fs-md) var(--tw-font); color: var(--tw-ink); pointer-events: none; }
+.gm-travel-hint.is-on { display: flex; }
+.gm-travel-hint kbd { font: 600 var(--tw-fs-xs) var(--tw-mono); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--tw-line); background: var(--tw-fill-2); }
+.gm-trip { display: grid; grid-template-columns: 1fr auto; gap: var(--tw-3); align-items: center; padding: var(--tw-2) 0; border-bottom: 1px solid var(--tw-line); }
+.gm-trip small { display: block; color: var(--tw-ink-3); font-size: var(--tw-fs-sm); margin-top: 2px; }
+.gm-trip.is-planned { opacity: 0.55; }
+.gm-trip.is-here > span:first-child b { color: var(--tw-aqua); }
+.gm-trip-note { margin-top: var(--tw-3); color: var(--tw-coral); font-size: var(--tw-fs-sm); }
 .gm-catch-level { margin-top: var(--tw-2); font-family: 'Kalam', var(--tw-font); font-size: clamp(16px, 1.5vw, 22px); color: #f0c46a; }
 
 /* catch card: full screen. The world dims and blurs; the fish lies side-on in its own studio light
@@ -276,7 +286,12 @@ export class GameHUD {
 		// panels (interactive)
 		this.inv = h( 'div', 'gm-panel tw-glass tw-interactive' );
 		this.stand = h( 'div', 'gm-panel tw-glass tw-interactive' );
-		ui.root.append( this.inv, this.stand );
+		this.travelEl = h( 'div', 'gm-panel tw-glass tw-interactive' );
+		ui.root.append( this.inv, this.stand, this.travelEl );
+		this.travelOpen = false;
+		// travel hint by the mooring
+		this.travelHint = h( 'div', 'gm-travel-hint tw-glass', `<kbd>B</kbd><span>${ loc( 'Travel by boat', 'Viajar en bote' ) }</span>` );
+		hud.append( this.travelHint );
 		this.invOpen = false;
 		this.standOpen = false;
 		this._last = {};
@@ -326,6 +341,7 @@ export class GameHUD {
 		this._last.lic = null; // redraw the licence on the next frame
 		if ( this.invOpen ) this.renderInventory();
 		if ( this.standOpen ) this.vendor && this.vendor.kind === 'shop' ? this.renderShop() : this.renderStand();
+		if ( this.travelOpen ) this.renderTravel();
 
 	}
 
@@ -519,6 +535,57 @@ export class GameHUD {
 		const s = this.game.state, lv = levelFromXp( s.xp ), tier = s.licenseTier;
 		const lic = tier ? `${ loc( 'Licence', 'Licencia' ) } ${ licenseName( tier ).toLowerCase() } · ${ minutes( s.licenseSecondsLeft ) }` : loc( 'No licence', 'Sin licencia' );
 		return `<div class="gm-prog"><b>${ loc( 'Level', 'Nivel' ) } ${ lv.level }</b><span class="gm-cooler-bar gm-xp-bar" style="width:100%" title="${ lv.into } / ${ lv.need } XP"><span style="width:${ lv.into / lv.need * 100 }%"></span></span><span>${ lic }</span></div>`;
+
+	}
+
+	// ---- travel by boat (B at the mooring)
+	setTravelHint( on ) {
+
+		if ( this._last.travelHint === on ) return;
+		this._last.travelHint = on;
+		this.travelHint.classList.toggle( 'is-on', on );
+
+	}
+
+	toggleTravel( force ) {
+
+		this.travelOpen = force ?? ! this.travelOpen;
+		if ( this.travelOpen ) {
+
+			this.toggleInventory( false );
+			this.closeStand();
+			this.renderTravel();
+			releaseMouse();
+
+		}
+
+		this.travelEl.classList.toggle( 'is-open', this.travelOpen );
+
+	}
+
+	renderTravel() {
+
+		const s = this.game.state;
+		const rows = travelOptions( s, MAPS ).map( ( o ) => {
+
+			let right;
+			if ( o.block === 'here' ) right = `<span class="gm-have">${ loc( 'You are here', 'Estás aquí' ) }</span>`;
+			else if ( o.block === 'planned' ) right = `<span class="gm-have">${ o.status === 'building' ? loc( 'Being built', 'En construcción' ) : loc( 'Coming later', 'Próximamente' ) }</span>`;
+			else if ( o.block === 'level' ) right = `<span class="gm-have">${ loc( 'From level', 'Desde el nivel' ) } ${ o.unlock }</span>`;
+			else right = `<button class="gm-btn" data-trip="${ o.id }" ${ o.block ? 'disabled' : '' }>${ loc( 'Travel', 'Viajar' ) } · $${ o.cost }</button>`;
+			const cls = o.block === 'here' ? 'is-here' : o.block === 'planned' ? 'is-planned' : '';
+			return `<div class="gm-trip ${ cls }"><span><b>${ o.order } · ${ o.name }</b><small>${ o.place } · ${ loc( 'levels', 'niveles' ) } ${ o.levels }</small></span>${ right }</div>`;
+
+		} ).join( '' );
+		const cooler = s.inventory.length > 0;
+		this.travelEl.innerHTML = `
+			<h2>${ loc( 'Travel by boat', 'Viajar en bote' ) }</h2>
+			<p class="gm-sub">${ loc( 'You can go to every map your level has opened. A trip costs one day of the basic licence of the destination.', 'Puedes ir a todos los mapas que tu nivel ya abrió. El viaje cuesta un día de la licencia básica del destino.' ) } · ${ loc( 'You have', 'Tienes' ) } $${ s.money.toLocaleString() }</p>
+			<div class="gm-list">${ rows }</div>
+			${ cooler ? `<div class="gm-trip-note">${ loc( 'Sell or release what is in your cooler before you travel.', 'Vende o suelta lo que hay en tu nevera antes de viajar.' ) }</div>` : '' }
+			<div class="gm-foot"><span class="gm-sub">${ loc( 'Your progress travels with you; licences and records stay with each map.', 'Tu progreso viaja contigo; las licencias y los récords son de cada mapa.' ) }</span><button class="gm-btn is-ghost" data-close>${ loc( 'Close (B)', 'Cerrar (B)' ) }</button></div>`;
+		this.travelEl.querySelector( '[data-close]' ).onclick = () => this.toggleTravel( false );
+		for ( const b of this.travelEl.querySelectorAll( '[data-trip]' ) ) b.onclick = () => this.game.travelTo( b.dataset.trip );
 
 	}
 

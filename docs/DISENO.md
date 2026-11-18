@@ -110,6 +110,8 @@ hacia arriba (mapas de nivel más alto).
 | D54 | **Desde la portada se continúa donde quedó la partida:** los mapas se ven, pero "Jugar" abre el mapa de la partida; cambiar de mapa sigue siendo viajar en el juego, desde el amarre y con costo (D20) | El viaje conserva su sentido | 2026-11-18 |
 | D55 | **La portada es una página ligera aparte, sin 3D:** abre al instante con el arte del juego de fondo; "Jugar" carga la página del juego con el mapa de la partida y "Salir al menú" vuelve. La dirección principal es la portada; el juego pasa a otra página | Rápida, desacoplada del motor, y no carga un mapa para mostrar un menú | 2026-11-18 |
 | D56 | **Multiplicador de XP con dos mapas:** el lago y la isla quedan los dos en ×1.0 mientras falten los mapas 2 a 5 (D45, D52). El lago ya da menos XP y dinero por pez que la isla (especies más fáciles); el ×3.05 de la isla (D32) se aplica cuando exista la cadena completa | Con la isla libre, ×3.05 haría saltarse el lago | 2026-11-18 |
+| D57 | **Viaje entre mapas desde el amarre (confirma D54):** junto al bote amarrado (en la punta del muelle o a bordo) aparece "B · Viajar en bote". Solo se puede ir a mapas **abiertos y desbloqueados por nivel**; entre los desbloqueados se va y viene libremente. **Reemplaza la "isla libre" de D52:** mientras falten los mapas 2 a 5, la isla se abre en el **nivel 10** (después volverá al 51). La nevera tiene que estar vacía (D20) | El nivel ordena la progresión sin cerrar los mapas ya ganados | 2026-11-18 |
+| D58 | **Costo del viaje = un día de la licencia básica del mapa de destino:** al lago $50, a la isla $175. Bajar a un mapa fácil sale barato; subir a uno difícil, más caro | El costo sigue la escala de cada mapa | 2026-11-18 |
 
 ---
 
@@ -676,10 +678,10 @@ sueltan todos sus peces y no hay viajes a vender): efecto conocido de D13.
 | # | Entrega | Contenido | Estado |
 |---|---|---|---|
 | L1 | Registro de mapas (M1) | La isla pasa a ser un mapa del registro (distribución, spots, especies, licencias, vendedores); el mapa activo viene de la partida; cambiar de mapa recarga la página (D6). Debe verse idéntico | **Hecha** (2026-11-18) |
-| L2 | Viaje | Desde el amarre del bote (E): destinos y costo; vender o soltar la nevera antes de viajar (D20) | Pendiente |
+| L2 | Viaje | Desde el amarre del bote (B): destinos y costo; vender o soltar la nevera antes de viajar (D20, D57, D58) | **Hecha** (2026-11-18) |
 | L3 | Terreno del lago | Cuenca inspirada en Tota: playa de arena, laderas, una o dos islas, desembocadura, bahía de lodo, centro profundo; agua en calma; sin arrecife, rompiente ni aves marinas | **Hecha** (2026-11-18, prototipo) |
 | L4 | Peces y spots del lago | Las 7 especies (D30) con anatomía básica, sus 5 spots, licencias del lago (precios ×5 por el día de 120 min, D47), multiplicador de XP | **Hecha** (2026-11-18) |
-| L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | Pendiente |
+| L5 | Pueblo y arranque | Pueblo, muelle y vendedores en el lago; las partidas nuevas empiezan ahí (D52) | **Hecha** (2026-11-18) |
 | Pulido | Por capas | Vegetación fría (pinos, eucaliptos, frailejones, juncos), pieles de peces de agua dulce, sonido de montaña, niebla y cielo de altura | Después |
 
 **Entrega L1, cómo quedó el registro:**
@@ -751,7 +753,25 @@ arriba: tu posición y hacia dónde miras, los nombres de los spots (el actual e
 - XP: los dos mapas en ×1.0 (D56).
 - 6 tests nuevos. Probado en el navegador: tarjetas de captura de las especies nuevas, especies por spot, mapa grande.
 
-**Resuelto en L4:** el multiplicador de XP (D56). con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
+**Resuelto en L4:** el multiplicador de XP (D56).
+
+**Entregas L2 y L5, cómo quedaron:**
+- **Viaje** (`src/game/Travel.js`): cerca del bote amarrado aparece "B · Viajar en bote"; B abre el menú con los 6
+  mapas: el actual ("Estás aquí"), los abiertos con su costo y "Viajar", los bloqueados con el nivel que piden y los
+  planeados ("Próximamente"). Sin dinero o con pescado en la nevera, el botón se apaga y se explica por qué. Al
+  pagar, el juego carga el otro mapa; el progreso viaja, las licencias y los récords son de cada mapa (la primera
+  visita a un mapa regala su básica por un día).
+- **Niveles de entrada** en el catálogo (`unlock`): lago 1, isla 10 (temporal, D57), los planeados 11, 21, 31 y 41.
+- **Arranque:** las partidas nuevas empiezan en el lago; las que ya existían siguen donde estaban (una partida de
+  antes de los mapas está en la isla). En Node los tests y el simulador siguen midiendo la isla.
+- **Portada:** el lago aparece abierto; los mapas que tu nivel aún no abre muestran "Nivel N"; la partida nueva dice
+  que empieza en el lago. La guía de bienvenida nombra el mapa donde abre y menciona el mapa (N). La ayuda (F1)
+  incluye N y B.
+- 8 tests nuevos. Probado en el navegador: el menú de viaje en la isla (nevera llena: bloqueado), viaje real al lago
+  (cobra $50 y carga el lago), partida nueva creada en la portada que empieza en el lago.
+
+**Con esto el Mapa 1 queda integrado al juego.** Pendientes del pulido: pinos, eucaliptos y frailejones; sonidos de
+montaña (sin rompiente ni gaviotas de mar); bigotes del capitán; puntos rojos más visibles en la trucha café. con el lago como inicio la isla pasaría a XP ×3.05 (D32) en vez de ×1.0
 (D45); como la isla queda libre (D52), eso dejaría saltarse el lago. Hay que medir y decidir.
 
 ## 7e. Plan de la portada (D53–D55)
@@ -906,3 +926,6 @@ arranque).
   nublado de páramo, cerros redondeados, río que nace en una quebrada.
 - **2026-11-18** · Mapa grande con la tecla N y minimapa que cubre todo el mapa. **L4 hecha:** las 7 especies del
   lago con modelo y sus 5 spots; ya se pesca en el lago. Decidido D56 (XP ×1.0 en los dos mapas por ahora).
+- **2026-11-18** · Decididos D57 (viaje desde el amarre, solo a mapas desbloqueados por nivel; la isla en el nivel
+  10 por ahora) y D58 (el viaje cuesta un día de la básica del destino). **L2 y L5 hechas:** viaje en bote con B y
+  partidas nuevas en el lago. El Mapa 1 queda integrado.
