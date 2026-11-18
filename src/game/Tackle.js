@@ -71,6 +71,8 @@ export const BAITS = {
 	corn: { name: loc( 'Sweetcorn', 'Maíz' ), n: 40, cost: 3, level: 2, g: 1 },
 	bread: { name: loc( 'Bread paste', 'Masa de pan' ), n: 25, cost: 3, level: 1, g: 1 },
 	pellet: { name: loc( 'Trout pellets', 'Pellet de trucha' ), n: 30, cost: 6, level: 3, g: 1 },
+	grasshopper: { name: loc( 'Grasshoppers', 'Saltamontes' ), n: 20, cost: 6, level: 2, g: 1 },
+	eggs: { name: loc( 'Artificial trout eggs', 'Huevas de trucha artificiales' ), n: 30, cost: 7, level: 3, g: 1 },
 };
 // lures: bought one by one, lost with a snapped line; they carry their own hook
 export const LURES = {
@@ -93,9 +95,10 @@ export const PREFS = {
 	carachi: { best: [ 'larva', 'worm' ], ok: [ 'bread' ], hook: [ 8, 12 ], lineD: 0.14, wary: 0.3, mouth: 1.4 },
 	pejerrey: { best: [ 'larva', 'spin1' ], ok: [ 'worm', 'spin2' ], hook: [ 6, 10 ], lineD: 0.16, wary: 0.5, mouth: 1.3 },
 	capitan: { best: [ 'worm' ], ok: [ 'larva' ], hook: [ 4, 8 ], lineD: 0.25, wary: 0.3, mouth: 2.2 },
-	rainbowTrout: { best: [ 'spin2', 'spin1', 'pellet' ], ok: [ 'worm', 'spoon', 'corn' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5 },
+	// reference: a trout lake of Fishing Planet (level 5): insects, eggs and small spinners first (2026-11-18)
+	rainbowTrout: { best: [ 'spin1', 'spin2', 'eggs', 'grasshopper' ], ok: [ 'worm', 'larva', 'spoon', 'soft', 'pellet', 'corn' ], hook: [ 4, 8 ], lineD: 0.20, wary: 0.8, mouth: 1.5 },
 	carp: { best: [ 'corn', 'bread' ], ok: [ 'worm', 'pellet' ], hook: [ 1, 6 ], lineD: 0.30, wary: 0.4, mouth: 2.4 },
-	brownTrout: { best: [ 'minnow', 'spoon' ], ok: [ 'worm', 'soft', 'spin2' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6 },
+	brownTrout: { best: [ 'minnow', 'spoon' ], ok: [ 'worm', 'soft', 'spin2', 'grasshopper' ], hook: [ 2, 6 ], lineD: 0.22, wary: 0.85, mouth: 1.6 },
 };
 
 export const BITE = { ok: 0.4, other: 0.05, lineMin: 0.25, lineSlope: 1.5, bigHook: 0.4, bigHookMiss: 0.5 };

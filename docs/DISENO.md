@@ -998,9 +998,9 @@ pequeña y mediana, cucharilla ondulante, pececito (crankbait pequeño), plásti
 | Carachi | Larva, lombriz | Masa de pan | #12–#8 | UL–L |
 | Pejerrey | Larva, cucharilla pequeña | Lombriz | #10–#6 | UL–L |
 | Capitán de la sabana | Lombriz (fondo, de noche) | Larva | #8–#4 | L–ML |
-| Trucha arcoíris | Cucharilla giratoria, pellet de trucha | Lombriz, cucharilla ondulante, maíz | #8–#4 | L–ML |
+| Trucha arcoíris | Cucharilla giratoria pequeña y mediana, huevas de trucha artificiales, saltamontes | Lombriz, larvas, cucharilla ondulante, plástico blando, pellet, maíz | #8–#4 | L–ML |
 | Carpa común | Maíz, masa de pan | Lombriz, pellet | #6–#1 | M–MH |
-| Trucha café | Pececito, cucharilla ondulante | Lombriz (de noche), plástico blando | #6–#2 | ML–M |
+| Trucha café | Pececito, cucharilla ondulante | Lombriz (de noche), plástico blando, saltamontes | #6–#2 | ML–M |
 
 ### La tienda (al estilo de Fishing Planet)
 
@@ -1112,7 +1112,8 @@ su sedal):
 a $4. **Plomos** (sobre de 5): 20, 40 y 60 g, $2 a $4. Se pierden con el sedal.
 
 **Carnadas** (una por picada): larvas 30 por $4 · lombrices 20 por $5 · maíz 40 por $3 (nivel 2) · masa de pan 25 por
-$3 · pellet de trucha 30 por $6 (nivel 3). **Señuelos** (por unidad, se pierden al cortar): cucharilla giratoria #1
+$3 · pellet de trucha 30 por $6 (nivel 3) · saltamontes 20 por $6 (nivel 2) · huevas de trucha artificiales 30 por $7 (nivel 3).
+**Señuelos** (por unidad, se pierden al cortar): cucharilla giratoria #1
 3 g $8 (nivel 2) · #2 6 g $10 (nivel 3) · ondulante 8 g $10 (nivel 4) · plástico blando con cabeza 5 g $6 (nivel 4) ·
 pececito 5 cm 6 g $14 (nivel 5).
 
@@ -1134,7 +1135,7 @@ pececito 5 cm 6 g $14 (nivel 5).
 
 | Equipo | Guapucha | Carachi | Pejerrey | Capitán | Trucha arcoíris | Carpa | Trucha café |
 |---|---|---|---|---|---|---|---|
-| Flotador UL, 0.16, #12, larvas (inicial) | 0.90 | 0.94 | 1.00 | 0.40 | 0.05 | 0.05 | 0.05 |
+| Flotador UL, 0.16, #12, larvas (inicial) | 0.90 | 0.94 | 1.00 | 0.40 | 0.40 | 0.05 | 0.05 |
 | Spinning L, flúor 0.18, cucharilla #2 | 0.01 | 0.01 | 0.40 | 0.05 | **1.00** | 0.05 | 0.40 |
 | Spinning ML, flúor 0.22, pececito | 0.01 | 0.01 | 0.01 | 0.05 | 0.05 | 0.05 | **1.00** |
 | Fondo M, 0.30, #4, maíz | 0.01 | 0.00 | 0.00 | 0.05 | 0.16 | **1.00** | 0.03 |
@@ -1270,6 +1271,13 @@ sin parecerse a los reales ni a los de FP).
 - **Medición pendiente en FP:** el jugador del proyecto puede pescar una sesión en ese mapa de nivel 1 para tomar los
   números del inicio (espera hasta la picada, picadas que enganchan, duración de las peleas con peces chicos, dinero y
   XP por hora) y compararlos con D73–D75.
+
+**Referencia para la trucha (captura 20, 2026-11-18):** un lago de truchas de Fishing Planet de nivel 5 (22 especies,
+varias truchas). Su trucha arcoíris pesa de 0.5 a 2 kg lo típico y llega a 4 kg, igual que la nuestra (0.2–4 kg); tiene
+clases joven, común y trofeo, sin único. Cebos preferidos: insectos (mosca, efímeras, saltamontes) y huevas (naturales y
+artificiales); señuelos: cucharillas estrechas, giratorias pequeñas y plásticos blandos. **Ajustado:** se suman los
+saltamontes y las huevas artificiales al catálogo; la trucha arcoíris los prefiere junto con las cucharillas giratorias,
+y acepta larvas, así que con la caña inicial también pica algo (×0.4 en vez de ×0.05).
 
 ### Lo que cambia en las decisiones
 
@@ -1480,3 +1488,5 @@ cañas armadas (D65); carnadas y señuelos se gastan (D66). **Antes de E1:** fij
   ilimitada, restricciones por clase, multa). Propuesta D82 (básica del lago gratis y sin vencimiento). Por decidir.
 - **2026-11-18** · Anotado: FP no sirve de referencia para la fuerza del equipo inicial ni para la economía (es gratuito
   con pagos y recorta el equipo de inicio); de FP se toman mecánicas, ritmo y pantallas.
+- **2026-11-18** · Con un lago de truchas de Fishing Planet como referencia: saltamontes y huevas artificiales al
+  catálogo; la trucha arcoíris prefiere insectos, huevas y cucharillas giratorias, y acepta larvas.
