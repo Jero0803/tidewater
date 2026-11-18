@@ -114,6 +114,7 @@ hacia arriba (mapas de nivel más alto).
 | D58 | **Costo del viaje = un día de la licencia básica del mapa de destino:** al lago $50, a la isla $175. Bajar a un mapa fácil sale barato; subir a uno difícil, más caro | El costo sigue la escala de cada mapa | 2026-11-18 |
 | D59 | **Peces con piel ilustrada, sin cambiar de motor (revisada el 2026-11-18):** cada especie lleva una **ilustración de perfil de dominio público** (U.S. Fish and Wildlife Service, muchas de Duane Raver, en Wikimedia Commons) proyectada de lado sobre el cuerpo y las aletas de nuestro modelo, en los dos costados. La anatomía de la especie (perfil, ojo, boca, aletas, cola) se ajusta a la ilustración para que encajen. El pez hecho con código queda de respaldo para las especies sin ilustración. Créditos en `public/models/fish/skins/CREDITOS.md`. **Antes se pensó en modelos GLB de Sketchfab** (la trucha Redband de E.A.Cornell, CC-BY), pero Sketchfab no deja crear cuenta por edad; se pueden añadir más adelante si alguien con cuenta los baja | Los peces hechos con código se ven de baja calidad; las ilustraciones cubren casi todas las especies de EE. UU. y el Caribe, se bajan sin cuenta y no tienen restricciones | 2026-11-18 |
 | D60 | **Guía de peces de cada mapa, en el juego y en la portada:** una ficha por especie con su imagen, nombre común y científico, dónde pica (spots), a qué hora, licencia que pide, rango de tamaño y tu récord. En el juego es una pestaña del inventario; en la portada va dentro de Progreso. Las imágenes se sacan del propio juego (una por especie), así se ven igual en los dos lados y la portada sigue sin motor. **Todo visible desde el inicio**, también los peces que aún no pescaste | Hoy no hay forma de saber qué peces tiene un mapa ni cómo son | 2026-11-18 |
+| D61 | **Los peces pasan a modelos 3D (GLB) como camino principal (completa D59):** la prueba con la trucha arcoíris de eb78 se ve muy superior a la ilustración (volumen real, nado animado). Cada especie usa un modelo 3D libre (CC0 / CC-BY de Sketchfab; los baja el jugador del proyecto y yo los reduzco con `tools/fish/glb_slim.py`). Un modelo sin esqueleto o sin animación también sirve: el motor lo hace nadar con la misma onda que hoy dobla a los peces. Los escaneos pesados se simplifican. **Las especies sin modelo libre conservan su piel ilustrada** (guapucha, carachi, capitán por ahora). Presupuesto: 2 a 4 MB por especie, y cada mapa carga solo sus especies, cuando se necesitan | La calidad del modelo 3D es muy superior; la ilustración queda de respaldo | 2026-11-18 |
 
 ---
 
@@ -846,7 +847,22 @@ Blender.
 | G1 | Guía de peces: pestaña "Peces" en el inventario y sección en Progreso de la portada, con una imagen por especie sacada del juego (con los modelos de hoy; se renuevan al llegar los GLB) | Pendiente |
 | M1 | Prototipo con piel ilustrada: trucha café y carpa (ilustraciones del USFWS), anatomía ajustada a cada ilustración | **Hecha** (2026-11-18) |
 | M2 | Si M1 convence: ilustraciones para las demás especies del lago (trucha arcoíris, pejerrey; guapucha, capitán y carachi si hay fuente), luego las de la isla | Pendiente |
-| M3 | Prueba de modelo 3D: la trucha arcoíris "Rainbow Trout - Redband" (eb78, Sketchfab, CC-BY) en la tarjeta de captura, reducida de 22 MB a 3,4 MB (`tools/fish/glb_slim.py`); se apaga con `?fishglb=0` para comparar. Comparación en `docs/comparacion-trucha.png` | **Prueba** (2026-11-18), por decidir |
+| M3 | Prueba de modelo 3D: la trucha arcoíris "Rainbow Trout - Redband" (eb78, Sketchfab, CC-BY) en la tarjeta de captura, reducida de 22 MB a 3,4 MB (`tools/fish/glb_slim.py`); se apaga con `?fishglb=0` para comparar. Comparación en `docs/comparacion-trucha.png` | **Hecha** (2026-11-18): aprobada, ver D61 |
+| M4 | Modelo 3D completo en la tarjeta de captura y en la mano: transparencia de las aletas, nado con la onda del motor para modelos sin animación, miniaturas | Pendiente |
+| M5 | Modelos 3D en el agua: los peces que nadan usan el modelo (una malla compartida por especie, con la onda del motor; el esqueleto solo en la tarjeta) | Pendiente |
+| M6 | Modelos para el resto del lago (lista de candidatos abajo) | Pendiente |
+| M7 | Modelos para la isla | Pendiente |
+
+**Candidatos para el lago (Sketchfab, descargables, CC-BY):**
+
+| Especie | Modelo | Notas |
+|---|---|---|
+| Trucha arcoíris | Rainbow Trout - Redband (eb78 / E.A.Cornell) | En uso |
+| Trucha café | No hay libre. Opción: Bull Trout (E.A.Cornell, mismo estilo, 3 animaciones) pintada con la ilustración de la trucha café | La piel ilustrada se proyecta igual sobre un modelo 3D |
+| Carpa | Carp Fish (huykhoi2407, 7 mil caras, animada) o Common Carp (Nullifiedit, 19 mil caras) | Comparar las dos |
+| Pejerrey | Brook Silverside (MTSU Ichthyology, escaneo, 69 mil caras) | Misma familia (Atherinopsidae); hay que simplificarlo |
+| Capitán | Sin modelo parecido (los bagres libres son de otra forma) | Sigue con la piel ilustrada |
+| Guapucha, carachi | Sin modelo | Siguen con la piel ilustrada |
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -967,3 +983,5 @@ Blender.
 - **2026-11-18** · M2 avanzada: trucha arcoíris (Raver), carachi (*Orestias pentlandii*) y guapucha (Eigenmann, en
   modo tinte) con piel ilustrada; el pejerrey tiene modelo propio (para no pintar al pejerrey cabezón de la isla).
   M3: prueba del modelo 3D de la trucha arcoíris en la tarjeta de captura, para comparar con la ilustración.
+- **2026-11-18** · Decidido D61: los peces pasan a modelos 3D como camino principal; la piel ilustrada queda de
+  respaldo para las especies sin modelo libre. Plan M4 a M7 y candidatos del lago en 7f.
