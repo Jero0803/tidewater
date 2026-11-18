@@ -71,16 +71,28 @@ export const LAKE = {
 	// zone, each a count of fish. Small fish in the shallows, pejerrey schools by the pier and in open water,
 	// trout at the river mouth and in the deep, carp in the mud bay, the capitán on the bottom.
 	swimmers: [
-		{ kind: 'lakeGuapucha', groups: [ 30, 26, 24, 22, 20 ], zone: { x: - 120, z: 20, r: 260 } },
-		{ kind: 'lakeCarachi', groups: [ 8, 7, 6, 6, 5 ], zone: { x: - 200, z: 50, r: 220 } },
-		{ kind: 'lakePejerrey', groups: [ 14, 12 ], zone: { x: 55, z: 30, r: 35 } },
-		{ kind: 'lakePejerrey', groups: [ 16, 12 ], zone: { x: 60, z: 220, r: 120 } },
-		{ kind: 'lakeRainbow', groups: [ 3, 3, 2 ], zone: { x: - 720, z: 230, r: 90, band: [ 1.2, 40 ] } },
-		{ kind: 'lakeRainbow', groups: [ 3, 2 ], zone: { x: 60, z: 420, r: 140 } },
-		{ kind: 'lakeBrown', groups: [ 1, 1, 1 ], zone: { x: 0, z: 450, r: 160 } },
-		{ kind: 'lakeCarp', groups: [ 4, 3, 3 ], zone: { x: 560, z: 150, r: 90 } },
-		{ kind: 'lakeCarp', groups: [ 3 ], zone: { x: 120, z: 60, r: 60 } },
-		{ kind: 'lakeCapitan', groups: [ 1, 1, 1, 1 ], zone: { x: 200, z: 100, r: 300 } },
+		// small fish of the shallows, all around the lake (the zones overlap; each group finds water of its depth)
+		{ kind: 'lakeGuapucha', groups: [ 34, 30, 28, 26, 24, 22, 20 ], zone: { x: - 120, z: 20, r: 260 } },
+		{ kind: 'lakeGuapucha', groups: [ 30, 26, 24, 22, 20 ], zone: { x: - 520, z: 230, r: 260 } },
+		{ kind: 'lakeGuapucha', groups: [ 30, 26, 24, 20 ], zone: { x: 480, z: 140, r: 220 } },
+		{ kind: 'lakeGuapucha', groups: [ 28, 24, 22, 20 ], zone: { x: 40, z: 520, r: 700 } },
+		{ kind: 'lakeCarachi', groups: [ 9, 8, 8, 7, 6, 6, 5 ], zone: { x: - 200, z: 50, r: 240 } },
+		{ kind: 'lakeCarachi', groups: [ 8, 7, 6, 6, 5 ], zone: { x: - 520, z: 230, r: 260 } },
+		{ kind: 'lakeCarachi', groups: [ 8, 7, 6, 5 ], zone: { x: 40, z: 520, r: 700 } },
+		// pejerrey schools by the pier and in open water
+		{ kind: 'lakePejerrey', groups: [ 18, 14, 12 ], zone: { x: 55, z: 30, r: 40 } },
+		{ kind: 'lakePejerrey', groups: [ 24, 20, 18, 16 ], zone: { x: 60, z: 260, r: 200 } },
+		{ kind: 'lakePejerrey', groups: [ 22, 18, 16, 14 ], zone: { x: 40, z: 450, r: 450 } },
+		// trout at the river mouth and in the deep
+		{ kind: 'lakeRainbow', groups: [ 4, 3, 3, 3, 2 ], zone: { x: - 720, z: 230, r: 110, band: [ 1.2, 40 ] } },
+		{ kind: 'lakeRainbow', groups: [ 4, 3, 3, 2, 2 ], zone: { x: 60, z: 420, r: 300 } },
+		{ kind: 'lakeBrown', groups: [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], zone: { x: 40, z: 450, r: 400 } },
+		// carp in the mud bay and the shallow edges
+		{ kind: 'lakeCarp', groups: [ 5, 4, 4, 3, 3 ], zone: { x: 560, z: 150, r: 110 } },
+		{ kind: 'lakeCarp', groups: [ 4, 3, 3 ], zone: { x: 120, z: 60, r: 80 } },
+		{ kind: 'lakeCarp', groups: [ 4, 3, 3, 2 ], zone: { x: - 300, z: 150, r: 250 } },
+		// the capitán on the bottom
+		{ kind: 'lakeCapitan', groups: [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], zone: { x: 100, z: 200, r: 500 } },
 	],
 
 	features: { reef: false, surf: false, seabirds: true, whale: false, palms: false },
