@@ -860,14 +860,14 @@ Blender.
 |---|---|---|
 | Trucha arcoíris | Rainbow Trout - Redband (eb78, CC-BY), animado | 2,1 MB |
 | Trucha café | Doble: yamame (ffish.asia, CC0), escaneo animado | 2,4 MB |
-| Carpa | Carp (ffish.asia, CC0), escaneo animado | 4,7 MB |
-| Pejerrey | Doble: lisa, *Mugil cephalus* (ffish.asia, CC0), escaneo fijo; plateado y con dos dorsales | 6,2 MB |
+| Carpa | Carp (ffish.asia, CC0), escaneo animado, simplificado a 16 mil triángulos | 2,7 MB |
+| Pejerrey | Doble: lisa, *Mugil cephalus* (ffish.asia, CC0), escaneo fijo, simplificado a 33 mil triángulos; plateado y con dos dorsales | 3,0 MB |
 | Capitán | Doble: locha japonesa (ffish.asia, CC0), escaneo animado | 2,2 MB |
 | Guapucha | Doble: Amur minnow (ffish.asia, CC0), escaneo animado | 2,6 MB |
 | Carachi | Doble: medaka (ffish.asia, CC0), escaneo animado | 1,7 MB |
 
 Se descartó el Brook Silverside (MTSU): es un ejemplar de museo conservado, café y con las aletas maltratadas.
-**Pendiente:** simplificar las mallas pesadas (carpa y lisa) para bajar el total del lago (~22 MB).
+Los escaneos pesados se simplifican con gltf-transform (dependencia de desarrollo; pasos en `tools/fish/glb_slim.py`). Total del lago: ~17 MB.
 
 ## 8. Reglas para trabajar sin romper nada
 
@@ -995,3 +995,4 @@ Se descartó el Brook Silverside (MTSU): es un ejemplar de museo conservado, caf
 - **2026-11-18** · Las 7 especies del lago ya tienen modelo 3D en la tarjeta de captura (cinco son dobles parecidos,
   escaneos CC0 de ffish.asia). `FishModel.js` carga modelos con esqueleto y fijos; `glb_slim.py` convierte
   materiales antiguos y quita lo que no se dibuja.
+- **2026-11-18** · Instalado gltf-transform (solo desarrollo) para simplificar mallas: carpa de 4,7 a 2,7 MB, lisa de 6,2 a 3,0 MB.

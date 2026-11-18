@@ -5,6 +5,11 @@
 #  - re-encodes the kept textures as WebP (base colour up to --albedo px, the other maps up to --maps px)
 #  - repacks the binary chunk with only the data still referenced
 #   python tools/fish/glb_slim.py in.glb out.glb [--albedo 2048] [--maps 1024] [--drop Young,Foo]
+#
+# Heavy scans: simplify the mesh first with gltf-transform (dev dependency), then slim:
+#   npx gltf-transform weld in.glb welded.glb
+#   npx gltf-transform simplify welded.glb simple.glb --ratio 0.2 --error 0.004
+#   python tools/fish/glb_slim.py simple.glb public/models/fish/<species>.glb
 import io, json, struct, sys
 from PIL import Image
 
